@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Mail, ShieldCheck, Smartphone, Lock, CreditCard, ExternalLink, ChevronRight, User, Bell, Search, Settings, LogOut } from 'lucide-react';
+import { Mail, ShieldCheck, Smartphone, Lock, CreditCard, ChevronRight, Bell, Search, Settings, LogOut } from 'lucide-react';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -49,6 +49,13 @@ const Dashboard = () => {
         }
     ];
 
+    const username = localStorage.getItem('m365_user') || 'Admin';
+
+    const handleLogout = () => {
+        localStorage.removeItem('m365_user');
+        navigate('/');
+    };
+
     return (
         <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30">
             {/* Sidebar / Top Nav */}
@@ -65,21 +72,22 @@ const Dashboard = () => {
 
                 <div className="flex items-center space-x-6">
                     <div className="hidden md:flex relative">
-                        <Search className="absolute left-3 top-1/2" style={{ transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#6b7280' }} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <input
                             type="text"
                             placeholder="Search services..."
-                            className="rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none"
-                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '256px', transition: 'width 0.3s' }}
+                            className="rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none bg-white/5 border border-white/10 w-64 focus:w-80 transition-all"
                         />
                     </div>
                     <Bell className="w-5 h-5 text-gray-400 cursor-pointer hover:text-white transition-colors" />
                     <Settings className="w-5 h-5 text-gray-400 cursor-pointer hover:text-white transition-colors" />
                     <div className="flex items-center space-x-3 border-l border-white/10 pl-6 ml-2">
-                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm">SK</div>
+                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm uppercase">
+                            {username.substring(0, 2)}
+                        </div>
                         <LogOut
                             className="w-5 h-5 text-gray-400 cursor-pointer hover:text-red-400 transition-colors"
-                            onClick={() => navigate('/')}
+                            onClick={handleLogout}
                         />
                     </div>
                 </div>
@@ -92,7 +100,7 @@ const Dashboard = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-4xl font-bold mb-4"
                     >
-                        Welcome back, <span className="primary-gradient">Professional</span>
+                        Welcome back, <span className="primary-gradient capitalize">{username}</span>
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -130,7 +138,6 @@ const Dashboard = () => {
                                 <p className="text-gray-400 leading-relaxed mb-6">
                                     {service.description}
                                 </p>
-
                             </div>
                         </motion.div>
                     ))}

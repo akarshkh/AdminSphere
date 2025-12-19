@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Zap, ArrowRight, Github, Mail, Lock, User, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import { Shield, Zap, ArrowRight, Mail, Lock, User, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: '',
     email: '',
     password: ''
   });
@@ -24,10 +22,6 @@ const LandingPage = () => {
   const validateForm = () => {
     if (!formData.email || !formData.password) {
       setError('Please fill in all required fields.');
-      return false;
-    }
-    if (!isLogin && !formData.fullName) {
-      setError('Please enter your full name.');
       return false;
     }
     if (formData.password.length < 6) {
@@ -47,19 +41,14 @@ const LandingPage = () => {
     // Simulate API call
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
+      const username = formData.email.split('@')[0];
+      localStorage.setItem('m365_user', username);
       setSuccess(true);
     } catch (err) {
       setError('Authentication failed. Please try again.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const toggleMode = (e) => {
-    e.preventDefault();
-    setIsLogin(!isLogin);
-    setError('');
-    setSuccess(false);
   };
 
   if (success) {
@@ -75,8 +64,7 @@ const LandingPage = () => {
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">Welcome Back!</h2>
           <p className="text-gray-400 mb-8">
-            You have successfully {isLogin ? 'signed in' : 'created your account'}.
-            Redirecting to your dashboard...
+            You have successfully signed in. Redirecting to your dashboard...
           </p>
           <button
             onClick={() => navigate('/dashboard')}
@@ -125,28 +113,12 @@ const LandingPage = () => {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
-            <div className="flex items-start space-x-4">
-              <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                <Shield className="w-6 h-6 text-blue-400" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-white">Secure by Design</h3>
-                <p className="text-sm text-gray-500">RBAC and audit logging built-in</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-4">
-              <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                <Zap className="w-6 h-6 text-purple-400" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-white">Auto Execution</h3>
-                <p className="text-sm text-gray-500">PowerShell automation engine</p>
-              </div>
-            </div>
+            <div className="flex items-start space-x-4"></div>
+            <div className="flex items-start space-x-4"></div>
           </div>
         </motion.div>
 
-        {/* Right Side: Signup/Signin Card */}
+        {/* Right Side: Signin Card */}
         <motion.div
           layout
           initial={{ opacity: 0, y: 50 }}
@@ -157,12 +129,8 @@ const LandingPage = () => {
           <div className="absolute -top-4 -right-4 w-24 h-24 bg-blue-500/20 blur-3xl rounded-full"></div>
 
           <motion.div layout className="mb-8">
-            <h2 className="text-3xl font-bold text-white mb-2">
-              {isLogin ? 'Welcome Back' : 'Create Account'}
-            </h2>
-            <p className="text-gray-400">
-              {isLogin ? 'Sign in to continue to your dashboard' : 'Join the next generation of M365 management'}
-            </p>
+            <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+            <p className="text-gray-400">Sign in to continue to your dashboard</p>
           </motion.div>
 
           <AnimatePresence mode="wait">
@@ -180,28 +148,6 @@ const LandingPage = () => {
           </AnimatePresence>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {!isLogin && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-2"
-              >
-                <label className="text-sm font-medium text-gray-300 ml-1">Full Name</label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    placeholder="John Doe"
-                    className="pl-12"
-                    required={!isLogin}
-                  />
-                </div>
-              </motion.div>
-            )}
-
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300 ml-1">Work Email</label>
               <div className="relative">
@@ -241,48 +187,16 @@ const LandingPage = () => {
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Processing...</span>
+                  <span>Signing In...</span>
                 </>
               ) : (
                 <>
-                  <span>{isLogin ? 'Sign In' : 'Get Started'}</span>
+                  <span>Sign In</span>
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}
             </button>
-
-            <div className="relative py-2">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-800"></div>
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-[#050505] px-2 text-gray-500">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button type="button" className="btn-secondary flex items-center justify-center space-x-2">
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" />
-                </svg>
-                <span>Google</span>
-              </button>
-              <button type="button" className="btn-secondary flex items-center justify-center space-x-2">
-                <Github className="w-5 h-5" />
-                <span>GitHub</span>
-              </button>
-            </div>
           </form>
-
-          <p className="text-center text-sm text-gray-500 mt-8">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-            <button
-              onClick={toggleMode}
-              className="text-blue-400 hover:text-blue-300 font-medium underline underline-offset-4 bg-transparent border-none p-0 cursor-pointer"
-            >
-              {isLogin ? 'Sign up' : 'Sign in'}
-            </button>
-          </p>
         </motion.div>
       </div>
 
@@ -292,11 +206,7 @@ const LandingPage = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 1 }}
         className="mt-12 text-gray-600 text-sm flex space-x-6"
-      >
-        <a href="#" className="hover:text-gray-400 transition-colors">Privacy Policy</a>
-        <a href="#" className="hover:text-gray-400 transition-colors">Terms of Service</a>
-        <a href="#" className="hover:text-gray-400 transition-colors">Documentation</a>
-      </motion.div>
+      ></motion.div>
     </div>
   );
 };
