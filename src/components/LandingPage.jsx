@@ -151,14 +151,12 @@ const LandingPage = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300 ml-1">Work Email</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="name@company.com"
-                  className="pl-12"
                   required
                 />
               </div>
@@ -167,14 +165,12 @@ const LandingPage = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300 ml-1">Password</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
                   placeholder="••••••••"
-                  className="pl-12"
                   required
                 />
               </div>

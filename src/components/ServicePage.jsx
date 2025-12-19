@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Settings, RefreshCw, Filter, Download } from 'lucide-react';
+import { ArrowLeft, Settings, RefreshCw, Filter, Download, AlertCircle } from 'lucide-react';
 
 const ServicePage = () => {
     const { serviceId } = useParams();
@@ -16,6 +16,15 @@ const ServicePage = () => {
     };
 
     const name = serviceNames[serviceId] || 'Service Module';
+
+    const isExchange = serviceId === 'exchange';
+    const stats = isExchange ? [] : [
+        { label: 'Total Resources', value: '1,242', trend: '+12%' },
+        { label: 'Active Sessions', value: '842', trend: '+5%' },
+        { label: 'Security Alerts', value: '3', trend: '-2%', color: 'text-red-400' }
+    ];
+
+    const reports = isExchange ? [] : [1, 2, 3, 4, 5];
 
     return (
         <div className="min-h-screen bg-[#050505] text-white">
@@ -50,16 +59,20 @@ const ServicePage = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
                 >
-                    {[1, 2, 3].map((i) => (
+                    {stats.length > 0 ? stats.map((stat, i) => (
                         <div key={i} className="glass p-6">
-                            <p className="text-gray-400 text-sm mb-1">Total Resources</p>
-                            <p className="text-3xl font-bold">1,{i * 242}</p>
-                            <div className="mt-4 flex items-center text-xs text-green-400">
-                                <span className="font-bold">+12%</span>
+                            <p className="text-gray-400 text-sm mb-1">{stat.label}</p>
+                            <p className="text-3xl font-bold">{stat.value}</p>
+                            <div className={`mt-4 flex items-center text-xs ${stat.color || 'text-green-400'}`}>
+                                <span className="font-bold">{stat.trend}</span>
                                 <span className="ml-2 text-gray-500 text-[10px] uppercase tracking-wider">vs last month</span>
                             </div>
                         </div>
-                    ))}
+                    )) : (
+                        <div className="md:col-span-3 glass p-12 text-center border-dashed">
+                            <p className="text-gray-500">No telemetry data available for this module yet.</p>
+                        </div>
+                    )}
                 </motion.div>
 
                 <div className="glass p-8">
@@ -91,7 +104,7 @@ const ServicePage = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5 text-sm">
-                                {[1, 2, 3, 4, 5].map((i) => (
+                                {reports.length > 0 ? reports.map((i) => (
                                     <tr key={i} className="hover:bg-white/5 transition-colors">
                                         <td className="py-4">
                                             <div className="flex items-center space-x-3">
@@ -107,9 +120,18 @@ const ServicePage = () => {
                                             </span>
                                         </td>
                                         <td className="py-4 text-gray-400">Policy modification detected</td>
-                                        <td className="py-4 text-gray-500">2h ago</td>
+                                        <td className="py-4 text-gray-500">{i}h ago</td>
                                     </tr>
-                                ))}
+                                )) : (
+                                    <tr>
+                                        <td colSpan="4" className="py-20 text-center">
+                                            <div className="flex flex-col items-center space-y-4">
+                                                <AlertCircle className="w-12 h-12 text-gray-600" />
+                                                <div className="text-gray-500 italic">No reports found for the selected module.</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Mail, ShieldCheck, Smartphone, Lock, CreditCard, ChevronRight, Bell, Search, Settings, LogOut } from 'lucide-react';
+import { Mail, ShieldCheck, Smartphone, Lock, CreditCard, ChevronRight, Bell, Settings, LogOut } from 'lucide-react';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -71,12 +71,11 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex items-center space-x-6">
-                    <div className="hidden md:flex relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <div className="hidden md:flex relative items-center">
                         <input
                             type="text"
                             placeholder="Search services..."
-                            className="rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none bg-white/5 border border-white/10 w-64 focus:w-80 transition-all"
+                            className="rounded-full py-2.5 px-6 text-sm focus:outline-none bg-white/5 border border-white/10 w-64 focus:w-80 transition-all"
                         />
                     </div>
                     <Bell className="w-5 h-5 text-gray-400 cursor-pointer hover:text-white transition-colors" />
