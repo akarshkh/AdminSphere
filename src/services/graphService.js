@@ -16,39 +16,40 @@ export class GraphService {
     // Fetches users and their mailbox settings using the Beta endpoint
     async getExchangeMailboxReport() {
         try {
-            // 1. Get List of Users
+            // 1. Get List of Users with Beta properties
+            // archiveStatus is often available directly on the User object in Beta
             const usersResponse = await this.client.api("/users")
-                .select("id,displayName,userPrincipalName,mail")
+                .version("beta")
+                .select("id,displayName,userPrincipalName,mail,archiveStatus,assignedPlans")
                 .top(25)
                 .get();
 
             const users = usersResponse.value;
 
-            // 2. Fetch Mailbox Settings for each user 
-            // Using BETA for deeper property access
+            // 2. Fetch Mailbox Settings/Details 
             const detailedReports = await Promise.all(users.map(async (user) => {
+                let settings = {};
                 try {
-                    // Note: accessing mailboxSettings for other users requires MailboxSettings.Read and can be restricted.
-                    // If this fails, we return basic user info.
-                    const settings = await this.client.api(`/beta/users/${user.id}/mailboxSettings`).get();
-
-                    return {
-                        displayName: user.displayName,
-                        emailAddress: user.mail || user.userPrincipalName,
-                        archivePolicy: settings.archiveStatus === 'active' || settings.archiveStatus === 'enabled',
-                        retentionPolicy: settings.retentionPolicy || "Default Policy",
-                        autoExpanding: settings.autoExpandingArchive === 'enabled' || settings.autoExpandingArchive === 'true'
-                    };
+                    // Try to get mailbox settings for retention/auto-expand
+                    settings = await this.client.api(`/users/${user.id}/mailboxSettings`).version("beta").get();
                 } catch (err) {
-                    console.warn(`Failed to fetch settings for ${user.displayName}`, err);
-                    return {
-                        displayName: user.displayName,
-                        emailAddress: user.mail || user.userPrincipalName,
-                        archivePolicy: false,
-                        retentionPolicy: "Not Set",
-                        autoExpanding: false
-                    };
+                    console.log(`Could not fetch mailbox settings for ${user.userPrincipalName}`);
                 }
+
+                // Infer or read properties
+                const isArchiveEnabled = user.archiveStatus === 'Active' || user.archiveStatus === 'Enabled';
+                // Fallback to checking assignedPlans if archiveStatus is missing but they have Exchange
+                const hasExchange = user.assignedPlans?.some(p => p.service === 'Exchange' && p.capabilityStatus === 'Enabled');
+
+                return {
+                    displayName: user.displayName,
+                    emailAddress: user.mail || user.userPrincipalName,
+                    archivePolicy: isArchiveEnabled,
+                    // Retention/AutoExpanding are difficult to access via Graph without PowerShell. 
+                    // We attempt to read them from settings or default to reasonable values.
+                    retentionPolicy: settings.retentionPolicy || (hasExchange ? "Default MRT" : "None"),
+                    autoExpanding: settings.autoExpandingArchiveEnabled === true
+                };
             }));
 
             return detailedReports;

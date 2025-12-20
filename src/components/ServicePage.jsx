@@ -91,20 +91,6 @@ const ServicePage = () => {
                         </button>
                         <h1 className="text-2xl font-bold font-['Outfit']">{name}</h1>
                     </div>
-
-                    <div className="flex items-center space-x-4">
-                        <button
-                            onClick={fetchData}
-                            className="flex items-center space-x-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all text-sm font-medium"
-                        >
-                            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                            <span>Refresh</span>
-                        </button>
-                        <button className="flex items-center space-x-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all text-sm font-medium">
-                            <Settings className="w-4 h-4" />
-                            <span>Configure</span>
-                        </button>
-                    </div>
                 </div>
             </header>
 
@@ -133,82 +119,60 @@ const ServicePage = () => {
                     ))}
                 </motion.div>
 
-                <div className="glass p-8">
-                    <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-xl font-bold">
-                            {isExchange ? 'Exchange Mailbox Report' : 'Latest Reports'}
-                        </h3>
-                        <div className="flex items-center space-x-3">
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Search here"
-                                    value={filterText}
-                                    onChange={(e) => setFilterText(e.target.value)}
-                                    className="bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-sm focus:outline-none focus:border-blue-500/50"
-                                />
-                            </div>
-                            <button className="p-2 hover:bg-white/10 rounded-lg border border-white/10">
-                                <Download className="w-4 h-4" />
+                <div className="glass p-8 relative min-h-[400px] flex items-center justify-center">
+                    {isExchange ? (
+                        <div className="text-center space-y-4">
+                            <h3 className="text-2xl font-bold">Exchange Mailbox Report</h3>
+                            <p className="text-gray-400 max-w-md mx-auto">
+                                View detailed statistics about user mailboxes, archive status, retention policies, and more.
+                            </p>
+                            <button
+                                onClick={() => navigate('/service/exchange/report')}
+                                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold transition-all flex items-center space-x-2 mx-auto"
+                            >
+                                <span>View Mailbox Report</span>
+
                             </button>
                         </div>
-                    </div>
-
-                    <div className="overflow-x-auto min-h-[300px]">
-                        {loading ? (
-                            <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                                <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-                                <p className="text-gray-400 animate-pulse">Fetching Real-time Telemetry...</p>
+                    ) : (
+                        <div className="w-full">
+                            <div className="flex items-center justify-between mb-8">
+                                <h3 className="text-xl font-bold">Latest Reports</h3>
+                                <div className="flex items-center space-x-3">
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="Search here"
+                                            value={filterText}
+                                            onChange={(e) => setFilterText(e.target.value)}
+                                            className="bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-sm focus:outline-none focus:border-blue-500/50"
+                                        />
+                                    </div>
+                                    <button className="p-2 hover:bg-white/10 rounded-lg border border-white/10">
+                                        <Download className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
-                        ) : (
-                            <table className="w-full text-left">
-                                <thead>
-                                    <tr className="border-b border-white/10 text-gray-400 text-sm uppercase tracking-wider">
-                                        {isExchange ? (
-                                            <>
-                                                <th className="pb-4 font-semibold px-4">Display Name</th>
-                                                <th className="pb-4 font-semibold px-4">Email Address</th>
-                                                <th className="pb-4 font-semibold px-4 text-center">Archive Policy</th>
-                                                <th className="pb-4 font-semibold px-4">Retention Policy</th>
-                                                <th className="pb-4 font-semibold px-4 text-center">Auto Expanding</th>
-                                            </>
-                                        ) : (
-                                            <>
+
+                            <div className="overflow-x-auto min-h-[300px]">
+                                {loading ? (
+                                    <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                                        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+                                        <p className="text-gray-400 animate-pulse">Fetching Real-time Telemetry...</p>
+                                    </div>
+                                ) : (
+                                    <table className="w-full text-left">
+                                        <thead>
+                                            <tr className="border-b border-white/10 text-gray-400 text-sm uppercase tracking-wider">
                                                 <th className="pb-4 font-semibold">User / Resource</th>
                                                 <th className="pb-4 font-semibold">Status</th>
                                                 <th className="pb-4 font-semibold">Activity</th>
                                                 <th className="pb-4 font-semibold">Time</th>
-                                            </>
-                                        )}
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-white/5 text-sm">
-                                    {filteredData.length > 0 ? filteredData.map((report, i) => (
-                                        <tr key={i} className="hover:bg-white/5 transition-colors">
-                                            {isExchange ? (
-                                                <>
-                                                    <td className="py-4 px-4 font-medium text-white/90">{report.displayName}</td>
-                                                    <td className="py-4 px-4 text-gray-400">{report.emailAddress}</td>
-                                                    <td className="py-4 px-4 text-center">
-                                                        {report.archivePolicy ?
-                                                            <span className="inline-flex items-center space-x-1 text-green-400 bg-green-400/10 px-2 py-1 rounded-md text-[10px] font-bold border border-green-400/20">
-                                                                <CheckCircle2 className="w-3 h-3" /> <span>ENABLED</span>
-                                                            </span> :
-                                                            <span className="inline-flex items-center space-x-1 text-gray-500 bg-gray-500/10 px-2 py-1 rounded-md text-[10px] font-bold border border-gray-500/20">
-                                                                <XCircle className="w-3 h-3" /> <span>DISABLED</span>
-                                                            </span>
-                                                        }
-                                                    </td>
-                                                    <td className="py-4 px-4 text-gray-300 italic">{report.retentionPolicy}</td>
-                                                    <td className="py-4 px-4 text-center">
-                                                        {report.autoExpanding ?
-                                                            <span className="text-blue-400 bg-blue-400/10 px-2 py-1 rounded-md text-[10px] font-bold border border-blue-400/20">YES</span> :
-                                                            <span className="text-gray-500 bg-gray-500/10 px-2 py-1 rounded-md text-[10px] font-bold border border-gray-500/20">NO</span>
-                                                        }
-                                                    </td>
-                                                </>
-                                            ) : (
-                                                <>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5 text-sm">
+                                            {filteredData.length > 0 ? filteredData.map((report, i) => (
+                                                <tr key={i} className="hover:bg-white/5 transition-colors">
                                                     <td className="py-4">
                                                         <div className="flex items-center space-x-3">
                                                             <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">
@@ -224,23 +188,23 @@ const ServicePage = () => {
                                                     </td>
                                                     <td className="py-4 text-gray-400">Policy modification detected</td>
                                                     <td className="py-4 text-gray-500">{report}h ago</td>
-                                                </>
+                                                </tr>
+                                            )) : (
+                                                <tr>
+                                                    <td colSpan="4" className="py-20 text-center">
+                                                        <div className="flex flex-col items-center space-y-4">
+                                                            <AlertCircle className="w-12 h-12 text-gray-600" />
+                                                            <div className="text-gray-500 italic">No real-time data found. Ensure Graph API permissions are granted.</div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
                                             )}
-                                        </tr>
-                                    )) : (
-                                        <tr>
-                                            <td colSpan={isExchange ? "5" : "4"} className="py-20 text-center">
-                                                <div className="flex flex-col items-center space-y-4">
-                                                    <AlertCircle className="w-12 h-12 text-gray-600" />
-                                                    <div className="text-gray-500 italic">No real-time data found. Ensure Graph API permissions are granted.</div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        )}
-                    </div>
+                                        </tbody>
+                                    </table>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
         </div>
