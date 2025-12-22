@@ -2,6 +2,7 @@ import { Client } from "@microsoft/microsoft-graph-client";
 
 export class GraphService {
     constructor(accessToken) {
+        this.accessToken = accessToken; // Store for fetch-based report calls
         this.client = Client.init({
             authProvider: (done) => {
                 done(null, accessToken);
@@ -13,62 +14,145 @@ export class GraphService {
         return await this.client.api("/me").get();
     }
 
+    /**
+     * Checks if a specific user's "Online Archive Mailbox" is enabled using the Reports API.
+     * Handles the 302 redirect logic as required by the Reports endpoint.
+     * @param {string} userPrincipalName - The email address of the user.
+     * @returns {Promise<boolean>} - True if archive is enabled.
+     */
+    async getArchiveStatusReport(userPrincipalName) {
+        try {
+            // Switch to beta endpoint as v1.0 does not support JSON format query parameter ($format)
+            const reportUrl = "https://graph.microsoft.com/beta/reports/getMailboxUsageDetail(period='D7')?$format=application/json";
+
+            // Step 1: Request from Graph with the Authorization: Bearer <token> header.
+            const response = await fetch(reportUrl, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${this.accessToken}`
+                },
+                redirect: "manual"
+            });
+
+            let data;
+            // Step 2: Handle the 302 Redirect (Location URL without Auth header)
+            if (response.status === 302 || response.status === 301) {
+                const redirectUrl = response.headers.get("Location");
+                const dataResponse = await fetch(redirectUrl);
+                if (!dataResponse.ok) throw new Error(`Report fetch failed: ${dataResponse.status}`);
+                data = await dataResponse.json();
+            } else if (response.ok) {
+                data = await response.json();
+            } else {
+                if (response.status === 401) throw new Error("Unauthorized - Check Access Token");
+                if (response.status === 403) throw new Error("Forbidden - Reports.Read.All required");
+                throw new Error(`Graph API returned ${response.status}`);
+            }
+
+            // Step 3: Filter logic
+            const userReport = data.value?.find(u =>
+                u.userPrincipalName.toLowerCase() === userPrincipalName.toLowerCase()
+            );
+
+            if (!userReport) {
+                throw new Error(`User ${userPrincipalName} not found in mailbox usage reports (Check if user has an active mailbox).`);
+            }
+
+            return userReport.isArchiveEnabled;
+        } catch (error) {
+            console.error("getArchiveStatusReport Error:", error);
+            throw error;
+        }
+    }
+
     // Fetches users and their mailbox settings using the Beta endpoint
     async getExchangeMailboxReport() {
         try {
             // 1. Get List of Users with Beta properties
-            // archiveStatus is often available directly on the User object in Beta
+            // archiveStatus and userType (to filter guest settings) are available in Beta
             const usersResponse = await this.client.api("/users")
                 .version("beta")
-                .select("id,displayName,userPrincipalName,mail,archiveStatus,assignedPlans,onPremisesSyncEnabled")
-                .top(25)
+                .select("id,displayName,userPrincipalName,mail,archiveStatus,assignedPlans,onPremisesSyncEnabled,userType")
+                .top(100)
                 .get();
 
             const users = usersResponse.value;
 
-            // 2. Fetch Mailbox Settings/Details 
-            const detailedReports = await Promise.all(users.map(async (user) => {
-                let settings = {};
-                try {
-                    // Try to get mailbox settings for retention/auto-expand
-                    settings = await this.client.api(`/users/${user.id}/mailboxSettings`).version("beta").get();
-                } catch (err) {
-                    console.log(`Could not fetch mailbox settings for ${user.userPrincipalName}`);
+            // 2. Fetch Report Data once for Archive Status (as requested)
+            let usageReport = [];
+            try {
+                // Switch to beta for JSON support
+                const reportUrl = "https://graph.microsoft.com/beta/reports/getMailboxUsageDetail(period='D7')?$format=application/json";
+                const resp = await fetch(reportUrl, {
+                    headers: { "Authorization": `Bearer ${this.accessToken}` },
+                    redirect: "follow" // Browser fetch automatically strips Auth header for different domains (S3/Blob)
+                });
+
+                if (resp.ok) {
+                    const json = await resp.json();
+                    usageReport = json.value || [];
+                } else if (resp.status === 302 || resp.status === 301) {
+                    // Fallback for manual redirect handling if 'follow' fails for some reason
+                    const location = resp.headers.get("Location");
+                    if (location) {
+                        const dr = await fetch(location);
+                        if (dr.ok) {
+                            const json = await dr.json();
+                            usageReport = json.value || [];
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn("Usage report fetch failed:", e.message);
+            }
+
+            // 3. Map Report Data
+            let isConcealed = false;
+            const detailedReports = users.map((user) => {
+                const upn = user.userPrincipalName.toLowerCase();
+                const reportInfo = usageReport.find(r => r.userPrincipalName?.toLowerCase() === upn);
+
+                // Check if the report data is hashed/concealed (hexadecimal string without @)
+                if (usageReport.length > 0 && !isConcealed) {
+                    const firstUPN = usageReport[0].userPrincipalName;
+                    if (firstUPN && /^[A-F0-9]+$/.test(firstUPN)) {
+                        isConcealed = true;
+                    }
                 }
 
-                // Infer or read properties
-                const isArchiveEnabled = user.archiveStatus === 'Active' || user.archiveStatus === 'Enabled';
-                // Fallback to checking assignedPlans if archiveStatus is missing but they have Exchange
+                // Archive logic: Trust report first (hasArchive), fallback to User object 'archiveStatus'
+                const isArchiveEnabled = (reportInfo && reportInfo.hasArchive !== undefined) ?
+                    reportInfo.hasArchive :
+                    (user.archiveStatus && user.archiveStatus.toLowerCase() === 'active');
+
                 const hasExchange = user.assignedPlans?.some(p => p.service === 'Exchange' && p.capabilityStatus === 'Enabled');
-
-                // Estimate Mailbox Size based on Plan (Mock logic for demo)
-                let mailboxQuota = "50 GB"; // Default E1/Business
-                const planName = user.assignedPlans?.find(p => p.service === 'Exchange')?.servicePlanId;
-                // Simple heuristic: If plan ID starts with generic values or known GUIDs (mocking checks)
-                // In a real app, we'd map ServicePlanId GUIDs to Names.
-
-                // Determine Migration Status
                 const isSynced = user.onPremisesSyncEnabled === true;
-                const migrationStatus = isSynced ? "Migrated" : "Cloud Native";
 
-                // Mock Data Migrated (Random for demo, as real data requires MigrationBatch API)
-                const dataMigrated = isSynced ? (Math.floor(Math.random() * 45) + 5) + " GB" : "N/A";
+                // Safely format bytes to GB
+                const formatGB = (bytes) => (bytes ? (bytes / 1073741824).toFixed(2) : "0.00");
+                const quotaGB = (bytes) => (bytes ? (bytes / 1073741824).toFixed(0) : "0");
+
+                // Get Quota - prefer prohibitSendReceiveQuotaInBytes from report
+                const quotaBytes = reportInfo?.prohibitSendReceiveQuotaInBytes || reportInfo?.archiveQuotaInBytes;
 
                 return {
                     displayName: user.displayName,
                     emailAddress: user.mail || user.userPrincipalName,
                     archivePolicy: isArchiveEnabled,
-                    // Retention/AutoExpanding are difficult to access via Graph without PowerShell. 
-                    // We attempt to read them from settings or default to reasonable values.
-                    retentionPolicy: settings.retentionPolicy || (hasExchange ? "Default MRT" : "None"),
-                    autoExpanding: settings.autoExpandingArchiveEnabled === true,
-                    mailboxSize: mailboxQuota,
-                    migrationStatus: migrationStatus,
-                    dataMigrated: dataMigrated
+                    retentionPolicy: reportInfo?.retentionPolicy || (reportInfo ? "Applied" : (isArchiveEnabled ? "See PowerShell" : (hasExchange ? "Default MRT" : "None"))),
+                    autoExpanding: "N/A (PowerShell)",
+                    mailboxSize: reportInfo ?
+                        `${formatGB(reportInfo.storageUsedInBytes)} GB / ${quotaGB(quotaBytes)} GB` :
+                        (hasExchange ? "No usage data" : "No Mailbox"),
+                    migrationStatus: isSynced ? "Migrated" : "Cloud Native",
+                    dataMigrated: reportInfo ? `${formatGB(reportInfo.storageUsedInBytes)} GB` : "N/A"
                 };
-            }));
+            });
 
-            return detailedReports;
+            return {
+                reports: detailedReports,
+                isConcealed: isConcealed
+            };
         } catch (error) {
             console.error("Graph API Error:", error);
             throw error;

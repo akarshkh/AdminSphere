@@ -47,6 +47,7 @@ const ExchangeReport = () => {
     const [error, setError] = useState(null);
     const [selectedUsers, setSelectedUsers] = useState(new Set());
     const [isRunningMFA, setIsRunningMFA] = useState(false);
+    const [isConcealed, setIsConcealed] = useState(false);
 
     const toggleUserSelection = (email) => {
         const newSelection = new Set(selectedUsers);
@@ -185,14 +186,17 @@ const ExchangeReport = () => {
         setLoading(true);
         setError(null);
         try {
+            if (accounts.length === 0) return;
+
             const response = await instance.acquireTokenSilent({
                 ...loginRequest,
                 account: accounts[0]
             });
 
             const graphService = new GraphService(response.accessToken);
-            const data = await graphService.getExchangeMailboxReport();
-            setReportData(data);
+            const { reports, isConcealed: concealedFlag } = await graphService.getExchangeMailboxReport();
+            setReportData(reports);
+            setIsConcealed(concealedFlag);
         } catch (err) {
             console.error("Data Fetch Error:", err);
             setError("Failed to fetch real-time data from Microsoft Graph. Please check permissions.");
@@ -203,11 +207,13 @@ const ExchangeReport = () => {
     };
 
     useEffect(() => {
-        fetchData();
+        if (accounts.length > 0) {
+            fetchData();
+        }
     }, [instance, accounts]);
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white">
+        <div className="min-h-screen bg-[#050505] text-white font-['Inter']">
             <header className="glass sticky top-0 z-40 rounded-none border-x-0 border-t-0 bg-black/40 backdrop-blur-xl px-8 py-6">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center space-x-6">
@@ -233,6 +239,29 @@ const ExchangeReport = () => {
             </header>
 
             <main className="max-w-7xl mx-auto p-8">
+                {isConcealed && (
+                    <div className="mb-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start space-x-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                        <div className="p-3 bg-amber-500/20 rounded-xl text-amber-400">
+                            <Shield className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="text-amber-200 font-bold mb-1">M365 Privacy Settings Detected</h4>
+                            <p className="text-amber-200/70 text-sm leading-relaxed mb-4">
+                                Microsoft is concealing user identity in report telemetry. This prevents the portal from matching usage data (Mailbox Size, Archive Status) to specific users.
+                            </p>
+                            <div className="space-y-2 text-xs bg-black/40 p-4 rounded-xl border border-white/5">
+                                <p className="font-bold text-amber-100 uppercase tracking-widest">To Fix This:</p>
+                                <ol className="list-decimal list-inside space-y-1 text-amber-100/60">
+                                    <li>Open <b>M365 Admin Center</b> &gt; <b>Settings</b> &gt; <b>Org Settings</b>.</li>
+                                    <li>Select <b>Reports</b>.</li>
+                                    <li>Uncheck <b>"Display concealed user, group, and site names in all reports"</b>.</li>
+                                    <li>Click <b>Save</b> and refresh this page.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {error && (
                     <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center space-x-3 text-red-400">
                         <AlertCircle className="w-6 h-6" />
@@ -372,15 +401,12 @@ const ExchangeReport = () => {
                                             </td>
                                             <td className="py-4 px-4 text-gray-300 italic">{report.retentionPolicy}</td>
                                             <td className="py-4 px-4 text-center">
-                                                {report.autoExpanding ?
-                                                    <span className="text-blue-400 bg-blue-400/10 px-2 py-1 rounded-md text-[10px] font-bold border border-blue-400/20">YES</span> :
-                                                    <span className="text-gray-500 bg-gray-500/10 px-2 py-1 rounded-md text-[10px] font-bold border border-gray-500/20">NO</span>
-                                                }
+                                                <span className="text-gray-500 bg-gray-500/10 px-2 py-1 rounded-md text-[10px] font-bold border border-gray-500/20">N/A*</span>
                                             </td>
                                         </tr>
                                     )) : (
                                         <tr>
-                                            <td colSpan="5" className="py-20 text-center">
+                                            <td colSpan="9" className="py-20 text-center">
                                                 <div className="flex flex-col items-center space-y-4">
                                                     <AlertCircle className="w-12 h-12 text-gray-600" />
                                                     <div className="text-gray-500 italic">No matching data found.</div>

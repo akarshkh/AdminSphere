@@ -43,6 +43,8 @@ const ServicePage = () => {
         setLoading(true);
         setError(null);
         try {
+            if (accounts.length === 0) return;
+
             const response = await instance.acquireTokenSilent({
                 ...loginRequest,
                 account: accounts[0]
@@ -51,8 +53,8 @@ const ServicePage = () => {
             const graphService = new GraphService(response.accessToken);
 
             if (isExchange) {
-                const data = await graphService.getExchangeMailboxReport();
-                setReportData(data);
+                const { reports } = await graphService.getExchangeMailboxReport();
+                setReportData(reports);
             } else if (isLicensing) {
                 const { skus, users } = await graphService.getLicensingData();
                 setLicensingSummary(skus);
@@ -84,7 +86,9 @@ const ServicePage = () => {
     };
 
     useEffect(() => {
-        fetchData();
+        if (accounts.length > 0) {
+            fetchData();
+        }
     }, [serviceId, instance, accounts]);
 
     let stats = [];

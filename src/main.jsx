@@ -8,10 +8,13 @@ import App from './App.jsx'
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <MsalProvider instance={msalInstance}>
-      <App />
-    </MsalProvider>
-  </StrictMode>,
-)
+// Initialize MSAL before rendering
+msalInstance.initialize().then(() => {
+  createRoot(document.getElementById('root')).render(
+    <StrictMode>
+      <MsalProvider instance={msalInstance}>
+        <App />
+      </MsalProvider>
+    </StrictMode>,
+  );
+});
