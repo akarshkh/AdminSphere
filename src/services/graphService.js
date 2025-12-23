@@ -72,7 +72,7 @@ export class GraphService {
             // archiveStatus and userType (to filter guest settings) are available in Beta
             const usersResponse = await this.client.api("/users")
                 .version("beta")
-                .select("id,displayName,userPrincipalName,mail,archiveStatus,assignedPlans,onPremisesSyncEnabled,userType")
+                .select("id,displayName,userPrincipalName,mail,archiveStatus,assignedPlans,onPremisesSyncEnabled,userType,createdDateTime")
                 .top(100)
                 .get();
 
@@ -145,7 +145,8 @@ export class GraphService {
                         `${formatGB(reportInfo.storageUsedInBytes)} GB / ${quotaGB(quotaBytes)} GB` :
                         (hasExchange ? "No usage data" : "No Mailbox"),
                     migrationStatus: isSynced ? "Migrated" : "Cloud Native",
-                    dataMigrated: reportInfo ? `${formatGB(reportInfo.storageUsedInBytes)} GB` : "N/A"
+                    dataMigrated: reportInfo ? `${formatGB(reportInfo.storageUsedInBytes)} GB` : "N/A",
+                    createdDate: reportInfo?.createdDate || (user.createdDateTime ? user.createdDateTime.substring(0, 10) : "N.A.")
                 };
             });
 
