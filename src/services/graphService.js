@@ -158,6 +158,80 @@ export class GraphService {
             throw error;
         }
     }
+    /**
+     * Fetches email activity report for the last 7 days.
+     * Returns user-level details on send/receive counts.
+     */
+    async getEmailActivityUserDetail(period = 'D7') {
+        try {
+            // Using Beta endpoint for JSON format support
+            const reportUrl = `https://graph.microsoft.com/beta/reports/getEmailActivityUserDetail(period='${period}')?$format=application/json`;
+            const response = await fetch(reportUrl, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${this.accessToken}`
+                },
+                redirect: "manual"
+            });
+
+            let data = [];
+            if (response.status === 302 || response.status === 301) {
+                const redirectUrl = response.headers.get("Location");
+                if (redirectUrl) {
+                    const dataResponse = await fetch(redirectUrl);
+                    if (dataResponse.ok) {
+                        const json = await dataResponse.json();
+                        data = json.value || [];
+                    }
+                }
+            } else if (response.ok) {
+                const json = await response.json();
+                data = json.value || [];
+            } else {
+                console.warn(`Email activity fetch returned status: ${response.status}`);
+            }
+
+            return data;
+        } catch (error) {
+            console.error("getEmailActivityUserDetail Error:", error);
+            // Return empty array instead of throwing to prevent blocking other dashboard data
+            return [];
+        }
+    }
+
+    /**
+     * Fetches daily email activity counts (aggregates).
+     */
+    async getEmailActivityCounts(period = 'D7') {
+        try {
+            const reportUrl = `https://graph.microsoft.com/beta/reports/getEmailActivityCounts(period='${period}')?$format=application/json`;
+            const response = await fetch(reportUrl, {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${this.accessToken}` },
+                redirect: "manual"
+            });
+
+            let data = [];
+            if (response.status === 302 || response.status === 301) {
+                const redirectUrl = response.headers.get("Location");
+                if (redirectUrl) {
+                    const r = await fetch(redirectUrl);
+                    if (r.ok) {
+                        const json = await r.json();
+                        data = json.value || [];
+                    }
+                }
+            } else if (response.ok) {
+                const json = await response.json();
+                data = json.value || [];
+            }
+            return data;
+        } catch (error) {
+            console.error("getEmailActivityCounts Error:", error);
+            return [];
+        }
+    }
+
     async getLicensingData() {
         try {
             // 1. Get Subscribed SKUs (Tenant level licenses)
@@ -177,6 +251,24 @@ export class GraphService {
             return { skus, users };
         } catch (error) {
             console.error("Graph API Error (Licensing):", error);
+            throw error;
+        }
+    }
+    async getDomains() {
+        try {
+            const response = await this.client.api("/domains").get();
+            return response.value || [];
+        } catch (error) {
+            console.error("Graph API Error (Domains):", error);
+            throw error;
+        }
+    }
+    async getGroups() {
+        try {
+            const response = await this.client.api("/groups").get();
+            return response.value || [];
+        } catch (error) {
+            console.error("Graph API Error (Groups):", error);
             throw error;
         }
     }

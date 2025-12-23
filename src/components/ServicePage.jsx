@@ -4,15 +4,19 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 
-const ServicePage = () => {
-    const { serviceId } = useParams();
+const ServicePage = ({ serviceId: propServiceId }) => {
+    const params = useParams();
+    const serviceId = propServiceId || params.serviceId;
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
 
     const [reportData, setReportData] = useState([]);
     const [exchangeData, setExchangeData] = useState([]);
+    const [domainsCount, setDomainsCount] = useState(0);
+    const [groupsCount, setGroupsCount] = useState(0);
+    const [emailActivity, setEmailActivity] = useState({ sent: 0, received: 0 });
     const [filterText, setFilterText] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -67,16 +71,35 @@ const ServicePage = () => {
                     graphService.getExchangeMailboxReport().catch(() => ({ reports: [] })),
                     graphService.getLicensingData().catch(() => ({ skus: [], users: [] }))
                 ]);
-                
+
                 setExchangeData(exchangeResult.reports || []);
-                
+
                 const { skus, users } = licensingResult;
                 setLicensingSummary(skus || []);
-                
+
+                // Fetch Email Activity - Get Counts for last 7 days (Graph API standard)
+                graphService.getEmailActivityCounts('D7').then(activity => {
+                    const sent = activity.reduce((acc, curr) => acc + (parseInt(curr.send) || 0), 0);
+                    const received = activity.reduce((acc, curr) => acc + (parseInt(curr.receive) || 0), 0);
+                    setEmailActivity({ sent, received });
+                });
+
+                // Fetch Domains Count
+                graphService.getDomains().then(domains => {
+                    setDomainsCount(domains.length);
+                });
+
+                // Fetch Groups Count
+                graphService.getGroups().then(groups => {
+                    setGroupsCount(groups.length);
+                });
+
+                // Process licensing users for the table
+
                 // Process licensing users for the table
                 const skuMap = new Map();
                 (skus || []).forEach(sku => skuMap.set(sku.skuId, sku.skuPartNumber));
-                
+
                 const processedUsers = (users || []).map(user => ({
                     displayName: user.displayName,
                     emailAddress: user.userPrincipalName,
@@ -127,8 +150,11 @@ const ServicePage = () => {
         const assignedSeats = licensingSummary.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0);
         stats = [
             { label: 'Total Mailboxes', value: exchangeData.length.toString(), trend: 'Real-time' },
-            { label: 'Total Licenses', value: totalSeats.toLocaleString(), trend: 'Capacity' },
-            { label: 'Licenses Used', value: assignedSeats.toLocaleString(), trend: totalSeats > 0 ? Math.round((assignedSeats / totalSeats) * 100) + '%' : '0%', color: 'text-blue-400' }
+            { label: 'Emails Sent (7d)', value: emailActivity.sent.toLocaleString(), trend: 'Activity*', color: 'text-purple-400' },
+            { label: 'Emails Received (7d)', value: emailActivity.received.toLocaleString(), trend: 'Activity*', color: 'text-blue-400' },
+            { label: 'Licenses Used', value: assignedSeats.toLocaleString(), trend: totalSeats > 0 ? Math.round((assignedSeats / totalSeats) * 100) + '%' : '0%', color: 'text-orange-400', path: '/service/admin/licenses' },
+            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/admin/groups', color: 'text-indigo-400' },
+            { label: 'Domains', value: domainsCount.toString(), trend: 'Manage', path: '/service/admin/domains', color: 'text-green-400' }
         ];
     } else if (isLicensing) {
         // Calculate license stats
@@ -198,26 +224,15 @@ const ServicePage = () => {
 
     return (
         <div className="min-h-screen bg-[#050505] text-white">
-            <header className="glass fixed top-0 left-0 right-0 z-50 h-20 rounded-none border-x-0 border-t-0 bg-black/50 backdrop-blur-2xl px-8 shadow-lg border-b border-white/10 flex items-center">
-                <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <button
-                            onClick={() => navigate('/dashboard')}
-                            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                        <div>
-                            <h1 className="text-xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight">
-                                {name}
-                            </h1>
-                            <p className="text-xs text-gray-400 leading-tight">Manage and monitor resources</p>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            {/* Header removed as it is now in ServiceLayout */}
 
-            <main className="max-w-7xl mx-auto p-8 pt-24">
+            <div className="w-full">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight mb-2">
+                        {name}
+                    </h1>
+                    <p className="text-sm text-gray-400">Manage and monitor resources</p>
+                </div>
                 {error && (
                     <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center space-x-3 text-red-400">
                         <AlertCircle className="w-6 h-6" />
@@ -231,7 +246,11 @@ const ServicePage = () => {
                     className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
                 >
                     {stats.map((stat, i) => (
-                        <div key={i} className="glass p-6">
+                        <div
+                            key={i}
+                            onClick={stat.path ? () => navigate(stat.path) : undefined}
+                            className={`glass p-6 ${stat.path ? 'cursor-pointer hover:bg-white/5 transition-all hover:scale-[1.02]' : ''}`}
+                        >
                             <p className="text-gray-400 text-sm mb-1">{stat.label}</p>
                             <p className="text-3xl font-bold">{stat.value}</p>
                             <div className={`mt-4 flex items-center text-xs ${stat.color || 'text-green-400'}`}>
@@ -242,9 +261,13 @@ const ServicePage = () => {
                     ))}
                 </motion.div>
 
+                <div className="text-xs text-gray-500 mb-8 -mt-8 text-right px-2 italic">
+                    * Metrics reflect available reports (typically 24-48h delayed)
+                </div>
 
 
-                {(isLicensing || isAdmin) && licensingSummary.length > 0 && (
+
+                {(isLicensing) && licensingSummary.length > 0 && (
                     <div className="mb-12">
                         <h3 className="text-xl font-bold mb-6">License Breakdown</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -359,8 +382,9 @@ const ServicePage = () => {
                     </div>
                 )}
 
-                <div className="glass p-8 relative min-h-[400px] flex items-center justify-center">
-                    <div className="w-full">
+                {!isAdmin && (
+                    <div className="glass p-8 relative min-h-[400px] flex items-center justify-center">
+                        <div className="w-full">
                             <div className="flex items-center justify-between mb-8">
                                 <h3 className="text-xl font-bold">{isAdmin ? 'User License Assignments' : isLicensing ? 'User License Assignments' : 'Latest Reports'}</h3>
                                 <div className="flex items-center space-x-3">
@@ -394,80 +418,80 @@ const ServicePage = () => {
                                         <table className="w-full text-left">
                                             <thead className="sticky top-0 z-20 bg-white/5 backdrop-blur-xl border-b border-white/10">
                                                 <tr className="text-gray-400 text-sm uppercase tracking-wider">
-                                                {(isLicensing || isAdmin) ? (
-                                                    <>
-                                                        <th className="pb-4 font-semibold px-4">Display Name</th>
-                                                        <th className="pb-4 font-semibold px-4">Email / UPN</th>
-                                                        <th className="pb-4 font-semibold px-4">Assigned Licenses</th>
-                                                        <th className="pb-4 font-semibold px-4 text-center">Count</th>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <th className="pb-4 font-semibold">User / Resource</th>
-                                                        <th className="pb-4 font-semibold">Status</th>
-                                                        <th className="pb-4 font-semibold">Activity</th>
-                                                        <th className="pb-4 font-semibold">Time</th>
-                                                    </>
-                                                )}
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-white/5 text-sm">
-                                            {filteredData.length > 0 ? filteredData.map((report, i) => (
-                                                <tr key={i} className="hover:bg-white/5 transition-colors">
                                                     {(isLicensing || isAdmin) ? (
                                                         <>
-                                                            <td className="py-4 px-4 font-medium text-white/90">{report.displayName}</td>
-                                                            <td className="py-4 px-4 text-gray-400">{report.emailAddress}</td>
-                                                            <td className="py-4 px-4 text-gray-300">
-                                                                {report.licenses !== 'No License' ? (
-                                                                    <span className="text-gray-300 text-sm">
-                                                                        {report.licenses}
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className="text-gray-500 italic">Unlicensed</span>
-                                                                )}
-                                                            </td>
-                                                            <td className="py-4 px-4 text-center text-gray-400">{report.licenseCount}</td>
+                                                            <th className="pb-4 font-semibold px-4">Display Name</th>
+                                                            <th className="pb-4 font-semibold px-4">Email / UPN</th>
+                                                            <th className="pb-4 font-semibold px-4">Assigned Licenses</th>
+                                                            <th className="pb-4 font-semibold px-4 text-center">Count</th>
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <td className="py-4">
-                                                                <div className="flex items-center space-x-3">
-                                                                    <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">
-                                                                        UR
-                                                                    </div>
-                                                                    <span className="font-medium text-white/90">User Resource {report}</span>
-                                                                </div>
-                                                            </td>
-                                                            <td className="py-4">
-                                                                <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded-md text-[10px] uppercase font-bold border border-green-500/20">
-                                                                    Active
-                                                                </span>
-                                                            </td>
-                                                            <td className="py-4 text-gray-400">Policy modification detected</td>
-                                                            <td className="py-4 text-gray-500">{report}h ago</td>
+                                                            <th className="pb-4 font-semibold">User / Resource</th>
+                                                            <th className="pb-4 font-semibold">Status</th>
+                                                            <th className="pb-4 font-semibold">Activity</th>
+                                                            <th className="pb-4 font-semibold">Time</th>
                                                         </>
                                                     )}
                                                 </tr>
-                                            )) : (
-                                                <tr>
-                                                    <td colSpan={isLicensing ? "4" : "4"} className="py-20 text-center">
-                                                        <div className="flex flex-col items-center space-y-4">
-                                                            <AlertCircle className="w-12 h-12 text-gray-600" />
-                                                            <div className="text-gray-500 italic">No real-time data found. Ensure Graph API permissions are granted.</div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            )}
+                                            </thead>
+                                            <tbody className="divide-y divide-white/5 text-sm">
+                                                {filteredData.length > 0 ? filteredData.map((report, i) => (
+                                                    <tr key={i} className="hover:bg-white/5 transition-colors">
+                                                        {(isLicensing || isAdmin) ? (
+                                                            <>
+                                                                <td className="py-4 px-4 font-medium text-white/90">{report.displayName}</td>
+                                                                <td className="py-4 px-4 text-gray-400">{report.emailAddress}</td>
+                                                                <td className="py-4 px-4 text-gray-300">
+                                                                    {report.licenses !== 'No License' ? (
+                                                                        <span className="text-gray-300 text-sm">
+                                                                            {report.licenses}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="text-gray-500 italic">Unlicensed</span>
+                                                                    )}
+                                                                </td>
+                                                                <td className="py-4 px-4 text-center text-gray-400">{report.licenseCount}</td>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <td className="py-4">
+                                                                    <div className="flex items-center space-x-3">
+                                                                        <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">
+                                                                            UR
+                                                                        </div>
+                                                                        <span className="font-medium text-white/90">User Resource {typeof report === 'object' ? 'Unknown' : report}</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="py-4">
+                                                                    <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded-md text-[10px] uppercase font-bold border border-green-500/20">
+                                                                        Active
+                                                                    </span>
+                                                                </td>
+                                                                <td className="py-4 text-gray-400">Policy modification detected</td>
+                                                                <td className="py-4 text-gray-500">{typeof report === 'object' ? '0' : report}h ago</td>
+                                                            </>
+                                                        )}
+                                                    </tr>
+                                                )) : (
+                                                    <tr>
+                                                        <td colSpan={isLicensing ? "4" : "4"} className="py-20 text-center">
+                                                            <div className="flex flex-col items-center space-y-4">
+                                                                <AlertCircle className="w-12 h-12 text-gray-600" />
+                                                                <div className="text-gray-500 italic">No real-time data found. Ensure Graph API permissions are granted.</div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>
                                 )}
                             </div>
                         </div>
-                    )}
-                </div>
-            </main>
+                    </div>
+                )}
+            </div>
         </div >
     );
 };

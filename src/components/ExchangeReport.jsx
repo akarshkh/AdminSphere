@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Archive, Database, HelpCircle } from 'lucide-react';
+import { RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Archive, Database, HelpCircle, X } from 'lucide-react';
 
 const TableHeader = ({ label, tooltip, center = false }) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -49,6 +49,12 @@ const ExchangeReport = () => {
     const [isRunningMFA, setIsRunningMFA] = useState(false);
     const [isConcealed, setIsConcealed] = useState(false);
 
+    // Filter states
+    const [archiveFilter, setArchiveFilter] = useState('all'); // 'all', 'enabled', 'disabled'
+    const [autoExpandFilter, setAutoExpandFilter] = useState('all'); // 'all', 'enabled', 'disabled'
+    const [migrationFilter, setMigrationFilter] = useState('all'); // 'all', 'migrated', 'not-migrated'
+    const [retentionFilter, setRetentionFilter] = useState('all'); // 'all' or specific policy name
+
     const toggleUserSelection = (email) => {
         const newSelection = new Set(selectedUsers);
         if (newSelection.has(email)) {
@@ -67,13 +73,47 @@ const ExchangeReport = () => {
         }
     };
 
+    // Get unique retention policies for filter dropdown
+    const uniqueRetentionPolicies = [...new Set(reportData.map(item => item.retentionPolicy).filter(Boolean))];
+
     const filteredData = reportData.filter(item => {
-        if (!filterText) return true;
-        const searchStr = filterText.toLowerCase();
-        const name = item.displayName?.toLowerCase() || '';
-        const email = item.emailAddress?.toLowerCase() || '';
-        return name.includes(searchStr) || email.includes(searchStr);
+        // Text search filter
+        if (filterText) {
+            const searchStr = filterText.toLowerCase();
+            const name = item.displayName?.toLowerCase() || '';
+            const email = item.emailAddress?.toLowerCase() || '';
+            if (!name.includes(searchStr) && !email.includes(searchStr)) {
+                return false;
+            }
+        }
+
+        // Archive filter
+        if (archiveFilter === 'enabled' && !item.archivePolicy) return false;
+        if (archiveFilter === 'disabled' && item.archivePolicy) return false;
+
+        // Auto-expanding filter
+        if (autoExpandFilter === 'enabled' && !item.autoExpanding) return false;
+        if (autoExpandFilter === 'disabled' && item.autoExpanding) return false;
+
+        // Migration status filter
+        if (migrationFilter === 'migrated' && item.migrationStatus !== 'Migrated') return false;
+        if (migrationFilter === 'not-migrated' && item.migrationStatus === 'Migrated') return false;
+
+        // Retention policy filter
+        if (retentionFilter !== 'all' && item.retentionPolicy !== retentionFilter) return false;
+
+        return true;
     });
+
+    const hasActiveFilters = archiveFilter !== 'all' || autoExpandFilter !== 'all' || migrationFilter !== 'all' || retentionFilter !== 'all';
+
+    const clearAllFilters = () => {
+        setArchiveFilter('all');
+        setAutoExpandFilter('all');
+        setMigrationFilter('all');
+        setRetentionFilter('all');
+        setFilterText('');
+    };
 
     const handleDownloadCSV = () => {
         if (filteredData.length === 0) return;
@@ -214,40 +254,26 @@ const ExchangeReport = () => {
 
     return (
         <div className="min-h-screen bg-[#050505] text-white">
-            <header className="glass fixed top-0 left-0 right-0 z-50 h-20 rounded-none border-x-0 border-t-0 bg-black/50 backdrop-blur-2xl px-8 shadow-lg border-b border-white/10 flex items-center">
-                <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => navigate('/service/admin')}
-                            className="p-2 hover:bg-white/10 rounded-lg transition-all"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </motion.button>
-                        <div>
-                            <h1 className="text-xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight">
-                                Exchange Mailbox Report
-                            </h1>
-                            <p className="text-xs text-gray-400 leading-tight">Real-time mailbox analytics</p>
-                        </div>
-                    </div>
+            {/* Header removed for ServiceLayout */}
 
-                    <div className="flex items-center space-x-3">
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={fetchData}
-                            className="flex items-center space-x-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all text-sm font-semibold"
-                        >
-                            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                            <span>Refresh</span>
-                        </motion.button>
+            <div className="w-full">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight mb-2">
+                            Exchange Mailbox Report
+                        </h1>
+                        <p className="text-sm text-gray-400">Real-time mailbox analytics</p>
                     </div>
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={fetchData}
+                        className="flex items-center space-x-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all text-sm font-semibold text-white"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                        <span>Refresh</span>
+                    </motion.button>
                 </div>
-            </header>
-
-            <main className="max-w-7xl mx-auto p-8 pt-24">
                 <AnimatePresence>
                     {isConcealed && (
                         <motion.div
@@ -304,11 +330,13 @@ const ExchangeReport = () => {
                             <h3 className="text-2xl font-bold mb-1 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                                 Mailbox Report
                             </h3>
-                            <p className="text-sm text-gray-400">Real-time telemetry from Microsoft Graph</p>
+                            <p className="text-sm text-gray-400">
+                                Showing {filteredData.length} of {reportData.length} mailboxes
+                                {hasActiveFilters && <span className="text-blue-400 ml-2">(filtered)</span>}
+                            </p>
                         </div>
                         <div className="flex items-center space-x-3 flex-wrap">
                             <div className="relative">
-                                <Filter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                                 <input
                                     type="text"
                                     placeholder="Search mailboxes..."
@@ -317,6 +345,68 @@ const ExchangeReport = () => {
                                     className="bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all w-full md:w-64"
                                 />
                             </div>
+
+                            {/* Archive Filter */}
+                            <select
+                                value={archiveFilter}
+                                onChange={(e) => setArchiveFilter(e.target.value)}
+                                className="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
+                            >
+                                <option value="all">All Archive</option>
+                                <option value="enabled">Archive Enabled</option>
+                                <option value="disabled">Archive Disabled</option>
+                            </select>
+
+                            {/* Auto-Expanding Filter */}
+                            <select
+                                value={autoExpandFilter}
+                                onChange={(e) => setAutoExpandFilter(e.target.value)}
+                                className="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
+                            >
+                                <option value="all">All Auto-Expand</option>
+                                <option value="enabled">Auto-Expand Enabled</option>
+                                <option value="disabled">Auto-Expand Disabled</option>
+                            </select>
+
+                            {/* Migration Status Filter */}
+                            <select
+                                value={migrationFilter}
+                                onChange={(e) => setMigrationFilter(e.target.value)}
+                                className="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
+                            >
+                                <option value="all">All Migration</option>
+                                <option value="migrated">Migrated</option>
+                                <option value="not-migrated">Not Migrated</option>
+                            </select>
+
+                            {/* Retention Policy Filter */}
+                            {uniqueRetentionPolicies.length > 0 && (
+                                <select
+                                    value={retentionFilter}
+                                    onChange={(e) => setRetentionFilter(e.target.value)}
+                                    className="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer max-w-[200px]"
+                                >
+                                    <option value="all">All Retention Policies</option>
+                                    {uniqueRetentionPolicies.map((policy, i) => (
+                                        <option key={i} value={policy}>{policy}</option>
+                                    ))}
+                                </select>
+                            )}
+
+                            {/* Clear Filters Button */}
+                            {hasActiveFilters && (
+                                <motion.button
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={clearAllFilters}
+                                    className="flex items-center space-x-2 px-3 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl border border-red-500/30 text-sm font-semibold transition-all"
+                                >
+                                    <X className="w-4 h-4" />
+                                    <span>Clear Filters</span>
+                                </motion.button>
+                            )}
                             <motion.button
                                 whileHover={selectedUsers.size > 0 && !isRunningMFA ? { scale: 1.05 } : {}}
                                 whileTap={selectedUsers.size > 0 && !isRunningMFA ? { scale: 0.95 } : {}}
@@ -325,7 +415,7 @@ const ExchangeReport = () => {
                                 className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl border transition-all text-sm font-semibold backdrop-blur-sm ${selectedUsers.size > 0 && !isRunningMFA
                                     ? 'bg-gradient-to-r from-blue-600 to-blue-500 border-blue-400/50 hover:from-blue-500 hover:to-blue-400 text-white shadow-lg shadow-blue-500/20'
                                     : 'bg-white/5 border-white/10 text-gray-500 cursor-not-allowed'
-                                }`}
+                                    }`}
                             >
                                 <Shield className={`w-4 h-4 ${isRunningMFA ? 'animate-pulse' : ''}`} />
                                 <span>{isRunningMFA ? 'Running...' : 'Run MFA'}</span>
@@ -383,7 +473,7 @@ const ExchangeReport = () => {
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={handleDownloadCSV}
-c                                className="p-2.5 hover:bg-white/10 rounded-xl border border-white/10 transition-all backdrop-blur-sm"
+                                c className="p-2.5 hover:bg-white/10 rounded-xl border border-white/10 transition-all backdrop-blur-sm"
                                 title="Download CSV"
                             >
                                 <Download className="w-5 h-5" />
@@ -415,87 +505,86 @@ c                                className="p-2.5 hover:bg-white/10 rounded-xl b
                                     <table className="w-full text-left">
                                         <thead className="sticky top-0 z-30 bg-white/5 backdrop-blur-xl border-b border-white/10">
                                             <tr>
-                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider w-12">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={filteredData.length > 0 && selectedUsers.size === filteredData.length}
-                                                    onChange={toggleAllSelection}
-                                                    className="w-4 h-4 rounded border-gray-600 bg-transparent text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
-                                                />
-                                            </th>
-                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Display Name</th>
-                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Email Address</th>
-                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Mailbox Size</th>
-                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Data Migrated</th>
-                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Migration Status</th>
-                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider text-center">Archive Policy</th>
-                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Retention Policy</th>
-                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider text-center">Auto Expanding</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-white/5">
-                                        {filteredData.length > 0 ? filteredData.map((report, i) => (
-                                            <motion.tr
-                                                key={i}
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: i * 0.02 }}
-                                                className="hover:bg-white/5 transition-all group"
-                                            >
-                                                <td className="py-5 px-6">
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider w-12">
                                                     <input
                                                         type="checkbox"
-                                                        checked={selectedUsers.has(report.emailAddress)}
-                                                        onChange={() => toggleUserSelection(report.emailAddress)}
+                                                        checked={filteredData.length > 0 && selectedUsers.size === filteredData.length}
+                                                        onChange={toggleAllSelection}
                                                         className="w-4 h-4 rounded border-gray-600 bg-transparent text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
                                                     />
-                                                </td>
-                                                <td className="py-5 px-6 font-semibold text-white group-hover:text-blue-400 transition-colors">{report.displayName}</td>
-                                                <td className="py-5 px-6 text-gray-400 font-mono text-sm">{report.emailAddress}</td>
-                                                <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.mailboxSize}</td>
-                                                <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.dataMigrated}</td>
-                                                <td className="py-5 px-6">
-                                                    <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold border ${
-                                                        report.migrationStatus === 'Migrated'
+                                                </th>
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Display Name</th>
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Email Address</th>
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Mailbox Size</th>
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Data Migrated</th>
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Migration Status</th>
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider text-center">Archive Policy</th>
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Retention Policy</th>
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider text-center">Auto Expanding</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            {filteredData.length > 0 ? filteredData.map((report, i) => (
+                                                <motion.tr
+                                                    key={i}
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: i * 0.02 }}
+                                                    className="hover:bg-white/5 transition-all group"
+                                                >
+                                                    <td className="py-5 px-6">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedUsers.has(report.emailAddress)}
+                                                            onChange={() => toggleUserSelection(report.emailAddress)}
+                                                            className="w-4 h-4 rounded border-gray-600 bg-transparent text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
+                                                        />
+                                                    </td>
+                                                    <td className="py-5 px-6 font-semibold text-white group-hover:text-blue-400 transition-colors">{report.displayName}</td>
+                                                    <td className="py-5 px-6 text-gray-400 font-mono text-sm">{report.emailAddress}</td>
+                                                    <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.mailboxSize}</td>
+                                                    <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.dataMigrated}</td>
+                                                    <td className="py-5 px-6">
+                                                        <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold border ${report.migrationStatus === 'Migrated'
                                                             ? 'text-purple-400 bg-purple-400/10 border-purple-400/30 shadow-sm'
                                                             : 'text-blue-400 bg-blue-400/10 border-blue-400/30 shadow-sm'
-                                                    }`}>
-                                                        {report.migrationStatus}
-                                                    </span>
-                                                </td>
-                                                <td className="py-5 px-6 text-center">
-                                                    {report.archivePolicy ? (
-                                                        <span className="inline-flex items-center space-x-1.5 text-green-400 bg-green-400/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-green-400/30 shadow-sm">
-                                                            <CheckCircle2 className="w-3.5 h-3.5" /> <span>ENABLED</span>
+                                                            }`}>
+                                                            {report.migrationStatus}
                                                         </span>
-                                                    ) : (
-                                                        <span className="inline-flex items-center space-x-1.5 text-gray-500 bg-gray-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-500/30 shadow-sm">
-                                                            <XCircle className="w-3.5 h-3.5" /> <span>DISABLED</span>
-                                                        </span>
-                                                    )}
-                                                </td>
-                                                <td className="py-5 px-6 text-gray-400 italic text-sm">{report.retentionPolicy || '-'}</td>
-                                                <td className="py-5 px-6 text-center">
-                                                    <span className="text-gray-500 bg-gray-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-500/30 shadow-sm">N/A*</span>
-                                                </td>
-                                            </motion.tr>
-                                        )) : (
-                                            <tr>
-                                                <td colSpan="9" className="py-20 text-center">
-                                                    <motion.div
-                                                        initial={{ opacity: 0, scale: 0.9 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        className="flex flex-col items-center space-y-4"
-                                                    >
-                                                        <AlertCircle className="w-16 h-16 text-gray-600" />
-                                                        <div>
-                                                            <p className="text-gray-400 font-semibold mb-1">No matching data found</p>
-                                                            <p className="text-gray-500 text-sm">Try adjusting your search filters</p>
-                                                        </div>
-                                                    </motion.div>
-                                                </td>
-                                            </tr>
-                                        )}
+                                                    </td>
+                                                    <td className="py-5 px-6 text-center">
+                                                        {report.archivePolicy ? (
+                                                            <span className="inline-flex items-center space-x-1.5 text-green-400 bg-green-400/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-green-400/30 shadow-sm">
+                                                                <CheckCircle2 className="w-3.5 h-3.5" /> <span>ENABLED</span>
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center space-x-1.5 text-gray-500 bg-gray-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-500/30 shadow-sm">
+                                                                <XCircle className="w-3.5 h-3.5" /> <span>DISABLED</span>
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-5 px-6 text-gray-400 italic text-sm">{report.retentionPolicy || '-'}</td>
+                                                    <td className="py-5 px-6 text-center">
+                                                        <span className="text-gray-500 bg-gray-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-500/30 shadow-sm">N/A*</span>
+                                                    </td>
+                                                </motion.tr>
+                                            )) : (
+                                                <tr>
+                                                    <td colSpan="9" className="py-20 text-center">
+                                                        <motion.div
+                                                            initial={{ opacity: 0, scale: 0.9 }}
+                                                            animate={{ opacity: 1, scale: 1 }}
+                                                            className="flex flex-col items-center space-y-4"
+                                                        >
+                                                            <AlertCircle className="w-16 h-16 text-gray-600" />
+                                                            <div>
+                                                                <p className="text-gray-400 font-semibold mb-1">No matching data found</p>
+                                                                <p className="text-gray-500 text-sm">Try adjusting your search filters</p>
+                                                            </div>
+                                                        </motion.div>
+                                                    </td>
+                                                </tr>
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
@@ -503,7 +592,7 @@ c                                className="p-2.5 hover:bg-white/10 rounded-xl b
                         )}
                     </div>
                 </motion.div>
-            </main>
+            </div>
         </div>
     );
 };

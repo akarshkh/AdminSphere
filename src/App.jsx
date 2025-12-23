@@ -1,9 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
-import Dashboard from './components/Dashboard';
 import ServicePage from './components/ServicePage';
 import ExchangeReport from './components/ExchangeReport';
+import DomainsPage from './components/DomainsPage';
+import LicensesPage from './components/LicensesPage';
+import GroupsPage from './components/GroupsPage';
+import ServiceLayout from './components/Layout'; // Imported from Layout.jsx which we updated
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -11,9 +15,20 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/service/:serviceId" element={<ServicePage />} />
-          <Route path="/service/admin/report" element={<ExchangeReport />} />
+
+          {/* Protected Service Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/service" element={<ServiceLayout />}>
+              <Route path="admin" element={<ServicePage serviceId="admin" />} /> {/* /service/admin */}
+              <Route path="admin/report" element={<ExchangeReport />} />
+              <Route path="admin/domains" element={<DomainsPage />} />
+              <Route path="admin/licenses" element={<LicensesPage />} />
+              <Route path="admin/groups" element={<GroupsPage />} />
+              <Route path=":serviceId" element={<ServicePage />} /> {/* generic service handler */}
+              <Route index element={<Navigate to="admin" replace />} /> {/* /service -> /service/admin */}
+            </Route>
+          </Route>
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
