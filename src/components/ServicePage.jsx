@@ -16,7 +16,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const [exchangeData, setExchangeData] = useState([]);
     const [domainsCount, setDomainsCount] = useState(0);
     const [groupsCount, setGroupsCount] = useState(0);
-    const [emailActivity, setEmailActivity] = useState({ sent: 0, received: 0 });
+    const [emailActivity, setEmailActivity] = useState({ sent: 0, received: 0, date: null });
     const [filterText, setFilterText] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -77,11 +77,13 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 const { skus, users } = licensingResult;
                 setLicensingSummary(skus || []);
 
-                // Fetch Email Activity - Get Counts for last 7 days (Graph API standard)
-                graphService.getEmailActivityCounts('D7').then(activity => {
-                    const sent = activity.reduce((acc, curr) => acc + (parseInt(curr.send) || 0), 0);
-                    const received = activity.reduce((acc, curr) => acc + (parseInt(curr.receive) || 0), 0);
-                    setEmailActivity({ sent, received });
+                // Fetch Email Activity - Use User Detail for accurate sums
+                graphService.getEmailActivityUserDetail('D7').then(activity => {
+                    const sent = activity.reduce((acc, curr) => acc + (parseInt(curr.sendCount) || 0), 0);
+                    const received = activity.reduce((acc, curr) => acc + (parseInt(curr.receiveCount) || 0), 0);
+                    const latestDate = activity.length > 0 ? activity[0].reportRefreshDate : null;
+                    setEmailActivity({ sent, received, date: latestDate });
+                    console.log("Email Activity Data:", activity); // Debug log
                 });
 
                 // Fetch Domains Count
@@ -150,8 +152,8 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         const assignedSeats = licensingSummary.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0);
         stats = [
             { label: 'Total Mailboxes', value: exchangeData.length.toString(), trend: 'Real-time' },
-            { label: 'Emails Sent (7d)', value: emailActivity.sent.toLocaleString(), trend: 'Activity*', color: 'text-purple-400' },
-            { label: 'Emails Received (7d)', value: emailActivity.received.toLocaleString(), trend: 'Activity*', color: 'text-blue-400' },
+            { label: 'Emails Sent (7d)', value: emailActivity.sent.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', color: 'text-purple-400' },
+            { label: 'Emails Received (7d)', value: emailActivity.received.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', color: 'text-blue-400' },
             { label: 'Licenses Used', value: assignedSeats.toLocaleString(), trend: totalSeats > 0 ? Math.round((assignedSeats / totalSeats) * 100) + '%' : '0%', color: 'text-orange-400', path: '/service/admin/licenses' },
             { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/admin/groups', color: 'text-indigo-400' },
             { label: 'Domains', value: domainsCount.toString(), trend: 'Manage', path: '/service/admin/domains', color: 'text-green-400' }
@@ -216,6 +218,74 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         const link = document.createElement('a');
         link.setAttribute('href', url);
         link.setAttribute('download', `${serviceId}_report.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleDownloadExchangeReport = () => {
+        if (exchangeData.length === 0) return;
+
+        const headers = [
+            'Display Name',
+            'User Principal Name',
+            'Job Title',
+            'Department',
+            'Office Location',
+            'City',
+            'Country',
+            'Account Enabled',
+            'Created Date',
+            'Last Activity Date',
+            'Item Count',
+            'Deleted Item Count',
+            'Mailbox Size Used',
+            'Quota Used %',
+            'Issue Warning Quota',
+            'Prohibit Send Quota',
+            'Prohibit Send/Receive Quota',
+            'Archive Status',
+            'Retention Policy',
+            'Auto Expanding',
+            'Migration Status'
+        ];
+
+        const csvRows = [headers.join(',')];
+
+        exchangeData.forEach(row => {
+            const values = [
+                `"${row.displayName || ''}"`,
+                `"${row.userPrincipalName || ''}"`,
+                `"${row.jobTitle || ''}"`,
+                `"${row.department || ''}"`,
+                `"${row.officeLocation || ''}"`,
+                `"${row.city || ''}"`,
+                `"${row.country || ''}"`,
+                `"${row.accountEnabled || ''}"`,
+                `"${row.createdDateTime || ''}"`,
+                `"${row.lastActivityDate || ''}"`,
+                `"${row.itemCount || 0}"`,
+                `"${row.deletedItemCount || 0}"`,
+                `"${row.mailboxSize || ''}"`,
+                `"${row.quotaUsedPct || ''}"`,
+                `"${row.issueWarningQuota || ''}"`,
+                `"${row.prohibitSendQuota || ''}"`,
+                `"${row.prohibitSendReceiveQuota || ''}"`,
+                row.archivePolicy ? 'Enabled' : 'Disabled',
+                `"${row.retentionPolicy || ''}"`,
+                `"${row.autoExpanding || ''}"`,
+                `"${row.migrationStatus || ''}"`
+            ];
+            csvRows.push(values.join(','));
+        });
+
+        const csvContent = csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'full_exchange_report.csv');
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
@@ -305,10 +375,11 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-xl font-bold">Exchange Mailboxes</h3>
                             <button
-                                onClick={() => navigate('/service/admin/report')}
-                                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition-all text-sm"
+                                onClick={handleDownloadExchangeReport}
+                                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition-all text-sm flex items-center space-x-2"
                             >
-                                View Full Report
+                                <Download className="w-4 h-4" />
+                                <span>Download Full Report</span>
                             </button>
                         </div>
                         {loading ? (

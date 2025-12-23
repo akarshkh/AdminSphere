@@ -72,8 +72,8 @@ export class GraphService {
             // archiveStatus and userType (to filter guest settings) are available in Beta
             const usersResponse = await this.client.api("/users")
                 .version("beta")
-                .select("id,displayName,userPrincipalName,mail,archiveStatus,assignedPlans,onPremisesSyncEnabled,userType")
-                .top(100)
+                .select("id,displayName,userPrincipalName,mail,archiveStatus,assignedPlans,onPremisesSyncEnabled,userType,jobTitle,department,officeLocation,city,country,createdDateTime,accountEnabled,mobilePhone")
+                .top(999)
                 .get();
 
             const users = usersResponse.value;
@@ -137,13 +137,32 @@ export class GraphService {
 
                 return {
                     displayName: user.displayName,
+                    userPrincipalName: user.userPrincipalName, // Explicit UPN
                     emailAddress: user.mail || user.userPrincipalName,
+                    jobTitle: user.jobTitle || '',
+                    department: user.department || '',
+                    officeLocation: user.officeLocation || '',
+                    city: user.city || '',
+                    country: user.country || '',
+                    accountEnabled: user.accountEnabled ? 'Yes' : 'No',
+                    createdDateTime: user.createdDateTime,
+
+                    // Mailbox Report Data
+                    lastActivityDate: reportInfo?.lastActivityDate || 'N/A',
+                    itemCount: reportInfo?.itemCount || 0,
+                    deletedItemCount: reportInfo?.deletedItemCount || 0,
+
                     archivePolicy: isArchiveEnabled,
                     retentionPolicy: reportInfo?.retentionPolicy || (reportInfo ? "Applied" : (isArchiveEnabled ? "See PowerShell" : (hasExchange ? "Default MRT" : "None"))),
                     autoExpanding: "N/A (PowerShell)",
-                    mailboxSize: reportInfo ?
-                        `${formatGB(reportInfo.storageUsedInBytes)} GB / ${quotaGB(quotaBytes)} GB` :
-                        (hasExchange ? "No usage data" : "No Mailbox"),
+
+                    mailboxSize: reportInfo ? `${formatGB(reportInfo.storageUsedInBytes)} GB` : "0.00 GB",
+                    quotaUsedPct: reportInfo ? Math.round((reportInfo.storageUsedInBytes / (quotaBytes || 1)) * 100) + '%' : '0%',
+
+                    issueWarningQuota: formatGB(reportInfo?.issueWarningQuotaInBytes) + ' GB',
+                    prohibitSendQuota: formatGB(reportInfo?.prohibitSendQuotaInBytes) + ' GB',
+                    prohibitSendReceiveQuota: formatGB(quotaBytes) + ' GB',
+
                     migrationStatus: isSynced ? "Migrated" : "Cloud Native",
                     dataMigrated: reportInfo ? `${formatGB(reportInfo.storageUsedInBytes)} GB` : "N/A"
                 };

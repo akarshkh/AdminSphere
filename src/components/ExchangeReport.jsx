@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Archive, Database, HelpCircle, X } from 'lucide-react';
+import { RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Archive, Database, HelpCircle, X, ArrowLeft } from 'lucide-react';
 
 const TableHeader = ({ label, tooltip, center = false }) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -257,6 +257,13 @@ const ExchangeReport = () => {
             {/* Header removed for ServiceLayout */}
 
             <div className="w-full">
+                <button
+                    onClick={() => navigate('/service/admin')}
+                    className="flex items-center text-gray-400 hover:text-white mb-6 transition-colors group"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+                    Back to Admin
+                </button>
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight mb-2">
@@ -473,7 +480,7 @@ const ExchangeReport = () => {
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={handleDownloadCSV}
-                                c className="p-2.5 hover:bg-white/10 rounded-xl border border-white/10 transition-all backdrop-blur-sm"
+                                className="p-2.5 hover:bg-white/10 rounded-xl border border-white/10 transition-all backdrop-blur-sm"
                                 title="Download CSV"
                             >
                                 <Download className="w-5 h-5" />
