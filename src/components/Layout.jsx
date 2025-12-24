@@ -42,10 +42,11 @@ const ServiceLayout = () => {
                     <div className="flex-1 py-6 px-3 space-y-2 overflow-y-auto">
                         <SidebarItem
                             icon={LayoutDashboard}
-                            label="Admin"
+                            label="Admin Center"
                             active={isActive('/service/admin')}
                             isOpen={isSidebarOpen}
                             onClick={() => navigate('/service/admin')}
+                            color="blue"
                         />
                         <SidebarItem
                             icon={ShieldCheck}
@@ -53,6 +54,7 @@ const ServiceLayout = () => {
                             active={isActive('/service/entra')}
                             isOpen={isSidebarOpen}
                             onClick={() => navigate('/service/entra')}
+                            color="indigo"
                         />
                         <SidebarItem
                             icon={Smartphone}
@@ -60,6 +62,7 @@ const ServiceLayout = () => {
                             active={isActive('/service/intune')}
                             isOpen={isSidebarOpen}
                             onClick={() => navigate('/service/intune')}
+                            color="cyan"
                         />
                         <SidebarItem
                             icon={Lock}
@@ -67,17 +70,21 @@ const ServiceLayout = () => {
                             active={isActive('/service/purview')}
                             isOpen={isSidebarOpen}
                             onClick={() => navigate('/service/purview')}
+                            color="orange"
                         />
                     </div>
 
                     <div className="p-4 border-t border-white/5">
-                        <button
+                        <motion.button
                             onClick={handleLogout}
-                            className={`flex items-center gap-3 p-3 rounded-xl hover:bg-red-500/10 hover:text-red-400 text-gray-400 w-full transition-colors ${!isSidebarOpen && 'justify-center'}`}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={`w-full relative overflow-hidden flex items-center gap-3 px-4 py-3 rounded-xl text-white group border border-red-500/30 bg-gradient-to-r from-red-500/10 to-orange-500/10 hover:from-red-600 hover:to-orange-600 hover:border-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] transition-all duration-300 ${!isSidebarOpen && 'justify-center'}`}
                         >
-                            <LogOut className="w-5 h-5" />
-                            {isSidebarOpen && <span className="font-medium">Sign Out</span>}
-                        </button>
+                            <LogOut className="w-5 h-5 relative z-10 text-red-400 group-hover:text-white transition-colors group-hover:-translate-x-1" />
+                            {isSidebarOpen && <span className="font-semibold relative z-10 text-red-100 group-hover:text-white">Sign Out</span>}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                        </motion.button>
                     </div>
                 </motion.aside>
 
@@ -94,28 +101,36 @@ const ServiceLayout = () => {
     );
 };
 
-const SidebarItem = ({ icon: Icon, label, active, isOpen, onClick }) => (
-    <motion.div
-        onClick={onClick}
-        whileHover={{ x: 4 }}
-        whileTap={{ scale: 0.98 }}
-        className={`
-            flex items-center gap-3 p-3.5 rounded-xl cursor-pointer transition-all duration-200 group relative
-            ${active ? 'bg-blue-600/15 text-blue-400 border-l-2 border-blue-500' : 'text-gray-400 hover:bg-white/8 hover:text-white'}
+const SidebarItem = ({ icon: Icon, label, active, isOpen, onClick, color = 'blue' }) => {
+    const activeColors = {
+        blue: 'bg-blue-500/15 text-blue-400 border-blue-500/50 shadow-[0_0_20px_-5px_rgba(59,130,246,0.3)]',
+        indigo: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/50 shadow-[0_0_20px_-5px_rgba(99,102,241,0.3)]',
+        cyan: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/50 shadow-[0_0_20px_-5px_rgba(34,211,238,0.3)]',
+        orange: 'bg-orange-500/15 text-orange-400 border-orange-500/50 shadow-[0_0_20px_-5px_rgba(249,115,22,0.3)]',
+    };
+
+    const activeStyle = activeColors[color] || activeColors.blue;
+    const iconColor = active ? activeStyle.split(' ')[1] : 'text-gray-500 group-hover:text-gray-300';
+
+    return (
+        <motion.div
+            onClick={onClick}
+            whileHover={{ x: 4 }}
+            whileTap={{ scale: 0.98 }}
+            className={`
+            flex items-center gap-3 p-3.5 rounded-xl cursor-pointer transition-all duration-300 group relative border
+            ${active ? `${activeStyle}` : 'border-transparent hover:bg-white/5 hover:border-white/5'}
             ${!isOpen && 'justify-center'}
         `}
-    >
-        <Icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-blue-400' : 'group-hover:text-white transition-colors'}`} />
-        {isOpen && <span className="font-semibold text-sm">{label}</span>}
-
-        {active && (
-            <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className={`absolute right-0 top-1/2 -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-blue-500 to-blue-400 rounded-l-full ${!isOpen && 'hidden'}`}
-            />
-        )}
-    </motion.div>
-);
+        >
+            <Icon className={`w-5 h-5 flex-shrink-0 transition-colors duration-300 ${iconColor}`} />
+            {isOpen && (
+                <span className={`font-semibold text-sm transition-colors duration-300 ${active ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
+                    {label}
+                </span>
+            )}
+        </motion.div>
+    );
+};
 
 export default ServiceLayout;

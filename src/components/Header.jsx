@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Bell } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Header = ({
@@ -40,15 +40,6 @@ const Header = ({
             {/* Right Section */}
             {isAuthenticated ? (
                 <div className="flex items-center gap-6">
-
-
-                    <button className="p-2 hover:bg-white/5 rounded-full text-gray-400 relative transition-colors">
-                        <Bell className="w-5 h-5" />
-                        <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-[#050505]"></span>
-                    </button>
-
-                    <div className="h-6 w-[1px] bg-white/10 hidden md:block"></div>
-
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center font-bold text-xs text-white shadow-lg">
                             {username ? username.substring(0, 2).toUpperCase() : 'AD'}
