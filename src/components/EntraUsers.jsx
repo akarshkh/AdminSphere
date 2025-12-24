@@ -41,14 +41,12 @@ const EntraUsers = () => {
         }
         return sortableItems;
     }, [users, filterText, sortConfig]);
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 if (accounts.length > 0) {
-                    const response = await instance.acquireTokenSilent({
-                        ...loginRequest,
-                        account: accounts[0]
-                    });
+                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
                     const graphService = new GraphService(response.accessToken);
                     const data = await graphService.getExchangeMailboxReport();
                     setUsers(data.reports || []);
@@ -59,26 +57,13 @@ const EntraUsers = () => {
                 setLoading(false);
             }
         };
-        if (accounts.length > 0) {
-            fetchUsers();
-        }
+        if (accounts.length > 0) fetchUsers();
     }, [accounts, instance]);
 
     const handleDownloadCSV = () => {
         const headers = ['Display Name', 'User Principal Name', 'User Type', 'Account Enabled', 'City', 'Country', 'Department', 'Job Title'];
-        const rows = sortedUsers.map(u => [
-            `"${u.displayName}"`,
-            `"${u.userPrincipalName}"`,
-            `"${u.userType || 'Member'}"`,
-            u.accountEnabled,
-            `"${u.city}"`,
-            `"${u.country}"`,
-            `"${u.department}"`,
-            `"${u.jobTitle}"`
-        ]);
-
-        const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const rows = sortedUsers.map(u => [`"${u.displayName}"`, `"${u.userPrincipalName}"`, `"${u.userType || 'Member'}"`, u.accountEnabled, `"${u.city}"`, `"${u.country}"`, `"${u.department}"`, `"${u.jobTitle}"`]);
+        const blob = new Blob([[headers.join(','), ...rows.map(r => r.join(','))].join('\n')], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -87,116 +72,114 @@ const EntraUsers = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white p-8">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-7xl mx-auto">
+        <div className="app-container">
+            <div className="main-content">
                 <button
-                    onClick={() => navigate('/service/entra-id')}
-                    className="group relative px-6 py-2.5 rounded-full text-white font-medium bg-gradient-to-r from-[#00a4ef] to-[#0078d4] hover:from-[#2bbafa] hover:to-[#1089e6] shadow-[0_0_20px_rgba(0,164,239,0.3)] hover:shadow-[0_0_30px_rgba(0,164,239,0.5)] transition-all duration-300 flex items-center gap-2 overflow-hidden border border-white/10 mb-6"
+                    onClick={() => navigate('/service/entra')}
+                    className="btn-back"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                    <ArrowLeft className="w-4 h-4 relative z-10 group-hover:-translate-x-1 transition-transform" />
-                    <span className="relative z-10">Back to Entra ID</span>
+                    <ArrowLeft size={16} />
+                    <span>Back to Entra ID</span>
                 </button>
 
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex justify-between items-center mb-10">
                     <div>
-                        <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                            All Users
-                        </h1>
-                        <p className="text-gray-400 mt-1">Manage identities and access</p>
+                        <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>User Identities</h1>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Lifecycle management and audit for all directory users</p>
                     </div>
                     <div className="flex gap-4">
-                        <div className="relative">
-                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                        <div style={{ position: 'relative' }}>
+                            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} />
                             <input
                                 type="text"
                                 placeholder="Search users..."
                                 value={filterText}
                                 onChange={(e) => setFilterText(e.target.value)}
-                                className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none w-64 transition-all"
+                                className="glass"
+                                style={{ padding: '10px 16px 10px 40px', borderRadius: '12px', fontSize: '0.875rem', width: '280px' }}
                             />
                         </div>
-                        <button onClick={handleDownloadCSV} className="btn-primary !py-2 !px-4 !text-sm flex items-center gap-2">
-                            <Download className="w-4 h-4" /> Export CSV
+                        <button onClick={handleDownloadCSV} className="btn btn-secondary" style={{ padding: '10px 16px', fontSize: '0.875rem' }}>
+                            <Download size={16} />
+                            <span>Export</span>
                         </button>
                     </div>
                 </div>
 
                 {loading ? (
-                    <div className="flex items-center justify-center h-64">
-                        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <Loader2 className="animate-spin" size={48} color="var(--accent-blue)" />
+                        <p style={{ color: 'var(--text-secondary)' }}>Synchronizing identity directory...</p>
                     </div>
                 ) : (
-                    <div className="glass overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-white/10 bg-white/5">
-                                        <th className="p-4 font-semibold text-gray-300 text-sm cursor-pointer hover:text-white select-none" onClick={() => requestSort('displayName')}>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="glass"
+                        style={{ padding: '32px' }}
+                    >
+                        <div className="table-container">
+                            <table className="data-table">
+                                <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-secondary)' }}>
+                                    <tr>
+                                        <th onClick={() => requestSort('displayName')} style={{ cursor: 'pointer' }}>
                                             <div className="flex items-center gap-1">Display Name {sortConfig.key === 'displayName' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
                                         </th>
-                                        <th className="p-4 font-semibold text-gray-300 text-sm cursor-pointer hover:text-white select-none" onClick={() => requestSort('userPrincipalName')}>
-                                            <div className="flex items-center gap-1">User Principal Name {sortConfig.key === 'userPrincipalName' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
+                                        <th onClick={() => requestSort('userPrincipalName')} style={{ cursor: 'pointer' }}>
+                                            <div className="flex items-center gap-1">UPN / Email {sortConfig.key === 'userPrincipalName' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
                                         </th>
-                                        <th className="p-4 font-semibold text-gray-300 text-sm cursor-pointer hover:text-white select-none" onClick={() => requestSort('city')}>
+                                        <th onClick={() => requestSort('city')} style={{ cursor: 'pointer' }}>
                                             <div className="flex items-center gap-1">Location {sortConfig.key === 'city' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
                                         </th>
-                                        <th className="p-4 font-semibold text-gray-300 text-sm cursor-pointer hover:text-white select-none" onClick={() => requestSort('accountEnabled')}>
+                                        <th onClick={() => requestSort('accountEnabled')} style={{ cursor: 'pointer' }}>
                                             <div className="flex items-center gap-1">Status {sortConfig.key === 'accountEnabled' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
                                         </th>
-                                        <th className="p-4 font-semibold text-gray-300 text-sm cursor-pointer hover:text-white select-none" onClick={() => requestSort('jobTitle')}>
-                                            <div className="flex items-center gap-1">Job Info {sortConfig.key === 'jobTitle' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
+                                        <th onClick={() => requestSort('jobTitle')} style={{ cursor: 'pointer' }}>
+                                            <div className="flex items-center gap-1">Role / Dept {sortConfig.key === 'jobTitle' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {sortedUsers.length > 0 ? (
-                                        sortedUsers.map((user, i) => (
-                                            <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                                <td className="p-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-400 font-bold text-xs">
-                                                            {user.displayName.substring(0, 2).toUpperCase()}
-                                                        </div>
-                                                        <span className="font-medium text-white">{user.displayName}</span>
+                                    {sortedUsers.length > 0 ? sortedUsers.map((user, i) => (
+                                        <tr key={i}>
+                                            <td>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="avatar" style={{ background: 'rgba(59, 130, 246, 0.05)', color: 'var(--accent-blue)', fontSize: '10px', width: '32px', height: '32px' }}>
+                                                        {user.displayName.substring(0, 2).toUpperCase()}
                                                     </div>
-                                                </td>
-                                                <td className="p-4 text-gray-300 text-sm">{user.userPrincipalName}</td>
-                                                <td className="p-4 text-gray-400 text-sm">{user.city ? `${user.city}, ${user.country}` : 'N/A'}</td>
-                                                <td className="p-4">
-                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${user.accountEnabled === 'Yes'
-                                                        ? 'bg-green-500/10 text-green-400'
-                                                        : 'bg-red-500/10 text-red-400'
-                                                        }`}>
-                                                        {user.accountEnabled === 'Yes' ? (
-                                                            <CheckCircle2 className="w-3 h-3" />
-                                                        ) : (
-                                                            <XCircle className="w-3 h-3" />
-                                                        )}
-                                                        {user.accountEnabled === 'Yes' ? 'Enabled' : 'Disabled'}
-                                                    </span>
-                                                </td>
-                                                <td className="p-4 text-gray-400 text-sm">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-gray-300">{user.jobTitle || '-'}</span>
-                                                        <span className="text-xs">{user.department}</span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
+                                                    <span style={{ fontWeight: 600 }}>{user.displayName}</span>
+                                                </div>
+                                            </td>
+                                            <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{user.userPrincipalName}</td>
+                                            <td style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{user.city ? `${user.city}, ${user.country}` : <span style={{ opacity: 0.3 }}>Cloud Native</span>}</td>
+                                            <td>
+                                                <span className={`badge ${user.accountEnabled === 'Yes' ? 'badge-success' : 'badge-error'}`} style={{ fontSize: '10px' }}>
+                                                    {user.accountEnabled === 'Yes' ? 'Enabled' : 'Disabled'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{user.jobTitle || <span style={{ opacity: 0.3 }}>-</span>}</span>
+                                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user.department}</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )) : (
                                         <tr>
-                                            <td colSpan="5" className="p-8 text-center text-gray-500">
-                                                No users found matching your search.
+                                            <td colSpan="5" style={{ padding: '80px', textAlign: 'center' }}>
+                                                <div className="flex flex-col items-center gap-4 text-muted">
+                                                    <Search size={48} opacity={0.2} />
+                                                    <p>No users found matching your search.</p>
+                                                </div>
                                             </td>
                                         </tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
-            </motion.div>
+            </div>
         </div>
     );
 };

@@ -16,6 +16,7 @@ const DomainsPage = () => {
     useEffect(() => {
         const fetchDomains = async () => {
             if (accounts.length === 0) return;
+            setLoading(true);
             try {
                 const response = await instance.acquireTokenSilent({
                     ...loginRequest,
@@ -26,7 +27,7 @@ const DomainsPage = () => {
                 setDomains(data);
             } catch (err) {
                 console.error("Error fetching domains:", err);
-                setError("Failed to load domains.");
+                setError("Failed to synchronize organization domains from Microsoft Graph.");
             } finally {
                 setLoading(false);
             }
@@ -35,80 +36,99 @@ const DomainsPage = () => {
         fetchDomains();
     }, [instance, accounts]);
 
-    if (loading) return (
-        <div className="flex items-center justify-center min-h-[50vh] text-blue-400">
-            <Loader2 className="w-10 h-10 animate-spin" />
-        </div>
-    );
-
-    if (error) return (
-        <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-400">
-            {error}
-        </div>
-    );
-
     return (
-        <div className="w-full text-white">
-            <button
-                onClick={() => navigate('/service/admin')}
-                className="flex items-center text-gray-400 hover:text-white mb-6 transition-colors group"
-            >
-                <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-                Back to Admin
-            </button>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight mb-2">
-                    Domains
-                </h1>
-                <p className="text-sm text-gray-400">Manage and verify your verified domains.</p>
-            </div>
+        <div className="app-container">
+            <div className="main-content">
+                <button
+                    onClick={() => navigate('/service/admin')}
+                    className="btn-back"
+                >
+                    <ArrowLeft size={16} />
+                    <span>Back to Admin</span>
+                </button>
 
-            <div className="glass-panel rounded-xl overflow-hidden border border-white/10">
-                <table className="w-full text-left">
-                    <thead className="bg-white/5 border-b border-white/10">
-                        <tr className="text-gray-400 text-sm uppercase tracking-wider">
-                            <th className="pb-4 pt-4 px-6 font-semibold">Domain Name</th>
-                            <th className="pb-4 pt-4 px-6 font-semibold">Status</th>
-                            <th className="pb-4 pt-4 px-6 font-semibold">Authentication</th>
-                            <th className="pb-4 pt-4 px-6 font-semibold text-center">Default</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5 text-sm">
-                        {domains.map((domain) => (
-                            <tr key={domain.id} className="hover:bg-white/5 transition-colors">
-                                <td className="py-4 px-6 font-medium flex items-center space-x-3">
-                                    <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
-                                        <Globe className="w-4 h-4" />
-                                    </div>
-                                    <span>{domain.id}</span>
-                                </td>
-                                <td className="py-4 px-6">
-                                    {domain.state === 'Verified' ? (
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">
-                                            <CheckCircle2 className="w-3 h-3 mr-1" />
-                                            Verified
-                                        </span>
-                                    ) : (
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
-                                            <ShieldAlert className="w-3 h-3 mr-1" />
-                                            {domain.state}
-                                        </span>
-                                    )}
-                                </td>
-                                <td className="py-4 px-6 text-gray-300">
-                                    {domain.authenticationType}
-                                </td>
-                                <td className="py-4 px-6 text-center">
-                                    {domain.isDefault && (
-                                        <span className="inline-flex items-center justify-center p-1 bg-blue-500 text-white rounded-full">
-                                            <CheckCircle2 className="w-4 h-4" />
-                                        </span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <div className="mb-10">
+                    <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
+                        Verified Domains
+                    </h1>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Management and verification for all organizational custom domains</p>
+                </div>
+
+                {error && (
+                    <div style={{ marginBottom: '32px', padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444' }}>
+                        <XCircle size={24} />
+                        <span>{error}</span>
+                    </div>
+                )}
+
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <Loader2 className="animate-spin" size={48} color="var(--accent-blue)" />
+                        <p style={{ color: 'var(--text-secondary)' }}>Synchronizing domain registry...</p>
+                    </div>
+                ) : (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="glass"
+                        style={{ padding: '32px' }}
+                    >
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-xl font-bold">Domain Directory</h3>
+                            <div className="badge badge-secondary" style={{ textTransform: 'none' }}>
+                                {domains.length} Total Domains
+                            </div>
+                        </div>
+
+                        <div className="table-container">
+                            <table className="data-table">
+                                <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-secondary)' }}>
+                                    <tr>
+                                        <th>Domain Name</th>
+                                        <th>Status</th>
+                                        <th>Authentication</th>
+                                        <th style={{ textAlign: 'center' }}>Default</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {domains.map((domain) => (
+                                        <tr key={domain.id}>
+                                            <td>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="avatar" style={{ background: 'rgba(59, 130, 246, 0.05)', color: 'var(--accent-blue)', width: '32px', height: '32px' }}>
+                                                        <Globe size={14} />
+                                                    </div>
+                                                    <span style={{ fontWeight: 600 }}>{domain.id}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {domain.isVerified ? (
+                                                    <span className="badge badge-success" style={{ fontSize: '10px' }}>
+                                                        Verified
+                                                    </span>
+                                                ) : (
+                                                    <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--accent-orange)', border: '1px solid rgba(245, 158, 11, 0.2)', fontSize: '10px' }}>
+                                                        Unverified
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td style={{ color: 'var(--text-secondary)' }}>
+                                                {domain.authenticationType}
+                                            </td>
+                                            <td style={{ textAlign: 'center' }}>
+                                                {domain.isDefault && (
+                                                    <span className="badge badge-success" style={{ borderRadius: '50%', padding: '4px', display: 'inline-flex' }}>
+                                                        <CheckCircle2 size={12} />
+                                                    </span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </motion.div>
+                )}
             </div>
         </div>
     );

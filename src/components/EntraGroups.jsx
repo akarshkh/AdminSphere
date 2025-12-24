@@ -66,19 +66,19 @@ const EntraGroups = () => {
     }, [groups, filterText, sortConfig]);
 
     const getGroupType = (group) => {
-        if (group.groupTypes?.includes('Unified')) return 'Microsoft 365';
-        if (group.securityEnabled && !group.mailEnabled) return 'Security';
-        if (group.mailEnabled && !group.securityEnabled) return 'Distribution';
-        if (group.mailEnabled && group.securityEnabled) return 'Mail-Enabled Security';
-        return 'Other';
+        if (group.groupTypes?.includes('Unified')) return { label: 'Microsoft 365', class: 'badge-success' };
+        if (group.securityEnabled && !group.mailEnabled) return { label: 'Security', class: 'badge-secondary' };
+        if (group.mailEnabled && !group.securityEnabled) return { label: 'Distribution', class: 'badge-secondary' };
+        if (group.mailEnabled && group.securityEnabled) return { label: 'Mail-Enabled Security', class: 'badge-secondary' };
+        return { label: 'Other', class: 'badge-secondary' };
     };
 
     const handleDownloadCSV = () => {
         const headers = ['Display Name', 'Email', 'Type', 'Description', 'Created Date'];
-        const rows = filteredGroups.map(g => [
+        const rows = sortedGroups.map(g => [
             `"${g.displayName}"`,
             `"${g.mail || ''}"`,
-            `"${getGroupType(g)}"`,
+            `"${getGroupType(g).label}"`,
             `"${g.description || ''}"`,
             `"${g.createdDateTime || ''}"`
         ]);
@@ -93,95 +93,112 @@ const EntraGroups = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white p-8">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-7xl mx-auto">
+        <div className="app-container">
+            <div className="main-content">
                 <button
-                    onClick={() => navigate('/service/entra-id')}
-                    className="group relative px-6 py-2.5 rounded-full text-white font-medium bg-gradient-to-r from-[#00a4ef] to-[#0078d4] hover:from-[#2bbafa] hover:to-[#1089e6] shadow-[0_0_20px_rgba(0,164,239,0.3)] hover:shadow-[0_0_30px_rgba(0,164,239,0.5)] transition-all duration-300 flex items-center gap-2 overflow-hidden border border-white/10 mb-6"
+                    onClick={() => navigate('/service/entra')}
+                    className="btn-back"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                    <ArrowLeft className="w-4 h-4 relative z-10 group-hover:-translate-x-1 transition-transform" />
-                    <span className="relative z-10">Back to Entra ID</span>
+                    <ArrowLeft size={16} />
+                    <span>Back to Entra ID</span>
                 </button>
 
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-10">
                     <div>
-                        <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                        <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
                             Groups
                         </h1>
-                        <p className="text-gray-400 mt-1">Manage groups and membership</p>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Management and lifecycle monitoring for directory groups</p>
                     </div>
                     <div className="flex gap-4">
-                        <div className="relative">
-                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                        <div style={{ position: 'relative' }}>
+                            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} />
                             <input
                                 type="text"
                                 placeholder="Search groups..."
                                 value={filterText}
                                 onChange={(e) => setFilterText(e.target.value)}
-                                className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none w-64 transition-all"
+                                className="glass"
+                                style={{ padding: '10px 16px 10px 40px', borderRadius: '12px', fontSize: '0.875rem', width: '280px' }}
                             />
                         </div>
-                        <button onClick={handleDownloadCSV} className="btn-primary !py-2 !px-4 !text-sm flex items-center gap-2">
-                            <Download className="w-4 h-4" /> Export CSV
+                        <button onClick={handleDownloadCSV} className="btn btn-secondary" style={{ padding: '10px 16px', fontSize: '0.875rem' }}>
+                            <Download size={16} />
+                            <span>Export</span>
                         </button>
                     </div>
                 </div>
 
                 {loading ? (
-                    <div className="flex items-center justify-center h-64">
-                        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <Loader2 className="animate-spin" size={48} color="var(--accent-blue)" />
+                        <p style={{ color: 'var(--text-secondary)' }}>Synchronizing directory groups...</p>
                     </div>
                 ) : (
-                    <div className="glass overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-white/10 bg-white/5">
-                                        <th className="p-4 font-semibold text-gray-300 text-sm cursor-pointer hover:text-white select-none" onClick={() => requestSort('displayName')}>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="glass"
+                        style={{ padding: '32px' }}
+                    >
+                        <div className="table-container">
+                            <table className="data-table">
+                                <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-secondary)' }}>
+                                    <tr>
+                                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('displayName')}>
                                             <div className="flex items-center gap-1">Display Name {sortConfig.key === 'displayName' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
                                         </th>
-                                        <th className="p-4 font-semibold text-gray-300 text-sm cursor-pointer hover:text-white select-none" onClick={() => requestSort('mail')}>
+                                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('mail')}>
                                             <div className="flex items-center gap-1">Email {sortConfig.key === 'mail' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
                                         </th>
-                                        <th className="p-4 font-semibold text-gray-300 text-sm">Type</th>
-                                        <th className="p-4 font-semibold text-gray-300 text-sm">Description</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {sortedGroups.length > 0 ? (
-                                        sortedGroups.map((group, i) => (
-                                            <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                                <td className="p-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-indigo-600/20 flex items-center justify-center text-indigo-400 font-bold">
-                                                            <Users className="w-4 h-4" />
+                                        sortedGroups.map((group, i) => {
+                                            const type = getGroupType(group);
+                                            return (
+                                                <tr key={i}>
+                                                    <td>
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="avatar" style={{ background: 'rgba(99, 102, 241, 0.05)', color: 'var(--accent-indigo)', width: '32px', height: '32px' }}>
+                                                                <Users size={14} />
+                                                            </div>
+                                                            <span style={{ fontWeight: 600 }}>{group.displayName}</span>
                                                         </div>
-                                                        <span className="font-medium text-white">{group.displayName}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="p-4 text-gray-300 text-sm">{group.mail || '-'}</td>
-                                                <td className="p-4">
-                                                    <span className="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-300">
-                                                        {getGroupType(group)}
-                                                    </span>
-                                                </td>
-                                                <td className="p-4 text-gray-400 text-sm truncate max-w-xs">{group.description || '-'}</td>
-                                            </tr>
-                                        ))
+                                                    </td>
+                                                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{group.mail || '-'}</td>
+                                                    <td>
+                                                        <span className={`badge ${type.class}`} style={{ fontSize: '10px' }}>
+                                                            {type.label}
+                                                        </span>
+                                                    </td>
+                                                    <td style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                                                        <div style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                            {group.description || <span style={{ opacity: 0.3 }}>No description set</span>}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
                                     ) : (
                                         <tr>
-                                            <td colSpan="4" className="p-8 text-center text-gray-500">
-                                                No groups found.
+                                            <td colSpan="4" style={{ padding: '80px', textAlign: 'center' }}>
+                                                <div className="flex flex-col items-center gap-4 text-muted">
+                                                    <Search size={48} opacity={0.2} />
+                                                    <p>No groups found matching your search.</p>
+                                                </div>
                                             </td>
                                         </tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
-            </motion.div>
+            </div>
         </div>
     );
 };

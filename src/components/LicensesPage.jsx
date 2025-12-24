@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { Loader2, ArrowLeft, Download, AlertCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Loader2, ArrowLeft, Download, AlertCircle, Search } from 'lucide-react';
 
 const LicensesPage = () => {
     const navigate = useNavigate();
@@ -40,7 +39,7 @@ const LicensesPage = () => {
                 setReportData(processedUsers);
             } catch (err) {
                 console.error("Error fetching license data:", err);
-                setError("Failed to load license data.");
+                setError("Failed to load real-time license telemetry from Microsoft Graph.");
             } finally {
                 setLoading(false);
             }
@@ -83,127 +82,159 @@ const LicensesPage = () => {
         document.body.removeChild(link);
     };
 
-    if (loading) return (
-        <div className="flex items-center justify-center min-h-[50vh] text-blue-400">
-            <Loader2 className="w-10 h-10 animate-spin" />
-        </div>
-    );
-
-    if (error) return (
-        <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-400">
-            <AlertCircle className="w-6 h-6 mr-2 inline-block" />
-            {error}
-        </div>
-    );
-
     return (
-        <div className="w-full text-white">
-            <button
-                onClick={() => navigate('/service/admin')}
-                className="flex items-center text-gray-400 hover:text-white mb-6 transition-colors group"
-            >
-                <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-                Back to Admin
-            </button>
+        <div className="app-container">
+            <div className="main-content">
+                <button
+                    onClick={() => navigate('/service/admin')}
+                    className="btn-back"
+                >
+                    <ArrowLeft size={16} />
+                    <span>Back to Admin</span>
+                </button>
 
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight mb-2">
-                    License Assignments
-                </h1>
-                <p className="text-sm text-gray-400">Manage user licenses and view available seats.</p>
-            </div>
+                <div className="mb-8">
+                    <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
+                        License Assignments
+                    </h1>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Full visibility into seat usage and assignments</p>
+                </div>
 
-            {/* License Breakdown Cards */}
-            {licensingSummary.length > 0 && (
-                <div className="mb-12">
-                    <h3 className="text-xl font-bold mb-6">License Breakdown</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {licensingSummary.map((sku, i) => (
-                            <div key={i} className="glass p-6 border-l-4 border-l-blue-500">
-                                <p className="text-gray-300 font-medium mb-1 truncate" title={sku.skuPartNumber}>{sku.skuPartNumber}</p>
-                                <div className="flex justify-between items-end mt-4">
-                                    <div>
-                                        <p className="text-sm text-gray-500">Assigned</p>
-                                        <p className="text-2xl font-bold">{sku.consumedUnits}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-sm text-gray-500">Total</p>
-                                        <p className="text-2xl font-bold">{sku.prepaidUnits?.enabled || 0}</p>
-                                    </div>
+                {error && (
+                    <div style={{ marginBottom: '32px', padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444' }}>
+                        <AlertCircle size={24} />
+                        <span>{error}</span>
+                    </div>
+                )}
+
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <Loader2 className="animate-spin" size={48} color="var(--accent-blue)" />
+                        <p style={{ color: 'var(--text-secondary)' }}>Synchronizing Cloud Licenses...</p>
+                    </div>
+                ) : (
+                    <>
+                        {/* License Breakdown Grid */}
+                        {licensingSummary.length > 0 && (
+                            <div className="mb-12">
+                                <h3 className="mb-6">Global License Breakdown</h3>
+                                <div className="stats-grid">
+                                    {licensingSummary.map((sku, i) => (
+                                        <div key={i} className="glass stat-card glass-hover relative overflow-hidden" style={{ borderLeft: '4px solid var(--accent-blue)' }}>
+                                            <div className="ambient-glow" style={{ background: 'var(--accent-blue)', width: '100px', height: '100px', top: '-50px', right: '-50px', opacity: 0.1 }} />
+                                            <p className="stat-label truncate" title={sku.skuPartNumber}>{sku.skuPartNumber}</p>
+
+                                            <div className="flex justify-between items-end mt-4">
+                                                <div>
+                                                    <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Assigned</p>
+                                                    <p className="stat-value">{sku.consumedUnits}</p>
+                                                </div>
+                                                <div style={{ textAlign: 'right' }}>
+                                                    <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Total</p>
+                                                    <p className="stat-value">{sku.prepaidUnits?.enabled || 0}</p>
+                                                </div>
+                                            </div>
+
+                                            <div style={{ width: '100%', background: 'rgba(255, 255, 255, 0.05)', height: '6px', marginTop: '16px', borderRadius: '3px', overflow: 'hidden' }}>
+                                                <div
+                                                    style={{
+                                                        background: 'var(--accent-blue)',
+                                                        height: '100%',
+                                                        borderRadius: '3px',
+                                                        width: `${Math.min(((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100), 100)}%`
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="flex justify-between items-center mt-3">
+                                                <span className="badge badge-success" style={{ fontSize: '10px' }}>
+                                                    {Math.round((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100)}% Seats Used
+                                                </span>
+                                                <span style={{ fontSize: '10px', color: 'var(--text-dim)', fontWeight: 600 }}>ENFORCED</span>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                                <div className="w-full bg-gray-700/50 h-1.5 mt-4 rounded-full overflow-hidden">
-                                    <div
-                                        className="bg-blue-500 h-full rounded-full"
-                                        style={{ width: `${Math.min(((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100), 100)}%` }}
-                                    />
-                                </div>
-                                <p className="text-xs text-right mt-1 text-gray-500">
-                                    {Math.round((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100)}% Used
-                                </p>
                             </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+                        )}
 
-            {/* User List Table */}
-            <div className="glass p-8 relative min-h-[400px]">
-                <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-xl font-bold">User License Assignments</h3>
-                    <div className="flex items-center space-x-3">
-                        <input
-                            type="text"
-                            placeholder="Search users..."
-                            value={filterText}
-                            onChange={(e) => setFilterText(e.target.value)}
-                            className="bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-sm focus:outline-none focus:border-blue-500/50"
-                        />
-                        <button
-                            onClick={handleDownloadCSV}
-                            className="p-2 hover:bg-white/10 rounded-lg border border-white/10"
-                            title="Download CSV"
-                        >
-                            <Download className="w-4 h-4" />
-                        </button>
-                    </div>
-                </div>
+                        {/* Detailed Table */}
+                        <div className="glass" style={{ padding: '32px' }}>
+                            <div className="flex items-center justify-between mb-8">
+                                <h3 className="text-xl font-bold">User License Assignments</h3>
+                                <div className="flex items-center gap-4">
+                                    <div style={{ position: 'relative' }}>
+                                        <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} />
+                                        <input
+                                            type="text"
+                                            placeholder="Search users..."
+                                            value={filterText}
+                                            onChange={(e) => setFilterText(e.target.value)}
+                                            className="glass"
+                                            style={{ padding: '10px 16px 10px 40px', borderRadius: '12px', fontSize: '0.875rem', width: '280px' }}
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={handleDownloadCSV}
+                                        className="btn btn-secondary"
+                                        style={{ padding: '10px 16px', fontSize: '0.875rem' }}
+                                        title="Download CSV"
+                                    >
+                                        <Download size={16} />
+                                        <span>Export</span>
+                                    </button>
+                                </div>
+                            </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-white/5 border-b border-white/10 text-gray-400 text-sm uppercase tracking-wider">
-                            <tr>
-                                <th className="pb-4 pt-4 px-4 font-semibold">Display Name</th>
-                                <th className="pb-4 pt-4 px-4 font-semibold">Email / UPN</th>
-                                <th className="pb-4 pt-4 px-4 font-semibold">Assigned Licenses</th>
-                                <th className="pb-4 pt-4 px-4 font-semibold text-center">Count</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5 text-sm">
-                            {filteredData.length > 0 ? (
-                                filteredData.map((report, i) => (
-                                    <tr key={i} className="hover:bg-white/5 transition-colors">
-                                        <td className="py-4 px-4 font-medium text-white/90">{report.displayName}</td>
-                                        <td className="py-4 px-4 text-gray-400">{report.emailAddress}</td>
-                                        <td className="py-4 px-4 text-gray-300">
-                                            {report.licenses !== 'No License' ? (
-                                                <span className="text-gray-300 text-sm">{report.licenses}</span>
-                                            ) : (
-                                                <span className="text-gray-500 italic">Unlicensed</span>
-                                            )}
-                                        </td>
-                                        <td className="py-4 px-4 text-center text-gray-400">{report.licenseCount}</td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="4" className="py-8 text-center text-gray-500 italic">
-                                        No users found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            <div className="table-container">
+                                <table className="data-table">
+                                    <thead style={{ position: 'sticky', top: 0, zIndex: 20, background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(16px)' }}>
+                                        <tr>
+                                            <th>Display Name</th>
+                                            <th>Email / UPN</th>
+                                            <th>Assigned Licenses</th>
+                                            <th style={{ textAlign: 'center' }}>Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredData.length > 0 ? (
+                                            filteredData.map((report, i) => (
+                                                <tr key={i}>
+                                                    <td style={{ fontWeight: 600 }}>{report.displayName}</td>
+                                                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{report.emailAddress}</td>
+                                                    <td>
+                                                        {report.licenses !== 'No License' ? (
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {report.licenses.split(', ').map((lic, idx) => (
+                                                                    <span key={idx} className="badge" style={{ background: 'rgba(59, 130, 246, 0.1)', color: 'var(--accent-blue)', fontSize: '10px', textTransform: 'none' }}>
+                                                                        {lic}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <span className="badge" style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-dim)', fontSize: '10px' }}>Unlicensed</span>
+                                                        )}
+                                                    </td>
+                                                    <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                                        <span className="font-bold">{report.licenseCount}</span>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="4" style={{ padding: '80px', textAlign: 'center' }}>
+                                                    <div className="flex flex-col items-center gap-4 text-muted">
+                                                        <AlertCircle size={48} opacity={0.2} />
+                                                        <p>No user license data found matching your search.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

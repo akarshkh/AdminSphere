@@ -212,23 +212,23 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         const totalSeats = licensingSummary.reduce((acc, sku) => acc + (sku.prepaidUnits?.enabled || 0), 0);
         const assignedSeats = licensingSummary.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0);
         stats = [
-            { label: 'Total Mailboxes', value: exchangeData.length.toString(), trend: 'Real-time' },
-            { label: 'Emails Sent (7d)', value: emailActivity.sent.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', color: 'text-purple-400' },
-            { label: 'Emails Received (7d)', value: emailActivity.received.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', color: 'text-blue-400' },
-            { label: 'Licenses Used', value: assignedSeats.toLocaleString(), trend: totalSeats > 0 ? Math.round((assignedSeats / totalSeats) * 100) + '%' : '0%', color: 'text-orange-400', path: '/service/admin/licenses' },
-            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/admin/groups', color: 'text-indigo-400' },
-            { label: 'Domains', value: domainsCount.toString(), trend: 'Manage', path: '/service/admin/domains', color: 'text-green-400' },
+            { label: 'Total Mailboxes', value: exchangeData.length.toString(), trend: 'Real-time', color: 'accent-blue' },
+            { label: 'Emails Sent (7d)', value: emailActivity.sent.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', color: 'accent-purple' },
+            { label: 'Emails Received (7d)', value: emailActivity.received.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', color: 'accent-blue' },
+            { label: 'Licenses Used', value: assignedSeats.toLocaleString(), trend: totalSeats > 0 ? Math.round((assignedSeats / totalSeats) * 100) + '%' : '0%', color: 'accent-orange', path: '/service/admin/licenses' },
+            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/admin/groups', color: 'accent-purple' },
+            { label: 'Domains', value: domainsCount.toString(), trend: 'Manage', path: '/service/admin/domains', color: 'accent-green' },
             /* Admin Extras */
-            { label: 'Inactive Users', value: inactiveUsers.toString(), trend: '> 30 Days', color: 'text-red-400' },
-            { label: 'Device Compliance', value: deviceSummary.total > 0 ? Math.round((deviceSummary.compliant / deviceSummary.total) * 100) + '%' : 'No Data', trend: `${deviceSummary.compliant}/${deviceSummary.total}`, color: 'text-teal-400' }
+            { label: 'Inactive Users', value: inactiveUsers.toString(), trend: '> 30 Days', color: 'accent-red' },
+            { label: 'Device Compliance', value: deviceSummary.total > 0 ? Math.round((deviceSummary.compliant / deviceSummary.total) * 100) + '%' : 'No Data', trend: `${deviceSummary.compliant}/${deviceSummary.total}`, color: 'accent-cyan' }
         ];
     } else if (isEntra) {
         stats = [
-            { label: 'Total Users', value: exchangeData.length.toString(), trend: 'Manage', path: '/service/entra/users', color: 'text-blue-400' },
-            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/entra/groups', color: 'text-indigo-400' },
-            { label: 'Applications', value: appsCount.toString(), trend: 'Manage', path: '/service/entra/apps', color: 'text-cyan-400' },
-            { label: 'Global Admins', value: globalAdmins.length.toString(), trend: 'Security', color: 'text-red-400' },
-            { label: 'CA Policies', value: caPolicies.length.toString(), trend: `${caPolicies.filter(p => p.state === 'enabled').length} Active`, color: 'text-orange-400' }
+            { label: 'Total Users', value: exchangeData.length.toString(), trend: 'Manage', path: '/service/entra/users', color: 'accent-blue' },
+            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/entra/groups', color: 'accent-purple' },
+            { label: 'Applications', value: appsCount.toString(), trend: 'Manage', path: '/service/entra/apps', color: 'accent-cyan' },
+            { label: 'Global Admins', value: globalAdmins.length.toString(), trend: 'Security', color: 'accent-red' },
+            { label: 'CA Policies', value: caPolicies.length.toString(), trend: `${caPolicies.filter(p => p.state === 'enabled').length} Active`, color: 'accent-orange' }
         ];
     } else if (isLicensing) {
         // Calculate license stats
@@ -237,9 +237,9 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         const availableSeats = totalSeats - assignedSeats;
 
         stats = [
-            { label: 'Total Licenses', value: totalSeats.toLocaleString(), trend: 'Capacity' },
-            { label: 'Assigned', value: assignedSeats.toLocaleString(), trend: Math.round((assignedSeats / totalSeats) * 100) + '% Used' },
-            { label: 'Available', value: availableSeats.toLocaleString(), trend: 'Free', color: 'text-blue-400' }
+            { label: 'Total Licenses', value: totalSeats.toLocaleString(), trend: 'Capacity', color: 'accent-purple' },
+            { label: 'Assigned', value: assignedSeats.toLocaleString(), trend: Math.round((assignedSeats / totalSeats) * 100) + '% Used', color: 'accent-blue' },
+            { label: 'Available', value: availableSeats.toLocaleString(), trend: 'Free', color: 'accent-green' }
         ];
     } else {
         stats = [];
@@ -361,19 +361,18 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white">
-            {/* Header removed as it is now in ServiceLayout */}
-
-            <div className="w-full">
+        <div className="app-container">
+            <div className="main-content">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight mb-2">
+                    <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
                         {name}
                     </h1>
-                    <p className="text-sm text-gray-400">Manage and monitor resources</p>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Manage and monitor resources</p>
                 </div>
+
                 {error && (
-                    <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center space-x-3 text-red-400">
-                        <AlertCircle className="w-6 h-6" />
+                    <div style={{ marginBottom: '32px', padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444' }}>
+                        <AlertCircle size={24} />
                         <span>{error}</span>
                     </div>
                 )}
@@ -381,19 +380,39 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+                    className="stats-grid"
                 >
                     {stats.map((stat, i) => (
                         <div
                             key={i}
                             onClick={stat.path ? () => navigate(stat.path) : undefined}
-                            className={`glass p-6 ${stat.path ? 'cursor-pointer hover:bg-white/5 transition-all hover:scale-[1.02]' : ''}`}
+                            className={`glass stat-card glass-hover relative overflow-hidden ${stat.path ? 'cursor-pointer' : ''}`}
                         >
-                            <p className="text-gray-400 text-sm mb-1">{stat.label}</p>
-                            <p className="text-3xl font-bold">{stat.value}</p>
-                            <div className={`mt-4 flex items-center text-xs ${stat.color || 'text-green-400'}`}>
-                                <span className="font-bold">{stat.trend}</span>
-                                <span className="ml-2 text-gray-500 text-[10px] uppercase tracking-wider">Source: Microsoft Graph</span>
+                            {/* Ambient Glow */}
+                            <div
+                                className="ambient-glow"
+                                style={{
+                                    background: stat.color ? `var(--accent-${stat.color.split('-')[1]})` : 'var(--accent-blue)',
+                                    width: '120px',
+                                    height: '120px',
+                                    top: '-60px',
+                                    right: '-60px',
+                                    opacity: 0.15
+                                }}
+                            />
+
+                            <p className="stat-label">{stat.label}</p>
+                            <h3 className="stat-value">{stat.value}</h3>
+
+                            <div className="mt-4 flex items-center justify-between" style={{ fontSize: '0.75rem' }}>
+                                <span className={`badge`} style={{
+                                    background: 'rgba(255,255,255,0.05)',
+                                    color: stat.color ? `var(--accent-${stat.color.split('-')[1]})` : 'var(--accent-green)',
+                                    fontSize: '10px'
+                                }}>
+                                    {stat.trend}
+                                </span>
+                                <span style={{ color: 'var(--text-dim)', fontSize: '10px', fontWeight: 600 }}>GRAPH API</span>
                             </div>
                         </div>
                     ))}
@@ -407,28 +426,32 @@ const ServicePage = ({ serviceId: propServiceId }) => {
 
                 {(isLicensing) && licensingSummary.length > 0 && (
                     <div className="mb-12">
-                        <h3 className="text-xl font-bold mb-6">License Breakdown</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <h3 className="mb-6">License Breakdown</h3>
+                        <div className="stats-grid">
                             {licensingSummary.map((sku, i) => (
-                                <div key={i} className="glass p-6 border-l-4 border-l-blue-500">
-                                    <p className="text-gray-300 font-medium mb-1 truncate" title={sku.skuPartNumber}>{sku.skuPartNumber}</p>
+                                <div key={i} className="glass stat-card" style={{ borderLeft: '4px solid var(--accent-blue)' }}>
+                                    <p className="stat-label truncate" title={sku.skuPartNumber}>{sku.skuPartNumber}</p>
                                     <div className="flex justify-between items-end mt-4">
                                         <div>
-                                            <p className="text-sm text-gray-500">Assigned</p>
-                                            <p className="text-2xl font-bold">{sku.consumedUnits}</p>
+                                            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Assigned</p>
+                                            <p style={{ fontSize: '1.5rem', fontWeight: 700 }}>{sku.consumedUnits}</p>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-gray-500">Total</p>
-                                            <p className="text-2xl font-bold">{sku.prepaidUnits?.enabled || 0}</p>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Total</p>
+                                            <p style={{ fontSize: '1.5rem', fontWeight: 700 }}>{sku.prepaidUnits?.enabled || 0}</p>
                                         </div>
                                     </div>
-                                    <div className="w-full bg-gray-700/50 h-1.5 mt-4 rounded-full overflow-hidden">
+                                    <div style={{ width: '100%', background: 'rgba(255, 255, 255, 0.05)', height: '6px', marginTop: '16px', borderRadius: '3px', overflow: 'hidden' }}>
                                         <div
-                                            className="bg-blue-500 h-full rounded-full"
-                                            style={{ width: `${Math.min(((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100), 100)}%` }}
+                                            style={{
+                                                background: 'var(--accent-blue)',
+                                                height: '100%',
+                                                borderRadius: '3px',
+                                                width: `${Math.min(((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100), 100)}%`
+                                            }}
                                         />
                                     </div>
-                                    <p className="text-xs text-right mt-1 text-gray-500">
+                                    <p style={{ fontSize: '0.75rem', textAlign: 'right', marginTop: '4px', color: 'var(--text-muted)' }}>
                                         {Math.round((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100)}% Used
                                     </p>
                                 </div>
@@ -437,141 +460,150 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                     </div>
                 )}
 
-                {/* Advanced Admin Features */}
+                {/* Advanced Admin Tiles */}
                 {isAdmin && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-                        {/* Secure Score */}
-                        <div className="glass p-6">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <Shield className="w-5 h-5 text-blue-400" />
-                                Secure Score
-                            </h3>
-                            {secureScore ? (
-                                <div className="flex items-center gap-6">
-                                    <div className="relative w-24 h-24 flex items-center justify-center">
-                                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                            <path
-                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                fill="none"
-                                                stroke="#333"
-                                                strokeWidth="4"
-                                            />
-                                            <path
-                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                fill="none"
-                                                stroke="#3b82f6"
-                                                strokeWidth="4"
-                                                strokeDasharray={`${(secureScore.currentScore / secureScore.maxScore) * 100}, 100`}
-                                            />
-                                        </svg>
-                                        <span className="absolute text-xl font-bold">{Math.round((secureScore.currentScore / secureScore.maxScore) * 100)}%</span>
-                                    </div>
-                                    <div>
-                                        <div className="text-3xl font-bold">{secureScore.currentScore} <span className="text-sm text-gray-500">/ {secureScore.maxScore}</span></div>
-                                        <div className="text-gray-400 text-sm mt-1">Microsoft Benchmarked Security</div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="text-gray-500 text-sm flex flex-col gap-2">
-                                    <p>Secure Score unavailable.</p>
-                                    <span className="text-xs text-gray-600">Requires SecurityEvents.Read.All permission.</span>
-                                </div>
-                            )}
+                    <div className="mb-12">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-bold">Security & Health Pulse</h3>
+                            <span className="text-[10px] text-gray-500 italic">
+                                * Metrics typically 24-48h delayed
+                            </span>
                         </div>
 
-                        {/* Recent Failed Sign-ins */}
-                        <div className="glass p-6">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <AlertTriangle className="w-5 h-5 text-yellow-400" />
-                                Recent Failed Logins
-                            </h3>
-                            <div className="space-y-3 max-h-[140px] overflow-y-auto custom-scrollbar">
-                                {failedSignIns.length > 0 ? failedSignIns.map((log, i) => (
-                                    <div key={i} className="flex items-center justify-between text-sm p-2 bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition-colors">
-                                        <div>
-                                            <div className="text-white font-medium">{log.userPrincipalName}</div>
-                                            <div className="text-xs text-gray-400">{log.location?.city}, {log.location?.countryOrRegion}</div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-red-400 text-xs">{log.status?.failureReason || 'Failed'}</div>
-                                            <div className="text-gray-500 text-[10px]">{new Date(log.createdDateTime).toLocaleTimeString()}</div>
+                        <div className="stats-grid">
+                            {/* Secure Score Tile */}
+                            <div className="glass stat-card glass-hover relative overflow-hidden">
+                                <div className="ambient-glow" style={{ background: 'var(--accent-blue)', width: '120px', height: '120px', top: '-60px', right: '-60px', opacity: 0.1 }} />
+                                <p className="stat-label">Secure Score</p>
+                                {secureScore ? (
+                                    <h3 className="stat-value">{Math.round((secureScore.currentScore / secureScore.maxScore) * 100)}%</h3>
+                                ) : (
+                                    <h3 className="stat-value text-muted" style={{ fontSize: '1.25rem', opacity: 0.5 }}>Telemetry Unavailable</h3>
+                                )}
+                                <div className="mt-4 flex items-center gap-2">
+                                    <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.1)', color: 'var(--accent-blue)', fontSize: '10px' }}>
+                                        {secureScore ? `${secureScore.currentScore} / ${secureScore.maxScore}` : 'Access Blocked'}
+                                    </span>
+                                    {!secureScore && <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Requires SecurityEvents.Read.All</span>}
+                                </div>
+                            </div>
+
+                            {/* Audit Events Tile */}
+                            <div className="glass stat-card glass-hover relative overflow-hidden">
+                                <div className="ambient-glow" style={{ background: 'var(--accent-red)', width: '120px', height: '120px', top: '-60px', right: '-60px', opacity: 0.1 }} />
+                                <p className="stat-label">Critical Audit Events</p>
+                                <h3 className="stat-value">{failedSignIns.length > 0 ? failedSignIns.length : '0'}</h3>
+                                <div className="mt-4 flex items-center gap-2">
+                                    <span className={`badge ${failedSignIns.length > 0 ? 'badge-error' : 'badge-success'}`} style={{ fontSize: '10px' }}>
+                                        {failedSignIns.length > 0 ? 'Failures Detected' : 'No recent failures'}
+                                    </span>
+                                    <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>7D Window</span>
+                                </div>
+                            </div>
+
+                            {/* Service Health Tile */}
+                            <div className="glass stat-card glass-hover relative overflow-hidden">
+                                <div className="ambient-glow" style={{ background: 'var(--accent-green)', width: '120px', height: '120px', top: '-60px', right: '-60px', opacity: 0.1 }} />
+                                <p className="stat-label">Service Health</p>
+                                {serviceHealth.length > 0 ? (
+                                    <h3 className="stat-value">{serviceHealth.filter(s => s.status === 'ServiceOperational').length} / {serviceHealth.length}</h3>
+                                ) : (
+                                    <h3 className="stat-value text-muted" style={{ fontSize: '1.25rem', opacity: 0.5 }}>Data Blocked</h3>
+                                )}
+                                <div className="mt-4 flex items-center gap-2">
+                                    <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent-green)', fontSize: '10px' }}>
+                                        {serviceHealth.length > 0 ? 'Connected' : 'Access Denied'}
+                                    </span>
+                                    {serviceHealth.length === 0 && <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Requires ServiceHealth.Read.All</span>}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Expandable Details for Admin (Only if data exists) */}
+                        {(secureScore || failedSignIns.length > 0 || serviceHealth.length > 0) && (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                                {secureScore && (
+                                    <div className="glass-panel p-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="relative w-24 h-24 flex items-center justify-center">
+                                                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                                    <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3" />
+                                                    <circle cx="18" cy="18" r="16" fill="none" stroke="var(--accent-blue)" strokeWidth="3" strokeDasharray={`${(secureScore.currentScore / secureScore.maxScore) * 100}, 100`} strokeLinecap="round" />
+                                                </svg>
+                                                <span className="absolute text-xl font-bold">{Math.round((secureScore.currentScore / secureScore.maxScore) * 100)}%</span>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold">Microsoft Secure Score</p>
+                                                <p className="text-xs text-gray-500 mt-1">Based on identity and device security configurations.</p>
+                                            </div>
                                         </div>
                                     </div>
-                                )) : (
-                                    <div className="text-gray-500 text-sm">No recent failed sign-ins found or access denied.</div>
+                                )}
+                                {failedSignIns.length > 0 && (
+                                    <div className="glass-panel p-6">
+                                        <p className="text-sm font-bold mb-4">Recent Audit Logs</p>
+                                        <div className="space-y-2 max-h-[100px] overflow-y-auto custom-scrollbar">
+                                            {failedSignIns.map((log, i) => (
+                                                <div key={i} className="flex justify-between text-[11px] p-2 bg-white/5 rounded">
+                                                    <span className="truncate w-2/3">{log.userPrincipalName}</span>
+                                                    <span className="text-red-400 font-bold">{log.status?.failureReason?.split('.')[0]}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 )}
                             </div>
-                        </div>
-
-                        {/* Service Health */}
-                        <div className="glass p-6 col-span-1 lg:col-span-2">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <Activity className="w-5 h-5 text-green-400" />
-                                Service Health Status
-                            </h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {serviceHealth.length > 0 ? serviceHealth.slice(0, 8).map((s, i) => (
-                                    <div key={i} className="p-3 bg-white/5 rounded-lg border border-white/5 flex flex-col">
-                                        <span className="text-sm font-medium mb-1 truncate" title={s.service}>{s.service}</span>
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-2 h-2 rounded-full ${s.status === 'ServiceOperational' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-                                            <span className={`text-xs ${s.status === 'ServiceOperational' ? 'text-green-400' : 'text-yellow-400'}`}>
-                                                {s.status === 'ServiceOperational' ? 'Operational' : s.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                )) : <div className="text-gray-500">Service health data unavailable (Requires ServiceHealth.Read.All).</div>}
-                            </div>
-                        </div>
+                        )}
                     </div>
                 )}
 
                 {/* Entra Specific Dashboards */}
                 {isEntra && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+                    <div className="stats-grid">
                         {/* Directory Audits */}
-                        <div className="glass p-6">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                        <div className="glass" style={{ padding: '24px' }}>
+                            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                                 <Activity className="w-5 h-5 text-indigo-400" />
                                 Recent Directory Audits
                             </h3>
-                            <div className="space-y-3 max-h-[200px] overflow-y-auto custom-scrollbar">
+                            <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
                                 {auditLogs.length > 0 ? auditLogs.map((log, i) => (
-                                    <div key={i} className="text-sm p-3 bg-white/5 rounded-lg border border-white/5 flex justify-between items-start">
+                                    <div key={i} className="glass-panel" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'rgba(255,255,255,0.02)' }}>
                                         <div>
-                                            <div className="font-medium text-white">{log.activityDisplayName}</div>
-                                            <div className="text-xs text-gray-400 mt-1">
+                                            <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{log.activityDisplayName}</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '4px' }}>
                                                 by {log.initiatedBy?.user?.userPrincipalName || 'System'}
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <div className="text-xs text-gray-500">{new Date(log.activityDateTime).toLocaleTimeString()}</div>
-                                            <div className={`text-[10px] uppercase font-bold mt-1 ${log.result === 'success' ? 'text-green-500' : 'text-red-500' // 'success' is typical value, check Graph docs. Actually usually 'success' or 'failure'.
-                                                }`}>{log.result}</div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(log.activityDateTime).toLocaleTimeString()}</div>
+                                            <span className={`badge ${log.result === 'success' ? 'badge-success' : 'badge-error'}`} style={{ fontSize: '9px', marginTop: '4px' }}>
+                                                {log.result}
+                                            </span>
                                         </div>
                                     </div>
-                                )) : <div className="text-gray-500 text-sm">No audit logs available (Requires AuditLog.Read.All).</div>}
+                                )) : <div style={{ color: 'var(--text-dim)', fontSize: '0.875rem', textAlign: 'center', padding: '20px' }}>No audit logs available (Requires AuditLog.Read.All).</div>}
                             </div>
                         </div>
 
                         {/* Conditional Access */}
-                        <div className="glass p-6">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                        <div className="glass" style={{ padding: '24px' }}>
+                            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                                 <Shield className="w-5 h-5 text-orange-400" />
                                 Conditional Access Policies
                             </h3>
-                            <div className="space-y-2 max-h-[200px] overflow-y-auto custom-scrollbar">
+                            <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
                                 {caPolicies.length > 0 ? caPolicies.map((policy, i) => (
-                                    <div key={i} className="flex items-center justify-between p-2 hover:bg-white/5 rounded-md transition-colors">
-                                        <div className="flex items-center gap-2">
+                                    <div key={i} className="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition-colors">
+                                        <div className="flex items-center gap-3">
                                             <div className={`w-2 h-2 rounded-full ${policy.state === 'enabled' ? 'bg-green-500' :
                                                 policy.state === 'disabled' ? 'bg-red-500' : 'bg-yellow-500'
-                                                }`} />
-                                            <span className="text-sm text-gray-300">{policy.displayName}</span>
+                                                }`} style={{ boxShadow: `0 0 8px ${policy.state === 'enabled' ? '#10b981' : '#ef4444'}` }} />
+                                            <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{policy.displayName}</span>
                                         </div>
-                                        <span className="text-xs text-gray-500 capitalize">{policy.state}</span>
+                                        <span className="badge badge-secondary" style={{ fontSize: '9px', textTransform: 'uppercase' }}>{policy.state}</span>
                                     </div>
-                                )) : <div className="text-gray-500 text-sm">No policies found or access denied.</div>}
+                                )) : <div style={{ color: 'var(--text-dim)', fontSize: '0.875rem', textAlign: 'center', padding: '20px' }}>No policies found or access denied.</div>}
                             </div>
                         </div>
                     </div>
@@ -584,68 +616,69 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                             <h3 className="text-xl font-bold">Exchange Mailboxes</h3>
                             <button
                                 onClick={handleDownloadExchangeReport}
-                                className="btn-primary !py-2 !px-5 !rounded-lg !text-sm flex items-center gap-2"
+                                className="btn btn-primary"
+                                style={{ padding: '8px 20px', fontSize: '0.875rem', borderRadius: '10px' }}
                             >
-                                <Download className="w-4 h-4" />
+                                <Download size={16} />
                                 <span>Download Full Report</span>
                             </button>
                         </div>
                         {loading ? (
-                            <div className="glass p-8 flex items-center justify-center">
-                                <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                            <div className="glass flex items-center justify-center" style={{ padding: '64px' }}>
+                                <Loader2 className="animate-spin" size={32} color="var(--accent-blue)" />
                             </div>
                         ) : exchangeData.length > 0 ? (
-                            <div className="glass p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-1">Total Mailboxes</p>
-                                        <p className="text-2xl font-bold">{exchangeData.length}</p>
+                            <div style={{ marginBottom: '32px' }}>
+                                <div className="stats-grid" style={{ marginBottom: '24px' }}>
+                                    <div className="glass glass-hover stat-card relative overflow-hidden">
+                                        <div className="ambient-glow" style={{ background: 'var(--accent-blue)', width: '100px', height: '100px', top: '-50px', right: '-50px', opacity: 0.1 }} />
+                                        <p className="stat-label">Total Mailboxes</p>
+                                        <p className="stat-value">{exchangeData.length}</p>
+                                        <p className="text-[10px] text-gray-500 mt-2 font-bold uppercase">Provisioned</p>
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-1">Archive Enabled</p>
-                                        <p className="text-2xl font-bold">{exchangeData.filter(r => r.archivePolicy).length}</p>
+                                    <div className="glass glass-hover stat-card relative overflow-hidden">
+                                        <div className="ambient-glow" style={{ background: 'var(--accent-purple)', width: '100px', height: '100px', top: '-50px', right: '-50px', opacity: 0.1 }} />
+                                        <p className="stat-label">Archive Enabled</p>
+                                        <p className="stat-value">{exchangeData.filter(r => r.archivePolicy).length}</p>
+                                        <p className="text-[10px] text-gray-500 mt-2 font-bold uppercase">Policy Active</p>
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-1">Auto-Expanding</p>
-                                        <p className="text-2xl font-bold">{exchangeData.filter(r => r.autoExpanding).length}</p>
+                                    <div className="glass glass-hover stat-card relative overflow-hidden">
+                                        <div className="ambient-glow" style={{ background: 'var(--accent-cyan)', width: '100px', height: '100px', top: '-50px', right: '-50px', opacity: 0.1 }} />
+                                        <p className="stat-label">Auto-Expanding</p>
+                                        <p className="stat-value">{exchangeData.filter(r => r.autoExpanding).length}</p>
+                                        <p className="text-[10px] text-gray-500 mt-2 font-bold uppercase">Storage Scale</p>
                                     </div>
                                 </div>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-sm">
-                                        <thead className="border-b border-white/10">
-                                            <tr className="text-gray-400 uppercase tracking-wider text-xs">
-                                                <th className="pb-3 px-4 font-semibold">Display Name</th>
-                                                <th className="pb-3 px-4 font-semibold">Email</th>
-                                                <th className="pb-3 px-4 font-semibold text-center">Archive</th>
-                                                <th className="pb-3 px-4 font-semibold">Size</th>
+                                <div className="table-container">
+                                    <table className="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Display Name</th>
+                                                <th>Email</th>
+                                                <th style={{ textAlign: 'center' }}>Archive</th>
+                                                <th>Size</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-white/5">
-                                            {filteredExchangeData.slice(0, 5).map((mailbox, i) => (
-                                                <tr key={i} className="hover:bg-white/5 transition-colors">
-                                                    <td className="py-3 px-4 font-medium">{mailbox.displayName}</td>
-                                                    <td className="py-3 px-4 text-gray-400 text-xs">{mailbox.emailAddress}</td>
-                                                    <td className="py-3 px-4 text-center">
-                                                        {mailbox.archivePolicy ? (
-                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-green-400/10 text-green-400 border border-green-400/30">
-                                                                Enabled
-                                                            </span>
-                                                        ) : (
-                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-gray-500/10 text-gray-500 border border-gray-500/30">
-                                                                Disabled
-                                                            </span>
-                                                        )}
+                                        <tbody>
+                                            {exchangeData.slice(0, 5).map((mailbox, i) => (
+                                                <tr key={i}>
+                                                    <td style={{ fontWeight: 500 }}>{mailbox.displayName}</td>
+                                                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{mailbox.emailAddress}</td>
+                                                    <td style={{ textAlign: 'center' }}>
+                                                        <span className={`badge ${mailbox.archivePolicy ? 'badge-success' : 'badge-disabled'}`} style={{ background: mailbox.archivePolicy ? '' : 'rgba(255,255,255,0.05)', color: mailbox.archivePolicy ? '' : 'var(--text-muted)' }}>
+                                                            {mailbox.archivePolicy ? 'Enabled' : 'Disabled'}
+                                                        </span>
                                                     </td>
-                                                    <td className="py-3 px-4 text-gray-300 text-xs">{mailbox.mailboxSize || 'N/A'}</td>
+                                                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{mailbox.mailboxSize || 'N/A'}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                     </table>
                                     {exchangeData.length > 5 && (
-                                        <div className="mt-4 text-center">
+                                        <div style={{ marginTop: '16px', textAlign: 'center' }}>
                                             <button
                                                 onClick={() => navigate('/service/admin/report')}
-                                                className="text-sm text-blue-400 hover:text-blue-300"
+                                                style={{ background: 'none', border: 'none', color: 'var(--accent-blue)', cursor: 'pointer', fontSize: '0.875rem' }}
                                             >
                                                 View all {exchangeData.length} mailboxes →
                                             </button>
@@ -654,7 +687,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="glass p-8 text-center text-gray-400">
+                            <div className="glass flex items-center justify-center text-muted" style={{ padding: '32px' }}>
                                 <p>No exchange data available</p>
                             </div>
                         )}
@@ -662,108 +695,100 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 )}
 
                 {!isAdmin && (
-                    <div className="glass p-8 relative min-h-[400px] flex items-center justify-center">
-                        <div className="w-full">
+                    <div className="glass" style={{ padding: '32px', minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ width: '100%' }}>
                             <div className="flex items-center justify-between mb-8">
                                 <h3 className="text-xl font-bold">{isAdmin ? 'User License Assignments' : isLicensing ? 'User License Assignments' : 'Latest Reports'}</h3>
-                                <div className="flex items-center space-x-3">
-
+                                <div className="flex items-center gap-3">
                                     <button
                                         onClick={handleDownloadCSV}
-                                        className="p-2 hover:bg-white/10 rounded-lg border border-white/10"
+                                        className="btn btn-secondary"
+                                        style={{ padding: '8px' }}
                                         title="Download CSV"
                                     >
-                                        <Download className="w-4 h-4" />
+                                        <Download size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="overflow-x-auto min-h-[300px] max-h-[calc(100vh-500px)]">
+                            <div className="table-container" style={{ minHeight: '300px', maxHeight: 'calc(100vh - 500px)' }}>
                                 {loading ? (
-                                    <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                                        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-                                        <p className="text-gray-400 animate-pulse">Fetching Real-time Telemetry...</p>
+                                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                                        <Loader2 className="animate-spin" size={48} color="var(--accent-blue)" />
+                                        <p style={{ color: 'var(--text-secondary)' }}>Fetching Real-time Telemetry...</p>
                                     </div>
                                 ) : (
-                                    <div className="glass-panel rounded-xl overflow-hidden border border-white/10">
-                                        <table className="w-full text-left">
-                                            <thead className="sticky top-0 z-20 bg-white/5 backdrop-blur-xl border-b border-white/10">
-                                                <tr className="text-gray-400 text-sm uppercase tracking-wider">
+                                    <table className="data-table">
+                                        <thead style={{ position: 'sticky', top: 0, zIndex: 20, background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(16px)' }}>
+                                            <tr>
+                                                {(isLicensing || isAdmin) ? (
+                                                    <>
+                                                        <th>Display Name</th>
+                                                        <th>Email / UPN</th>
+                                                        <th>Assigned Licenses</th>
+                                                        <th style={{ textAlign: 'center' }}>Count</th>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <th>User / Resource</th>
+                                                        <th>Status</th>
+                                                        <th>Activity</th>
+                                                        <th>Time</th>
+                                                    </>
+                                                )}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {filteredData.length > 0 ? filteredData.map((report, i) => (
+                                                <tr key={i}>
                                                     {(isLicensing || isAdmin) ? (
                                                         <>
-                                                            <th className="pb-4 font-semibold px-4">Display Name</th>
-                                                            <th className="pb-4 font-semibold px-4">Email / UPN</th>
-                                                            <th className="pb-4 font-semibold px-4">Assigned Licenses</th>
-                                                            <th className="pb-4 font-semibold px-4 text-center">Count</th>
+                                                            <td style={{ fontWeight: 500 }}>{report.displayName}</td>
+                                                            <td style={{ color: 'var(--text-secondary)' }}>{report.emailAddress}</td>
+                                                            <td style={{ color: 'var(--text-secondary)' }}>
+                                                                {report.licenses !== 'No License' ? (
+                                                                    <span>{report.licenses}</span>
+                                                                ) : (
+                                                                    <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Unlicensed</span>
+                                                                )}
+                                                            </td>
+                                                            <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{report.licenseCount}</td>
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <th className="pb-4 font-semibold">User / Resource</th>
-                                                            <th className="pb-4 font-semibold">Status</th>
-                                                            <th className="pb-4 font-semibold">Activity</th>
-                                                            <th className="pb-4 font-semibold">Time</th>
+                                                            <td>
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="avatar" style={{ fontSize: '10px' }}>UR</div>
+                                                                    <span style={{ fontWeight: 500 }}>User Resource {typeof report === 'object' ? 'Unknown' : report}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <span className="badge badge-success">Active</span>
+                                                            </td>
+                                                            <td style={{ color: 'var(--text-secondary)' }}>Policy modification detected</td>
+                                                            <td style={{ color: 'var(--text-muted)' }}>{typeof report === 'object' ? '0' : report}h ago</td>
                                                         </>
                                                     )}
                                                 </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-white/5 text-sm">
-                                                {filteredData.length > 0 ? filteredData.map((report, i) => (
-                                                    <tr key={i} className="hover:bg-white/5 transition-colors">
-                                                        {(isLicensing || isAdmin) ? (
-                                                            <>
-                                                                <td className="py-4 px-4 font-medium text-white/90">{report.displayName}</td>
-                                                                <td className="py-4 px-4 text-gray-400">{report.emailAddress}</td>
-                                                                <td className="py-4 px-4 text-gray-300">
-                                                                    {report.licenses !== 'No License' ? (
-                                                                        <span className="text-gray-300 text-sm">
-                                                                            {report.licenses}
-                                                                        </span>
-                                                                    ) : (
-                                                                        <span className="text-gray-500 italic">Unlicensed</span>
-                                                                    )}
-                                                                </td>
-                                                                <td className="py-4 px-4 text-center text-gray-400">{report.licenseCount}</td>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <td className="py-4">
-                                                                    <div className="flex items-center space-x-3">
-                                                                        <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">
-                                                                            UR
-                                                                        </div>
-                                                                        <span className="font-medium text-white/90">User Resource {typeof report === 'object' ? 'Unknown' : report}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="py-4">
-                                                                    <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded-md text-[10px] uppercase font-bold border border-green-500/20">
-                                                                        Active
-                                                                    </span>
-                                                                </td>
-                                                                <td className="py-4 text-gray-400">Policy modification detected</td>
-                                                                <td className="py-4 text-gray-500">{typeof report === 'object' ? '0' : report}h ago</td>
-                                                            </>
-                                                        )}
-                                                    </tr>
-                                                )) : (
-                                                    <tr>
-                                                        <td colSpan={isLicensing ? "4" : "4"} className="py-20 text-center">
-                                                            <div className="flex flex-col items-center space-y-4">
-                                                                <AlertCircle className="w-12 h-12 text-gray-600" />
-                                                                <div className="text-gray-500 italic">No real-time data found. Ensure Graph API permissions are granted.</div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                            )) : (
+                                                <tr>
+                                                    <td colSpan={4} style={{ padding: '80px', textAlign: 'center' }}>
+                                                        <div className="flex flex-col items-center gap-4">
+                                                            <AlertCircle size={48} color="var(--text-muted)" />
+                                                            <div style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No real-time data found. Ensure Graph API permissions are granted.</div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
                                 )}
                             </div>
                         </div>
                     </div>
                 )}
             </div>
-        </div >
+        </div>
     );
 };
 

@@ -60,87 +60,101 @@ const EntraApps = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white p-8">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-7xl mx-auto">
+        <div className="app-container">
+            <div className="main-content">
                 <button
-                    onClick={() => navigate('/service/entra-id')}
-                    className="group relative px-6 py-2.5 rounded-full text-white font-medium bg-gradient-to-r from-[#00a4ef] to-[#0078d4] hover:from-[#2bbafa] hover:to-[#1089e6] shadow-[0_0_20px_rgba(0,164,239,0.3)] hover:shadow-[0_0_30px_rgba(0,164,239,0.5)] transition-all duration-300 flex items-center gap-2 overflow-hidden border border-white/10"
+                    onClick={() => navigate('/service/entra')}
+                    className="btn-back"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                    <ArrowLeft className="w-4 h-4 relative z-10 group-hover:-translate-x-1 transition-transform" />
-                    <span className="relative z-10">Back to Entra ID</span>
+                    <ArrowLeft size={16} />
+                    <span>Back to Entra ID</span>
                 </button>
 
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-10">
                     <div>
-                        <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                        <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
                             App Registrations
                         </h1>
-                        <p className="text-gray-400 mt-1">Manage enterprise applications</p>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Full visibility into directory integrated enterprise applications</p>
                     </div>
                     <div className="flex gap-4">
-                        <div className="relative">
-                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                        <div style={{ position: 'relative' }}>
+                            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} />
                             <input
                                 type="text"
                                 placeholder="Search apps..."
                                 value={filterText}
                                 onChange={(e) => setFilterText(e.target.value)}
-                                className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none w-64 transition-all"
+                                className="glass"
+                                style={{ padding: '10px 16px 10px 40px', borderRadius: '12px', fontSize: '0.875rem', width: '280px' }}
                             />
                         </div>
-                        <button onClick={handleDownloadCSV} className="btn-primary !py-2 !px-4 !text-sm flex items-center gap-2">
-                            <Download className="w-4 h-4" /> Export CSV
+                        <button onClick={handleDownloadCSV} className="btn btn-secondary" style={{ padding: '10px 16px', fontSize: '0.875rem' }}>
+                            <Download size={16} />
+                            <span>Export</span>
                         </button>
                     </div>
                 </div>
 
                 {loading ? (
-                    <div className="flex items-center justify-center h-64">
-                        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <Loader2 className="animate-spin" size={48} color="var(--accent-blue)" />
+                        <p style={{ color: 'var(--text-secondary)' }}>Synchronizing application manifest...</p>
                     </div>
                 ) : (
-                    <div className="glass overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-white/10 bg-white/5">
-                                        <th className="p-4 font-semibold text-gray-300 text-sm">Display Name</th>
-                                        <th className="p-4 font-semibold text-gray-300 text-sm">Application (Client) ID</th>
-                                        <th className="p-4 font-semibold text-gray-300 text-sm">Created</th>
-                                        <th className="p-4 font-semibold text-gray-300 text-sm">Audience</th>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="glass"
+                        style={{ padding: '32px' }}
+                    >
+                        <div className="table-container">
+                            <table className="data-table">
+                                <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-secondary)' }}>
+                                    <tr>
+                                        <th>Display Name</th>
+                                        <th>Application (Client) ID</th>
+                                        <th>Created</th>
+                                        <th>Audience</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredApps.length > 0 ? (
                                         filteredApps.map((app, i) => (
-                                            <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                                <td className="p-4">
+                                            <tr key={i}>
+                                                <td>
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-cyan-600/20 flex items-center justify-center text-cyan-400 font-bold">
-                                                            <Box className="w-4 h-4" />
+                                                        <div className="avatar" style={{ background: 'rgba(34, 211, 238, 0.05)', color: 'var(--accent-cyan)', width: '32px', height: '32px' }}>
+                                                            <Box size={14} />
                                                         </div>
-                                                        <span className="font-medium text-white">{app.displayName}</span>
+                                                        <span style={{ fontWeight: 600 }}>{app.displayName}</span>
                                                     </div>
                                                 </td>
-                                                <td className="p-4 text-gray-300 text-sm font-mono">{app.appId}</td>
-                                                <td className="p-4 text-gray-400 text-sm">{new Date(app.createdDateTime).toLocaleDateString()}</td>
-                                                <td className="p-4 text-gray-400 text-sm">{app.signInAudience}</td>
+                                                <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', fontFamily: 'monospace' }}>{app.appId}</td>
+                                                <td style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{new Date(app.createdDateTime).toLocaleDateString()}</td>
+                                                <td>
+                                                    <span className="badge badge-secondary" style={{ fontSize: '10px', textTransform: 'none' }}>
+                                                        {app.signInAudience}
+                                                    </span>
+                                                </td>
                                             </tr>
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="4" className="p-8 text-center text-gray-500">
-                                                No applications found.
+                                            <td colSpan="4" style={{ padding: '80px', textAlign: 'center' }}>
+                                                <div className="flex flex-col items-center gap-4 text-muted">
+                                                    <Search size={48} opacity={0.2} />
+                                                    <p>No applications found matching your search.</p>
+                                                </div>
                                             </td>
                                         </tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
-            </motion.div>
+            </div>
         </div>
     );
 };
