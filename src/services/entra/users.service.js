@@ -2,24 +2,28 @@ export const UsersService = {
     // Get summary counts for the Users Tile
     getUserCounts: async (client) => {
         try {
-            // Parallel requests for counts
-            // Parallel requests for counts
-            const [total, enabled, licensed, guest] = await Promise.all([
-                client.api('/users').header('ConsistencyLevel', 'eventual').count(true).get().then(res => res['@odata.count'] || 0),
-                client.api('/users').header('ConsistencyLevel', 'eventual').count(true).filter("accountEnabled eq true").get().then(res => res['@odata.count'] || 0),
-                client.api('/users').header('ConsistencyLevel', 'eventual').count(true).filter("assignedLicenses/$count ne 0").get().then(res => res['@odata.count'] || 0),
-                client.api('/users').header('ConsistencyLevel', 'eventual').count(true).filter("userType eq 'Guest'").get().then(res => res['@odata.count'] || 0)
+            // Fetch actual users and count instead of using count API for accuracy
+            const [allUsers, enabledUsers, licensedUsers, guestUsers] = await Promise.all([
+                client.api('/users').select('id').top(999).get().catch(() => ({ value: [] })),
+                client.api('/users').select('id').filter("accountEnabled eq true").top(999).get().catch(() => ({ value: [] })),
+                client.api('/users').select('id,assignedLicenses').top(999).get().catch(() => ({ value: [] })),
+                client.api('/users').select('id').filter("userType eq 'Guest'").top(999).get().catch(() => ({ value: [] }))
             ]);
+
+            const total = allUsers.value ? allUsers.value.length : 0;
+            const enabled = enabledUsers.value ? enabledUsers.value.length : 0;
+            const licensed = licensedUsers.value ? licensedUsers.value.filter(u => u.assignedLicenses && u.assignedLicenses.length > 0).length : 0;
+            const guests = guestUsers.value ? guestUsers.value.length : 0;
 
             return {
                 total,
                 enabled,
                 licensed,
-                guests: guest
+                guests
             };
         } catch (error) {
             console.error("Error fetching user counts:", error);
-            return { total: 0, enabled: 0, licensed: 0, lists: 0 };
+            return { total: 0, enabled: 0, licensed: 0, guests: 0 };
         }
     },
 

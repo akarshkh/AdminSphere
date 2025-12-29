@@ -17,6 +17,19 @@ import EntraApps from './components/EntraApps';
 import SecureScorePage from './components/SecureScorePage';
 import ServiceHealthPage from './components/ServiceHealthPage';
 import SignInsPage from './components/SignInsPage';
+import IntuneMonitoring from './components/IntuneMonitoring';
+import IntuneManagedDevices from './components/IntuneManagedDevices';
+import IntuneNonCompliant from './components/IntuneNonCompliant';
+import IntuneInactiveDevices from './components/IntuneInactiveDevices';
+import IntuneCompliancePolicies from './components/IntuneCompliancePolicies';
+import IntuneConfigProfiles from './components/IntuneConfigProfiles';
+import IntuneApplications from './components/IntuneApplications';
+import IntuneAutopilot from './components/IntuneAutopilot';
+import IntuneSecurityBaselines from './components/IntuneSecurityBaselines';
+import IntuneUserDevices from './components/IntuneUserDevices';
+import IntuneRBAC from './components/IntuneRBAC';
+import IntuneAuditLogs from './components/IntuneAuditLogs';
+import IntuneReports from './components/IntuneReports';
 import ServiceLayout from './components/Layout'; // Imported from Layout.jsx which we updated
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -49,6 +62,22 @@ function App() {
               <Route path="entra/subscriptions" element={<EntraSubscriptions />} />
               <Route path="entra/admins" element={<EntraAdmins />} />
               <Route path="entra/apps" element={<EntraApps />} />
+
+              {/* Intune Routes */}
+              <Route path="intune" element={<IntuneMonitoring />} />
+              <Route path="intune/devices" element={<IntuneManagedDevices />} />
+              <Route path="intune/non-compliant" element={<IntuneNonCompliant />} />
+              <Route path="intune/inactive" element={<IntuneInactiveDevices />} />
+              <Route path="intune/compliance-policies" element={<IntuneCompliancePolicies />} />
+              <Route path="intune/config-profiles" element={<IntuneConfigProfiles />} />
+              <Route path="intune/applications" element={<IntuneApplications />} />
+              <Route path="intune/autopilot" element={<IntuneAutopilot />} />
+              <Route path="intune/security-baselines" element={<IntuneSecurityBaselines />} />
+              <Route path="intune/user-devices" element={<IntuneUserDevices />} />
+              <Route path="intune/rbac" element={<IntuneRBAC />} />
+              <Route path="intune/audit-logs" element={<IntuneAuditLogs />} />
+              <Route path="intune/reports" element={<IntuneReports />} />
+
 
               <Route path=":serviceId" element={<ServicePage />} /> {/* generic service handler */}
               <Route index element={<Navigate to="admin" replace />} /> {/* /service -> /service/admin */}

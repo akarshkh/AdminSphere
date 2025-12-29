@@ -1,12 +1,17 @@
 export const DevicesService = {
     getDeviceCounts: async (client) => {
         try {
+            // Fetch actual devices and count instead of using count API for accuracy
             // Need Device.Read.All
-            const [total, enabled, managed] = await Promise.all([
-                client.api('/devices').header('ConsistencyLevel', 'eventual').count(true).get().then(res => res['@odata.count'] || 0),
-                client.api('/devices').header('ConsistencyLevel', 'eventual').count(true).filter("accountEnabled eq true").get().then(res => res['@odata.count'] || 0),
-                client.api('/devices').header('ConsistencyLevel', 'eventual').count(true).filter("isManaged eq true").get().then(res => res['@odata.count'] || 0)
+            const [allDevices, enabledDevices, managedDevices] = await Promise.all([
+                client.api('/devices').select('id').top(999).get().catch(() => ({ value: [] })),
+                client.api('/devices').select('id').filter("accountEnabled eq true").top(999).get().catch(() => ({ value: [] })),
+                client.api('/devices').select('id').filter("isManaged eq true").top(999).get().catch(() => ({ value: [] }))
             ]);
+
+            const total = allDevices.value ? allDevices.value.length : 0;
+            const enabled = enabledDevices.value ? enabledDevices.value.length : 0;
+            const managed = managedDevices.value ? managedDevices.value.length : 0;
 
             return {
                 total,

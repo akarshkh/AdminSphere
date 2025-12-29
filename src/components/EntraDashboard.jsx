@@ -35,15 +35,16 @@ const EntraDashboard = () => {
                     const client = new GraphService(response.accessToken).client;
 
                     // Parallel Fetch
-                    // Parallel Fetch
-                    const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsCount] = await Promise.all([
+                    const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse] = await Promise.all([
                         UsersService.getUserCounts(client),
                         GroupsService.getGroupCounts(client),
                         DevicesService.getDeviceCounts(client),
                         SubscriptionsService.getSubscriptionCounts(client),
                         RolesService.getAdminCounts(client),
-                        client.api("/applications").count(true).header('ConsistencyLevel', 'eventual').get().then(res => res['@odata.count'] || 0).catch(() => 0)
+                        client.api("/applications").select('id').top(999).get().catch(() => ({ value: [] }))
                     ]);
+
+                    const appsCount = appsResponse.value ? appsResponse.value.length : 0;
 
                     setStats({
                         users: { total: userCounts.total, growth: 'Manage' },
