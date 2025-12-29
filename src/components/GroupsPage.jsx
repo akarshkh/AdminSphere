@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { motion } from 'framer-motion';
-import { Loader2, ArrowLeft, Users, Shield, Globe, Mail, Search, AlertCircle } from 'lucide-react';
+import { Loader2, ArrowLeft, Users, Shield, Globe, Mail, Search } from 'lucide-react';
+import styles from './DetailPage.module.css';
 
 const GroupsPage = () => {
     const navigate = useNavigate();
@@ -18,7 +18,6 @@ const GroupsPage = () => {
     useEffect(() => {
         const fetchGroups = async () => {
             if (accounts.length === 0) return;
-            setLoading(true);
             try {
                 const response = await instance.acquireTokenSilent({
                     ...loginRequest,
@@ -29,7 +28,7 @@ const GroupsPage = () => {
                 setGroups(data);
             } catch (err) {
                 console.error("Error fetching groups:", err);
-                setError("Failed to synchronize organization groups from Microsoft Graph.");
+                setError("Failed to load groups.");
             } finally {
                 setLoading(false);
             }
@@ -41,12 +40,6 @@ const GroupsPage = () => {
     const m365Count = groups.filter(g => g.groupTypes?.includes('Unified')).length;
     const securityCount = groups.filter(g => g.securityEnabled && !g.groupTypes?.includes('Unified')).length;
     const distributionCount = groups.filter(g => g.mailEnabled && !g.securityEnabled && !g.groupTypes?.includes('Unified')).length;
-
-    const stats = [
-        { label: 'M365 Groups', value: m365Count, icon: Globe, color: 'blue', type: 'Unified' },
-        { label: 'Security Groups', value: securityCount, icon: Shield, color: 'purple', type: 'Security' },
-        { label: 'Distribution Lists', value: distributionCount, icon: Mail, color: 'green', type: 'Distribution' },
-    ];
 
     const filteredGroups = groups.filter(group => {
         const searchStr = filterText.toLowerCase();
@@ -62,143 +55,149 @@ const GroupsPage = () => {
         return true;
     });
 
+    if (loading) {
+        return (
+            <div className={styles.loadingContainer}>
+                <Loader2 className="animate-spin" style={{ width: '2.5rem', height: '2.5rem', color: '#3b82f6' }} />
+            </div>
+        );
+    }
+
     return (
-        <div className="app-container">
-            <div className="main-content">
-                <button
-                    onClick={() => navigate('/service/admin')}
-                    className="btn-back"
-                >
-                    <ArrowLeft size={16} />
-                    <span>Back to Admin</span>
+        <div className={styles.pageContainer}>
+            <div className={styles.contentWrapper}>
+                <button onClick={() => navigate('/service/admin')} className={styles.backButton}>
+                    <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+                    Back to Dashboard
                 </button>
 
-                <div className="mb-10">
-                    <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
-                        Directory Groups
+                <div className={styles.pageHeader}>
+                    <h1 className={styles.pageTitle}>
+                        <Users style={{ width: '2rem', height: '2rem', color: '#3b82f6' }} />
+                        Groups
                     </h1>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Management and visibility for all organizational security and mail distributions</p>
+                    <p className={styles.pageSubtitle}>
+                        Manage Microsoft 365 groups, security groups, and distribution lists
+                    </p>
                 </div>
 
                 {error && (
-                    <div style={{ marginBottom: '32px', padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444' }}>
-                        <AlertCircle size={24} />
+                    <div className={`${styles.alert} ${styles.alertError}`}>
                         <span>{error}</span>
                     </div>
                 )}
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <Loader2 className="animate-spin" size={48} color="var(--accent-blue)" />
-                        <p style={{ color: 'var(--text-secondary)' }}>Retrieving directory graph data...</p>
-                    </div>
-                ) : (
-                    <>
-                        {/* Group Stats Tiles */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="stats-grid mb-12"
-                        >
-                            {stats.map((stat, i) => (
-                                <div
-                                    key={i}
-                                    onClick={() => setFilterType(filterType === stat.type ? null : stat.type)}
-                                    className={`glass stat-card glass-hover relative overflow-hidden cursor-pointer transition-all ${filterType === stat.type ? 'ring-2 ring-blue-500/50' : ''}`}
-                                    style={{ borderLeft: `4px solid var(--accent-${stat.color})` }}
-                                >
-                                    <div className="ambient-glow" style={{ background: `var(--accent-${stat.color})`, width: '100px', height: '100px', top: '-50px', right: '-50px', opacity: 0.1 }} />
-                                    <p className="stat-label">{stat.label}</p>
-                                    <h3 className="stat-value">{stat.value}</h3>
-                                    <div className="mt-4 flex items-center justify-between">
-                                        <div className="badge" style={{ background: `rgba(var(--accent-${stat.color}-rgb), 0.1)`, color: `var(--accent-${stat.color})`, fontSize: '10px' }}>
-                                            {stat.type} Members
-                                        </div>
-                                        <stat.icon size={16} style={{ color: `var(--accent-${stat.color})`, opacity: 0.5 }} />
-                                    </div>
-                                </div>
-                            ))}
-                        </motion.div>
-
-                        <div className="glass" style={{ padding: '32px' }}>
-                            <div className="flex items-center justify-between mb-8">
-                                <h3 className="text-xl font-bold">Group Directory</h3>
-                                <div className="flex items-center gap-4">
-                                    <div style={{ position: 'relative' }}>
-                                        <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} />
-                                        <input
-                                            type="text"
-                                            placeholder="Search groups..."
-                                            value={filterText}
-                                            onChange={(e) => setFilterText(e.target.value)}
-                                            className="glass"
-                                            style={{ padding: '10px 16px 10px 40px', borderRadius: '12px', fontSize: '0.875rem', width: '280px' }}
-                                        />
-                                    </div>
-                                    {filterType && (
-                                        <button
-                                            onClick={() => setFilterType(null)}
-                                            className="badge badge-secondary cursor-pointer hover:bg-white/10"
-                                            style={{ textTransform: 'none' }}
-                                        >
-                                            Clear Filter: {filterType} ×
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="table-container">
-                                <table className="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Display Name</th>
-                                            <th>Email</th>
-                                            <th>Type</th>
-                                            <th>Description</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {filteredGroups.length > 0 ? filteredGroups.map((group) => (
-                                            <tr key={group.id}>
-                                                <td>
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="avatar" style={{ background: 'rgba(59, 130, 246, 0.05)', color: 'var(--accent-blue)', width: '32px', height: '32px' }}>
-                                                            <Users size={14} />
-                                                        </div>
-                                                        <span style={{ fontWeight: 600 }}>{group.displayName}</span>
-                                                    </div>
-                                                </td>
-                                                <td style={{ color: 'var(--text-secondary)' }}>
-                                                    {group.mail || <span style={{ opacity: 0.3, fontStyle: 'italic' }}>No Email</span>}
-                                                </td>
-                                                <td>
-                                                    <span className={`badge ${group.groupTypes?.includes('Unified') ? 'badge-primary' :
-                                                        group.securityEnabled ? 'badge-purple' : 'badge-success'
-                                                        }`} style={{ fontSize: '10px' }}>
-                                                        {group.groupTypes?.includes('Unified') ? 'M365 Group' :
-                                                            group.securityEnabled ? 'Security' : 'Distribution'}
-                                                    </span>
-                                                </td>
-                                                <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem', maxWidth: '300px' }} className="truncate">
-                                                    {group.description || <span style={{ opacity: 0.3 }}>-</span>}
-                                                </td>
-                                            </tr>
-                                        )) : (
-                                            <tr>
-                                                <td colSpan="4" style={{ padding: '80px', textAlign: 'center' }}>
-                                                    <div className="flex flex-col items-center gap-4 text-muted">
-                                                        <Search size={48} opacity={0.2} />
-                                                        <p>No groups matching your search or filters.</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                <div className={styles.statsGrid}>
+                    <div
+                        className={styles.statCard}
+                        onClick={() => setFilterType(filterType === 'Unified' ? null : 'Unified')}
+                        style={{ cursor: 'pointer', borderColor: filterType === 'Unified' ? '#3b82f6' : 'transparent' }}
+                    >
+                        <div className={styles.statLabel}>
+                            <Globe style={{ width: '1.125rem', height: '1.125rem' }} />
+                            M365 Groups
                         </div>
-                    </>
-                )}
+                        <div className={styles.statValue} style={{ color: '#3b82f6' }}>{m365Count}</div>
+                    </div>
+                    <div
+                        className={styles.statCard}
+                        onClick={() => setFilterType(filterType === 'Security' ? null : 'Security')}
+                        style={{ cursor: 'pointer', borderColor: filterType === 'Security' ? '#a855f7' : 'transparent' }}
+                    >
+                        <div className={styles.statLabel}>
+                            <Shield style={{ width: '1.125rem', height: '1.125rem' }} />
+                            Security Groups
+                        </div>
+                        <div className={styles.statValue} style={{ color: '#a855f7' }}>{securityCount}</div>
+                    </div>
+                    <div
+                        className={styles.statCard}
+                        onClick={() => setFilterType(filterType === 'Distribution' ? null : 'Distribution')}
+                        style={{ cursor: 'pointer', borderColor: filterType === 'Distribution' ? '#22c55e' : 'transparent' }}
+                    >
+                        <div className={styles.statLabel}>
+                            <Mail style={{ width: '1.125rem', height: '1.125rem' }} />
+                            Distribution Lists
+                        </div>
+                        <div className={styles.statValue} style={{ color: '#22c55e' }}>{distributionCount}</div>
+                    </div>
+                </div>
+
+                <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>
+                            <Users style={{ width: '1.5rem', height: '1.5rem', color: '#3b82f6' }} />
+                            Groups List
+                        </h2>
+                        <div style={{ position: 'relative' }}>
+                            <Search style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', width: '1rem', height: '1rem', color: '#6b7280' }} />
+                            <input
+                                type="text"
+                                placeholder="Search groups..."
+                                value={filterText}
+                                onChange={(e) => setFilterText(e.target.value)}
+                                className={styles.filterInput}
+                                style={{ paddingLeft: '2.5rem', minWidth: '250px' }}
+                            />
+                        </div>
+                    </div>
+
+                    {filteredGroups.length > 0 ? (
+                        <div className={styles.tableContainer}>
+                            <table className={styles.table}>
+                                <thead className={styles.tableHead}>
+                                    <tr>
+                                        <th>Display Name</th>
+                                        <th>Email</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredGroups.map((group) => (
+                                        <tr key={group.id} className={styles.tableRow}>
+                                            <td>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                    <div style={{ padding: '0.5rem', background: 'rgba(59, 130, 246, 0.15)', borderRadius: '0.5rem' }}>
+                                                        <Users style={{ width: '1rem', height: '1rem', color: '#3b82f6' }} />
+                                                    </div>
+                                                    <span style={{ fontWeight: 500, color: 'white' }}>{group.displayName}</span>
+                                                </div>
+                                            </td>
+                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>
+                                                {group.mail || <span style={{ color: '#6b7280', fontStyle: 'italic' }}>No Email</span>}
+                                            </td>
+                                            <td>
+                                                {group.groupTypes?.includes('Unified') ? (
+                                                    <span className={`${styles.badge} ${styles.badgeInfo}`}>M365 Group</span>
+                                                ) : group.securityEnabled ? (
+                                                    <span className={`${styles.badge}`} style={{ background: 'rgba(168, 85, 247, 0.1)', borderColor: 'rgba(168, 85, 247, 0.3)', color: '#a855f7' }}>Security</span>
+                                                ) : (
+                                                    <span className={`${styles.badge} ${styles.badgeSuccess}`}>Distribution</span>
+                                                )}
+                                            </td>
+                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem', maxWidth: '20rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                {group.description || '-'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className={styles.emptyState}>
+                            <div className={styles.emptyIcon}>
+                                <Users style={{ width: '2.5rem', height: '2.5rem', color: '#6b7280' }} />
+                            </div>
+                            <h3 className={styles.emptyTitle}>No Groups Found</h3>
+                            <p className={styles.emptyDescription}>
+                                {filterText || filterType
+                                    ? `No groups match your current filters`
+                                    : "No groups are configured in your organization."}
+                            </p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

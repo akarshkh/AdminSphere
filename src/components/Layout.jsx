@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-    ShieldCheck, Smartphone, Lock,
-    LogOut, LayoutDashboard
+    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu
 } from 'lucide-react';
-import Header from './Header';
+import styles from './Layout.module.css';
 
 const ServiceLayout = () => {
     const navigate = useNavigate();
@@ -23,78 +22,83 @@ const ServiceLayout = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <div className="app-container">
-            <Header
-                toggleSidebar={toggleSidebar}
-                isSidebarOpen={isSidebarOpen}
-                username={username}
-                isAuthenticated={true}
-                showSidebarToggle={true}
-            />
+        <div className={styles.layoutContainer}>
+            {/* Fixed Header */}
+            <header className={styles.header}>
+                <div className={styles.headerLeft}>
+                    <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', padding: '0.5rem', cursor: 'pointer', color: '#9ca3af', borderRadius: '0.5rem', transition: 'all 200ms' }}>
+                        <Menu style={{ width: '1.25rem', height: '1.25rem' }} />
+                    </button>
 
-            <div className="flex" style={{ paddingTop: 'var(--header-height)' }}>
-                {/* Sidebar */}
-                <aside
-                    className="app-sidebar"
-                    style={{ width: isSidebarOpen ? 'var(--sidebar-width)' : '80px' }}
-                >
-                    <div className="sidebar-content">
-                        <SidebarItem
-                            icon={LayoutDashboard}
-                            label="Admin Center"
-                            active={isActive('/service/admin')}
-                            isOpen={isSidebarOpen}
-                            onClick={() => navigate('/service/admin')}
-                            color="blue"
-                        />
-                        <SidebarItem
-                            icon={ShieldCheck}
-                            label="Entra ID"
-                            active={isActive('/service/entra')}
-                            isOpen={isSidebarOpen}
-                            onClick={() => navigate('/service/entra')}
-                            color="indigo"
-                        />
-                        <SidebarItem
-                            icon={Smartphone}
-                            label="Intune"
-                            active={isActive('/service/intune')}
-                            isOpen={isSidebarOpen}
-                            onClick={() => navigate('/service/intune')}
-                            color="cyan"
-                        />
-                        <SidebarItem
-                            icon={Lock}
-                            label="Purview"
-                            active={isActive('/service/purview')}
-                            isOpen={isSidebarOpen}
-                            onClick={() => navigate('/service/purview')}
-                            color="orange"
-                        />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={() => navigate('/')}>
+                        <div className={styles.logo}>
+                            <div className={styles.logoSquare} style={{ backgroundColor: '#f25022' }}></div>
+                            <div className={styles.logoSquare} style={{ backgroundColor: '#7fba00' }}></div>
+                            <div className={styles.logoSquare} style={{ backgroundColor: '#00a4ef' }}></div>
+                            <div className={styles.logoSquare} style={{ backgroundColor: '#ffb900' }}></div>
+                        </div>
+                        <div className={styles.brandText}>
+                            <div className={styles.brandTitle}>Microsoft 365</div>
+                            <div className={styles.brandSubtitle}>Admin Center</div>
+                        </div>
                     </div>
+                </div>
 
-                    <div className="sidebar-footer">
-                        <motion.button
-                            onClick={handleLogout}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="btn-signout"
-                            style={{ justifyContent: isSidebarOpen ? 'flex-start' : 'center' }}
-                        >
-                            <LogOut size={20} />
-                            {isSidebarOpen && <span>Sign Out</span>}
-                        </motion.button>
+                <div className={styles.headerRight}>
+                    <div className={styles.userProfile}>
+                        <div className={styles.userInfo}>
+                            <div className={styles.userName}>{username || 'Admin User'}</div>
+                            <div className={styles.userRole}>Global Admin</div>
+                        </div>
+                        <div className={styles.avatar}>
+                            {username ? username.substring(0, 2).toUpperCase() : 'AD'}
+                        </div>
                     </div>
-                </aside>
+                </div>
+            </header>
 
-                {/* Main Content */}
-                <div
-                    style={{
-                        flex: 1,
-                        marginLeft: isSidebarOpen ? 'var(--sidebar-width)' : '80px',
-                        transition: 'margin-left 0.3s'
-                    }}
-                >
+            {/* Fixed Sidebar */}
+            <aside className={`${styles.sidebar} ${!isSidebarOpen ? styles.sidebarCollapsed : ''}`}>
+                <div className={styles.sidebarNav}>
+                    <SidebarItem
+                        icon={LayoutDashboard}
+                        label="Admin Center"
+                        active={isActive('/service/admin')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/admin')}
+                    />
+                    <SidebarItem
+                        icon={ShieldCheck}
+                        label="Entra ID"
+                        active={isActive('/service/entra')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/entra')}
+                    />
+                    <SidebarItem
+                        icon={Smartphone}
+                        label="Intune"
+                        active={isActive('/service/intune')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/intune')}
+                    />
+                    <SidebarItem
+                        icon={Lock}
+                        label="Purview"
+                        active={isActive('/service/purview')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/purview')}
+                    />
+                </div>
+
+                <button className={styles.signOutButton} onClick={handleLogout}>
+                    <LogOut style={{ width: '1.25rem', height: '1.25rem' }} />
+                    {isSidebarOpen && <span>Sign Out</span>}
+                </button>
+            </aside>
+
+            {/* Main Content Area */}
+            <div className={`${styles.mainContent} ${!isSidebarOpen ? styles.mainContentCollapsed : ''}`}>
+                <div className={styles.contentInner}>
                     <Outlet />
                 </div>
             </div>
@@ -102,22 +106,26 @@ const ServiceLayout = () => {
     );
 };
 
-const SidebarItem = ({ icon: Icon, label, active, isOpen, onClick, color = 'blue' }) => {
+const SidebarItem = ({ icon: Icon, label, active, isOpen, onClick }) => {
     return (
-        <motion.div
+        <div
             onClick={onClick}
-            whileHover={{ x: 4 }}
-            whileTap={{ scale: 0.98 }}
-            className={`sidebar-item ${active ? `active active-${color}` : ''}`}
-            style={{ justifyContent: isOpen ? 'flex-start' : 'center' }}
+            className={`${styles.sidebarItem} ${active ? styles.sidebarItemActive : ''}`}
+            style={{ justifyContent: !isOpen ? 'center' : 'flex-start' }}
         >
-            <Icon size={20} style={{ flexShrink: 0 }} />
+            <Icon
+                className={styles.sidebarItemIcon}
+                style={{
+                    strokeWidth: active ? 2 : 1.5,
+                    color: active ? '#60a5fa' : '#9ca3af'
+                }}
+            />
             {isOpen && (
-                <span>
+                <span className={styles.sidebarItemLabel} style={{ color: active ? 'white' : '#9ca3af' }}>
                     {label}
                 </span>
             )}
-        </motion.div>
+        </div>
     );
 };
 

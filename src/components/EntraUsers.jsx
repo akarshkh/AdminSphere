@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { ArrowLeft, Search, Download, User, Shield, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { UsersService } from '../services/entra';
+import { ArrowLeft, Search, Download, CheckCircle2, XCircle, Loader2, Users } from 'lucide-react';
+import styles from './DetailPage.module.css';
 
 const EntraUsers = () => {
     const navigate = useNavigate();
@@ -12,58 +13,60 @@ const EntraUsers = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterText, setFilterText] = useState('');
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
-
-    const requestSort = (key) => {
-        let direction = 'ascending';
-        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
-        }
-        setSortConfig({ key, direction });
-    };
-
-    const sortedUsers = React.useMemo(() => {
-        let sortableItems = [...users];
-        if (filterText) {
-            sortableItems = sortableItems.filter(user =>
-                user.displayName.toLowerCase().includes(filterText.toLowerCase()) ||
-                user.userPrincipalName.toLowerCase().includes(filterText.toLowerCase())
-            );
-        }
-        if (sortConfig.key !== null) {
-            sortableItems.sort((a, b) => {
-                const aVal = a[sortConfig.key] || '';
-                const bVal = b[sortConfig.key] || '';
-                if (aVal < bVal) return sortConfig.direction === 'ascending' ? -1 : 1;
-                if (aVal > bVal) return sortConfig.direction === 'ascending' ? 1 : -1;
-                return 0;
-            });
-        }
-        return sortableItems;
-    }, [users, filterText, sortConfig]);
+    const [filterType, setFilterType] = useState('all');
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [filterLicense, setFilterLicense] = useState('all');
 
     useEffect(() => {
         const fetchUsers = async () => {
-            try {
-                if (accounts.length > 0) {
-                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                    const graphService = new GraphService(response.accessToken);
-                    const data = await graphService.getExchangeMailboxReport();
-                    setUsers(data.reports || []);
+            if (accounts.length > 0) {
+                try {
+                    const response = await instance.acquireTokenSilent({
+                        ...loginRequest,
+                        account: accounts[0]
+                    });
+                    const client = new GraphService(response.accessToken).client;
+                    const data = await UsersService.getAllUsers(client, 100);
+                    setUsers(data);
+                } catch (error) {
+                    console.error("User fetch error:", error);
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                console.error("User fetch error:", error);
-            } finally {
-                setLoading(false);
             }
         };
-        if (accounts.length > 0) fetchUsers();
+        fetchUsers();
     }, [accounts, instance]);
 
+    const filteredUsers = users.filter(user => {
+        const matchesText = (user.displayName || '').toLowerCase().includes(filterText.toLowerCase()) ||
+            (user.userPrincipalName || '').toLowerCase().includes(filterText.toLowerCase());
+
+        const matchesType = filterType === 'all' ||
+            (filterType === 'guest' ? user.userType === 'Guest' : user.userType !== 'Guest');
+
+        const matchesStatus = filterStatus === 'all' ||
+            (filterStatus === 'enabled' ? user.accountEnabled : !user.accountEnabled);
+
+        const isLicensed = user.assignedLicenses && user.assignedLicenses.length > 0;
+        const matchesLicense = filterLicense === 'all' ||
+            (filterLicense === 'licensed' ? isLicensed : !isLicensed);
+
+        return matchesText && matchesType && matchesStatus && matchesLicense;
+    });
+
     const handleDownloadCSV = () => {
-        const headers = ['Display Name', 'User Principal Name', 'User Type', 'Account Enabled', 'City', 'Country', 'Department', 'Job Title'];
-        const rows = sortedUsers.map(u => [`"${u.displayName}"`, `"${u.userPrincipalName}"`, `"${u.userType || 'Member'}"`, u.accountEnabled, `"${u.city}"`, `"${u.country}"`, `"${u.department}"`, `"${u.jobTitle}"`]);
-        const blob = new Blob([[headers.join(','), ...rows.map(r => r.join(','))].join('\n')], { type: 'text/csv' });
+        const headers = ['Display Name', 'User Principal Name', 'User Type', 'Account Enabled', 'Licensed'];
+        const rows = filteredUsers.map(u => [
+            `"${u.displayName}"`,
+            `"${u.userPrincipalName}"`,
+            `"${u.userType || 'Member'}"`,
+            u.accountEnabled,
+            (u.assignedLicenses && u.assignedLicenses.length > 0) ? 'Yes' : 'No'
+        ]);
+
+        const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -71,114 +74,136 @@ const EntraUsers = () => {
         link.click();
     };
 
+    if (loading) {
+        return (
+            <div className={styles.loadingContainer}>
+                <Loader2 className="animate-spin" style={{ width: '2.5rem', height: '2.5rem', color: '#3b82f6' }} />
+            </div>
+        );
+    }
+
     return (
-        <div className="app-container">
-            <div className="main-content">
-                <button
-                    onClick={() => navigate('/service/entra')}
-                    className="btn-back"
-                >
-                    <ArrowLeft size={16} />
-                    <span>Back to Entra ID</span>
+        <div className={styles.pageContainer}>
+            <div className={styles.contentWrapper}>
+                <button onClick={() => navigate('/service/entra')} className={styles.backButton}>
+                    <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+                    Back to Dashboard
                 </button>
 
-                <div className="flex justify-between items-center mb-10">
-                    <div>
-                        <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>User Identities</h1>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Lifecycle management and audit for all directory users</p>
-                    </div>
-                    <div className="flex gap-4">
-                        <div style={{ position: 'relative' }}>
-                            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} />
-                            <input
-                                type="text"
-                                placeholder="Search users..."
-                                value={filterText}
-                                onChange={(e) => setFilterText(e.target.value)}
-                                className="glass"
-                                style={{ padding: '10px 16px 10px 40px', borderRadius: '12px', fontSize: '0.875rem', width: '280px' }}
-                            />
-                        </div>
-                        <button onClick={handleDownloadCSV} className="btn btn-secondary" style={{ padding: '10px 16px', fontSize: '0.875rem' }}>
-                            <Download size={16} />
-                            <span>Export</span>
-                        </button>
-                    </div>
+                <div className={styles.pageHeader}>
+                    <h1 className={styles.pageTitle}>
+                        <Users style={{ width: '2rem', height: '2rem', color: '#3b82f6' }} />
+                        All Users
+                    </h1>
+                    <p className={styles.pageSubtitle}>
+                        Manage user identities, access permissions, and account settings
+                    </p>
                 </div>
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <Loader2 className="animate-spin" size={48} color="var(--accent-blue)" />
-                        <p style={{ color: 'var(--text-secondary)' }}>Synchronizing identity directory...</p>
+                <div className={styles.filterBar}>
+                    <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className={styles.filterInput} style={{ flex: 'initial', minWidth: '150px' }}>
+                        <option value="all">All Types</option>
+                        <option value="member">Members</option>
+                        <option value="guest">Guests</option>
+                    </select>
+                    <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className={styles.filterInput} style={{ flex: 'initial', minWidth: '150px' }}>
+                        <option value="all">All Status</option>
+                        <option value="enabled">Enabled</option>
+                        <option value="disabled">Disabled</option>
+                    </select>
+                    <select value={filterLicense} onChange={(e) => setFilterLicense(e.target.value)} className={styles.filterInput} style={{ flex: 'initial', minWidth: '180px' }}>
+                        <option value="all">All License States</option>
+                        <option value="licensed">Licensed</option>
+                        <option value="unlicensed">Unlicensed</option>
+                    </select>
+
+                    <div style={{ position: 'relative', flex: 1, minWidth: '250px' }}>
+                        <Search style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '1rem', height: '1rem', color: '#6b7280' }} />
+                        <input
+                            type="text"
+                            placeholder="Search users..."
+                            value={filterText}
+                            onChange={(e) => setFilterText(e.target.value)}
+                            className={styles.filterInput}
+                            style={{ paddingLeft: '2.75rem' }}
+                        />
                     </div>
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="glass"
-                        style={{ padding: '32px' }}
-                    >
-                        <div className="table-container">
-                            <table className="data-table">
-                                <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-secondary)' }}>
+                    <button onClick={handleDownloadCSV} className={`${styles.actionButton} ${styles.actionButtonSecondary}`}>
+                        <Download style={{ width: '1rem', height: '1rem' }} />
+                        Export
+                    </button>
+                </div>
+
+                <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>Users Directory</h2>
+                        <span className={`${styles.badge} ${styles.badgeInfo}`}>
+                            {filteredUsers.length} USERS
+                        </span>
+                    </div>
+
+                    {filteredUsers.length > 0 ? (
+                        <div className={styles.tableContainer}>
+                            <table className={styles.table}>
+                                <thead className={styles.tableHead}>
                                     <tr>
-                                        <th onClick={() => requestSort('displayName')} style={{ cursor: 'pointer' }}>
-                                            <div className="flex items-center gap-1">Display Name {sortConfig.key === 'displayName' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
-                                        </th>
-                                        <th onClick={() => requestSort('userPrincipalName')} style={{ cursor: 'pointer' }}>
-                                            <div className="flex items-center gap-1">UPN / Email {sortConfig.key === 'userPrincipalName' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
-                                        </th>
-                                        <th onClick={() => requestSort('city')} style={{ cursor: 'pointer' }}>
-                                            <div className="flex items-center gap-1">Location {sortConfig.key === 'city' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
-                                        </th>
-                                        <th onClick={() => requestSort('accountEnabled')} style={{ cursor: 'pointer' }}>
-                                            <div className="flex items-center gap-1">Status {sortConfig.key === 'accountEnabled' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
-                                        </th>
-                                        <th onClick={() => requestSort('jobTitle')} style={{ cursor: 'pointer' }}>
-                                            <div className="flex items-center gap-1">Role / Dept {sortConfig.key === 'jobTitle' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}</div>
-                                        </th>
+                                        <th>Display Name</th>
+                                        <th>User Principal Name</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>License</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {sortedUsers.length > 0 ? sortedUsers.map((user, i) => (
-                                        <tr key={i}>
+                                    {filteredUsers.map((user, i) => (
+                                        <tr key={i} className={styles.tableRow}>
                                             <td>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="avatar" style={{ background: 'rgba(59, 130, 246, 0.05)', color: 'var(--accent-blue)', fontSize: '10px', width: '32px', height: '32px' }}>
-                                                        {user.displayName.substring(0, 2).toUpperCase()}
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                    <div style={{ width: '2rem', height: '2rem', borderRadius: '9999px', background: 'rgba(59, 130, 246, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#3b82f6' }}>
+                                                        {user.displayName ? user.displayName.substring(0, 2).toUpperCase() : 'U'}
                                                     </div>
-                                                    <span style={{ fontWeight: 600 }}>{user.displayName}</span>
+                                                    <span style={{ fontWeight: 500, color: 'white' }}>{user.displayName}</span>
                                                 </div>
                                             </td>
-                                            <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{user.userPrincipalName}</td>
-                                            <td style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{user.city ? `${user.city}, ${user.country}` : <span style={{ opacity: 0.3 }}>Cloud Native</span>}</td>
+                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{user.userPrincipalName}</td>
+                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>{user.userType || 'Member'}</td>
                                             <td>
-                                                <span className={`badge ${user.accountEnabled === 'Yes' ? 'badge-success' : 'badge-error'}`} style={{ fontSize: '10px' }}>
-                                                    {user.accountEnabled === 'Yes' ? 'Enabled' : 'Disabled'}
-                                                </span>
+                                                {user.accountEnabled ? (
+                                                    <span className={`${styles.badge} ${styles.badgeSuccess}`}>
+                                                        <CheckCircle2 style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.375rem' }} />
+                                                        Enabled
+                                                    </span>
+                                                ) : (
+                                                    <span className={`${styles.badge} ${styles.badgeError}`}>
+                                                        <XCircle style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.375rem' }} />
+                                                        Disabled
+                                                    </span>
+                                                )}
                                             </td>
                                             <td>
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{user.jobTitle || <span style={{ opacity: 0.3 }}>-</span>}</span>
-                                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user.department}</span>
-                                                </div>
+                                                {user.assignedLicenses && user.assignedLicenses.length > 0 ? (
+                                                    <span className={`${styles.badge} ${styles.badgeInfo}`}>Licensed</span>
+                                                ) : (
+                                                    <span className={`${styles.badge} ${styles.badgeNeutral}`}>Unlicensed</span>
+                                                )}
                                             </td>
                                         </tr>
-                                    )) : (
-                                        <tr>
-                                            <td colSpan="5" style={{ padding: '80px', textAlign: 'center' }}>
-                                                <div className="flex flex-col items-center gap-4 text-muted">
-                                                    <Search size={48} opacity={0.2} />
-                                                    <p>No users found matching your search.</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )}
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
-                    </motion.div>
-                )}
+                    ) : (
+                        <div className={styles.emptyState}>
+                            <div className={styles.emptyIcon}>
+                                <Users style={{ width: '2.5rem', height: '2.5rem', color: '#6b7280' }} />
+                            </div>
+                            <h3 className={styles.emptyTitle}>No Users Found</h3>
+                            <p className={styles.emptyDescription}>
+                                No users match your current filters. Try adjusting your search criteria.
+                            </p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

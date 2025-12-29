@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { Loader2, ArrowLeft, Download, AlertCircle, Search } from 'lucide-react';
+import { Loader2, ArrowLeft, Download, AlertCircle, CreditCard, TrendingUp, Search } from 'lucide-react';
+import styles from './DetailPage.module.css';
 
 const LicensesPage = () => {
     const navigate = useNavigate();
@@ -39,7 +40,7 @@ const LicensesPage = () => {
                 setReportData(processedUsers);
             } catch (err) {
                 console.error("Error fetching license data:", err);
-                setError("Failed to load real-time license telemetry from Microsoft Graph.");
+                setError("Failed to load license data.");
             } finally {
                 setLoading(false);
             }
@@ -82,159 +83,149 @@ const LicensesPage = () => {
         document.body.removeChild(link);
     };
 
+    if (loading) {
+        return (
+            <div className={styles.loadingContainer}>
+                <Loader2 className="animate-spin" style={{ width: '2.5rem', height: '2.5rem', color: '#3b82f6' }} />
+            </div>
+        );
+    }
+
     return (
-        <div className="app-container">
-            <div className="main-content">
-                <button
-                    onClick={() => navigate('/service/admin')}
-                    className="btn-back"
-                >
-                    <ArrowLeft size={16} />
-                    <span>Back to Admin</span>
+        <div className={styles.pageContainer}>
+            <div className={styles.contentWrapper}>
+                <button onClick={() => navigate('/service/admin')} className={styles.backButton}>
+                    <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+                    Back to Dashboard
                 </button>
 
-                <div className="mb-8">
-                    <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
+                <div className={styles.pageHeader}>
+                    <h1 className={styles.pageTitle}>
+                        <CreditCard style={{ width: '2rem', height: '2rem', color: '#3b82f6' }} />
                         License Assignments
                     </h1>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Full visibility into seat usage and assignments</p>
+                    <p className={styles.pageSubtitle}>
+                        Manage user licenses, view seat usage, and track license allocation across your organization
+                    </p>
                 </div>
 
                 {error && (
-                    <div style={{ marginBottom: '32px', padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444' }}>
-                        <AlertCircle size={24} />
+                    <div className={`${styles.alert} ${styles.alertError}`}>
+                        <AlertCircle style={{ width: '1.5rem', height: '1.5rem', flexShrink: 0 }} />
                         <span>{error}</span>
                     </div>
                 )}
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <Loader2 className="animate-spin" size={48} color="var(--accent-blue)" />
-                        <p style={{ color: 'var(--text-secondary)' }}>Synchronizing Cloud Licenses...</p>
-                    </div>
-                ) : (
-                    <>
-                        {/* License Breakdown Grid */}
-                        {licensingSummary.length > 0 && (
-                            <div className="mb-12">
-                                <h3 className="mb-6">Global License Breakdown</h3>
-                                <div className="stats-grid">
-                                    {licensingSummary.map((sku, i) => (
-                                        <div key={i} className="glass stat-card glass-hover relative overflow-hidden" style={{ borderLeft: '4px solid var(--accent-blue)' }}>
-                                            <div className="ambient-glow" style={{ background: 'var(--accent-blue)', width: '100px', height: '100px', top: '-50px', right: '-50px', opacity: 0.1 }} />
-                                            <p className="stat-label truncate" title={sku.skuPartNumber}>{sku.skuPartNumber}</p>
-
-                                            <div className="flex justify-between items-end mt-4">
-                                                <div>
-                                                    <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Assigned</p>
-                                                    <p className="stat-value">{sku.consumedUnits}</p>
-                                                </div>
-                                                <div style={{ textAlign: 'right' }}>
-                                                    <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Total</p>
-                                                    <p className="stat-value">{sku.prepaidUnits?.enabled || 0}</p>
-                                                </div>
+                {/* License SKU Cards */}
+                {licensingSummary.length > 0 && (
+                    <div style={{ marginBottom: '3rem' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', color: 'white' }}>
+                            License Breakdown
+                        </h3>
+                        <div className={styles.statsGrid}>
+                            {licensingSummary.map((sku, i) => {
+                                const percentage = Math.min((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100, 100);
+                                return (
+                                    <div key={i} className={styles.statCard} style={{ borderLeft: '4px solid #3b82f6' }}>
+                                        <div className={styles.statLabel} title={sku.skuPartNumber}>
+                                            <CreditCard style={{ width: '1.125rem', height: '1.125rem' }} />
+                                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sku.skuPartNumber}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', marginTop: '1rem' }}>
+                                            <div>
+                                                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Assigned</div>
+                                                <div style={{ fontSize: '1.75rem', fontWeight: 700 }}>{sku.consumedUnits}</div>
                                             </div>
-
-                                            <div style={{ width: '100%', background: 'rgba(255, 255, 255, 0.05)', height: '6px', marginTop: '16px', borderRadius: '3px', overflow: 'hidden' }}>
-                                                <div
-                                                    style={{
-                                                        background: 'var(--accent-blue)',
-                                                        height: '100%',
-                                                        borderRadius: '3px',
-                                                        width: `${Math.min(((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100), 100)}%`
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="flex justify-between items-center mt-3">
-                                                <span className="badge badge-success" style={{ fontSize: '10px' }}>
-                                                    {Math.round((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100)}% Seats Used
-                                                </span>
-                                                <span style={{ fontSize: '10px', color: 'var(--text-dim)', fontWeight: 600 }}>ENFORCED</span>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Total</div>
+                                                <div style={{ fontSize: '1.75rem', fontWeight: 700 }}>{sku.prepaidUnits?.enabled || 0}</div>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Detailed Table */}
-                        <div className="glass" style={{ padding: '32px' }}>
-                            <div className="flex items-center justify-between mb-8">
-                                <h3 className="text-xl font-bold">User License Assignments</h3>
-                                <div className="flex items-center gap-4">
-                                    <div style={{ position: 'relative' }}>
-                                        <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} />
-                                        <input
-                                            type="text"
-                                            placeholder="Search users..."
-                                            value={filterText}
-                                            onChange={(e) => setFilterText(e.target.value)}
-                                            className="glass"
-                                            style={{ padding: '10px 16px 10px 40px', borderRadius: '12px', fontSize: '0.875rem', width: '280px' }}
-                                        />
+                                        <div style={{ width: '100%', background: 'rgba(107, 114, 128, 0.3)', height: '0.375rem', marginTop: '1rem', borderRadius: '9999px', overflow: 'hidden' }}>
+                                            <div style={{ background: '#3b82f6', height: '100%', width: `${percentage}%`, borderRadius: '9999px', transition: 'width 300ms' }} />
+                                        </div>
+                                        <div style={{ fontSize: '0.75rem', textAlign: 'right', marginTop: '0.25rem', color: '#6b7280', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.25rem' }}>
+                                            <TrendingUp style={{ width: '0.875rem', height: '0.875rem' }} />
+                                            {Math.round(percentage)}% Used
+                                        </div>
                                     </div>
-                                    <button
-                                        onClick={handleDownloadCSV}
-                                        className="btn btn-secondary"
-                                        style={{ padding: '10px 16px', fontSize: '0.875rem' }}
-                                        title="Download CSV"
-                                    >
-                                        <Download size={16} />
-                                        <span>Export</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="table-container">
-                                <table className="data-table">
-                                    <thead style={{ position: 'sticky', top: 0, zIndex: 20, background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(16px)' }}>
-                                        <tr>
-                                            <th>Display Name</th>
-                                            <th>Email / UPN</th>
-                                            <th>Assigned Licenses</th>
-                                            <th style={{ textAlign: 'center' }}>Count</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {filteredData.length > 0 ? (
-                                            filteredData.map((report, i) => (
-                                                <tr key={i}>
-                                                    <td style={{ fontWeight: 600 }}>{report.displayName}</td>
-                                                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{report.emailAddress}</td>
-                                                    <td>
-                                                        {report.licenses !== 'No License' ? (
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {report.licenses.split(', ').map((lic, idx) => (
-                                                                    <span key={idx} className="badge" style={{ background: 'rgba(59, 130, 246, 0.1)', color: 'var(--accent-blue)', fontSize: '10px', textTransform: 'none' }}>
-                                                                        {lic}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        ) : (
-                                                            <span className="badge" style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-dim)', fontSize: '10px' }}>Unlicensed</span>
-                                                        )}
-                                                    </td>
-                                                    <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-                                                        <span className="font-bold">{report.licenseCount}</span>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan="4" style={{ padding: '80px', textAlign: 'center' }}>
-                                                    <div className="flex flex-col items-center gap-4 text-muted">
-                                                        <AlertCircle size={48} opacity={0.2} />
-                                                        <p>No user license data found matching your search.</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                );
+                            })}
                         </div>
-                    </>
+                    </div>
                 )}
+
+                {/* User License Table */}
+                <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>User License Assignments</h2>
+                        <div style={{ display: 'flex', gap: '0.75rem' }}>
+                            <div style={{ position: 'relative' }}>
+                                <Search style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', width: '1rem', height: '1rem', color: '#6b7280' }} />
+                                <input
+                                    type="text"
+                                    placeholder="Search users..."
+                                    value={filterText}
+                                    onChange={(e) => setFilterText(e.target.value)}
+                                    className={styles.filterInput}
+                                    style={{ paddingLeft: '2.5rem', minWidth: '250px' }}
+                                />
+                            </div>
+                            <button
+                                onClick={handleDownloadCSV}
+                                className={`${styles.actionButton} ${styles.actionButtonSecondary}`}
+                                title="Download CSV"
+                            >
+                                <Download style={{ width: '1rem', height: '1rem' }} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {filteredData.length > 0 ? (
+                        <div className={styles.tableContainer}>
+                            <table className={styles.table}>
+                                <thead className={styles.tableHead}>
+                                    <tr>
+                                        <th>Display Name</th>
+                                        <th>Email / UPN</th>
+                                        <th>Assigned Licenses</th>
+                                        <th style={{ textAlign: 'center' }}>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredData.map((report, i) => (
+                                        <tr key={i} className={styles.tableRow}>
+                                            <td style={{ fontWeight: 500, color: 'white' }}>{report.displayName}</td>
+                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{report.emailAddress}</td>
+                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>
+                                                {report.licenses !== 'No License' ? (
+                                                    report.licenses
+                                                ) : (
+                                                    <span style={{ color: '#6b7280', fontStyle: 'italic' }}>Unlicensed</span>
+                                                )}
+                                            </td>
+                                            <td style={{ textAlign: 'center', color: '#9ca3af' }}>
+                                                <span className={report.licenseCount > 0 ? styles.badge : `${styles.badge} ${styles.badgeNeutral}`}>
+                                                    {report.licenseCount}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className={styles.emptyState}>
+                            <div className={styles.emptyIcon}>
+                                <CreditCard style={{ width: '2.5rem', height: '2.5rem', color: '#6b7280' }} />
+                            </div>
+                            <h3 className={styles.emptyTitle}>No Users Found</h3>
+                            <p className={styles.emptyDescription}>
+                                {filterText ? `No users match "${filterText}"` : "No user license data available."}
+                            </p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

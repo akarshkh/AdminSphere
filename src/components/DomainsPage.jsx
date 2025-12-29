@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { Loader2, CheckCircle2, XCircle, Globe, ShieldCheck, ShieldAlert, ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Loader2, CheckCircle2, Globe, ShieldAlert, ArrowLeft } from 'lucide-react';
+import styles from './DetailPage.module.css';
 
 const DomainsPage = () => {
     const navigate = useNavigate();
@@ -16,7 +16,6 @@ const DomainsPage = () => {
     useEffect(() => {
         const fetchDomains = async () => {
             if (accounts.length === 0) return;
-            setLoading(true);
             try {
                 const response = await instance.acquireTokenSilent({
                     ...loginRequest,
@@ -27,7 +26,7 @@ const DomainsPage = () => {
                 setDomains(data);
             } catch (err) {
                 console.error("Error fetching domains:", err);
-                setError("Failed to synchronize organization domains from Microsoft Graph.");
+                setError("Failed to load domains.");
             } finally {
                 setLoading(false);
             }
@@ -36,53 +35,70 @@ const DomainsPage = () => {
         fetchDomains();
     }, [instance, accounts]);
 
+    if (loading) {
+        return (
+            <div className={styles.loadingContainer}>
+                <Loader2 className="animate-spin" style={{ width: '2.5rem', height: '2.5rem', color: '#3b82f6' }} />
+            </div>
+        );
+    }
+
+    const verifiedCount = domains.filter(d => d.state === 'Verified').length;
+
     return (
-        <div className="app-container">
-            <div className="main-content">
-                <button
-                    onClick={() => navigate('/service/admin')}
-                    className="btn-back"
-                >
-                    <ArrowLeft size={16} />
-                    <span>Back to Admin</span>
+        <div className={styles.pageContainer}>
+            <div className={styles.contentWrapper}>
+                <button onClick={() => navigate('/service/admin')} className={styles.backButton}>
+                    <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+                    Back to Dashboard
                 </button>
 
-                <div className="mb-10">
-                    <h1 className="title-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
-                        Verified Domains
+                <div className={styles.pageHeader}>
+                    <h1 className={styles.pageTitle}>
+                        <Globe style={{ width: '2rem', height: '2rem', color: '#3b82f6' }} />
+                        Domains
                     </h1>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Management and verification for all organizational custom domains</p>
+                    <p className={styles.pageSubtitle}>
+                        Manage and verify your organization's domain names and DNS settings
+                    </p>
                 </div>
 
                 {error && (
-                    <div style={{ marginBottom: '32px', padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444' }}>
-                        <XCircle size={24} />
+                    <div className={`${styles.alert} ${styles.alertError}`}>
+                        <AlertCircle style={{ width: '1.5rem', height: '1.5rem', flexShrink: 0 }} />
                         <span>{error}</span>
                     </div>
                 )}
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <Loader2 className="animate-spin" size={48} color="var(--accent-blue)" />
-                        <p style={{ color: 'var(--text-secondary)' }}>Synchronizing domain registry...</p>
-                    </div>
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="glass"
-                        style={{ padding: '32px' }}
-                    >
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className="text-xl font-bold">Domain Directory</h3>
-                            <div className="badge badge-secondary" style={{ textTransform: 'none' }}>
-                                {domains.length} Total Domains
-                            </div>
+                <div className={styles.statsGrid}>
+                    <div className={styles.statCard}>
+                        <div className={styles.statLabel}>
+                            <Globe style={{ width: '1.125rem', height: '1.125rem' }} />
+                            Total Domains
                         </div>
+                        <div className={styles.statValue}>{domains.length}</div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <div className={styles.statLabel}>
+                            <CheckCircle2 style={{ width: '1.125rem', height: '1.125rem' }} />
+                            Verified
+                        </div>
+                        <div className={styles.statValue} style={{ color: '#22c55e' }}>{verifiedCount}</div>
+                    </div>
+                </div>
 
-                        <div className="table-container">
-                            <table className="data-table">
-                                <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-secondary)' }}>
+                <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>
+                            <Globe style={{ width: '1.5rem', height: '1.5rem', color: '#3b82f6' }} />
+                            Domain List
+                        </h2>
+                    </div>
+
+                    {domains.length > 0 ? (
+                        <div className={styles.tableContainer}>
+                            <table className={styles.table}>
+                                <thead className={styles.tableHead}>
                                     <tr>
                                         <th>Domain Name</th>
                                         <th>Status</th>
@@ -92,33 +108,35 @@ const DomainsPage = () => {
                                 </thead>
                                 <tbody>
                                     {domains.map((domain) => (
-                                        <tr key={domain.id}>
+                                        <tr key={domain.id} className={styles.tableRow}>
                                             <td>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="avatar" style={{ background: 'rgba(59, 130, 246, 0.05)', color: 'var(--accent-blue)', width: '32px', height: '32px' }}>
-                                                        <Globe size={14} />
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                    <div style={{ padding: '0.5rem', background: 'rgba(59, 130, 246, 0.15)', borderRadius: '0.5rem' }}>
+                                                        <Globe style={{ width: '1rem', height: '1rem', color: '#3b82f6' }} />
                                                     </div>
-                                                    <span style={{ fontWeight: 600 }}>{domain.id}</span>
+                                                    <span style={{ fontWeight: 500, color: 'white' }}>{domain.id}</span>
                                                 </div>
                                             </td>
                                             <td>
-                                                {domain.isVerified ? (
-                                                    <span className="badge badge-success" style={{ fontSize: '10px' }}>
+                                                {domain.state === 'Verified' ? (
+                                                    <span className={`${styles.badge} ${styles.badgeSuccess}`}>
+                                                        <CheckCircle2 style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.375rem' }} />
                                                         Verified
                                                     </span>
                                                 ) : (
-                                                    <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--accent-orange)', border: '1px solid rgba(245, 158, 11, 0.2)', fontSize: '10px' }}>
-                                                        Unverified
+                                                    <span className={`${styles.badge} ${styles.badgeWarning}`}>
+                                                        <ShieldAlert style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.375rem' }} />
+                                                        {domain.state}
                                                     </span>
                                                 )}
                                             </td>
-                                            <td style={{ color: 'var(--text-secondary)' }}>
+                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>
                                                 {domain.authenticationType}
                                             </td>
                                             <td style={{ textAlign: 'center' }}>
                                                 {domain.isDefault && (
-                                                    <span className="badge badge-success" style={{ borderRadius: '50%', padding: '4px', display: 'inline-flex' }}>
-                                                        <CheckCircle2 size={12} />
+                                                    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0.25rem', background: '#3b82f6', borderRadius: '9999px' }}>
+                                                        <CheckCircle2 style={{ width: '1rem', height: '1rem', color: 'white' }} />
                                                     </span>
                                                 )}
                                             </td>
@@ -127,8 +145,18 @@ const DomainsPage = () => {
                                 </tbody>
                             </table>
                         </div>
-                    </motion.div>
-                )}
+                    ) : (
+                        <div className={styles.emptyState}>
+                            <div className={styles.emptyIcon}>
+                                <Globe style={{ width: '2.5rem', height: '2.5rem', color: '#6b7280' }} />
+                            </div>
+                            <h3 className={styles.emptyTitle}>No Domains Found</h3>
+                            <p className={styles.emptyDescription}>
+                                No domains are configured for your organization.
+                            </p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
