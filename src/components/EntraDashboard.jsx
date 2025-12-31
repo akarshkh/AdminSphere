@@ -29,8 +29,7 @@ const EntraDashboard = () => {
                     const client = new GraphService(response.accessToken).client;
 
                     // Parallel Fetch
-                    
-                    const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsCount] = await Promise.all([
+                    const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse] = await Promise.all([
                         UsersService.getUserCounts(client),
                         GroupsService.getGroupCounts(client),
                         DevicesService.getDeviceCounts(client),
