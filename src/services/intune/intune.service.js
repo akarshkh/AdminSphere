@@ -27,6 +27,7 @@ export const IntuneService = {
 
             // Get non-compliant devices count - fetch actual devices to get accurate count
             const nonCompliantResponse = await client.api('/deviceManagement/managedDevices')
+                .header('ConsistencyLevel', 'eventual')
                 .filter('complianceState eq \'noncompliant\'')
                 .select('id')
                 .top(999)
@@ -38,6 +39,7 @@ export const IntuneService = {
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
             const inactiveResponse = await client.api('/deviceManagement/managedDevices')
+                .header('ConsistencyLevel', 'eventual')
                 .filter(`lastSyncDateTime lt ${thirtyDaysAgo.toISOString()}`)
                 .select('id')
                 .top(999)
@@ -130,6 +132,7 @@ export const IntuneService = {
     async getNonCompliantDevices(client, top = 100) {
         try {
             const response = await client.api('/deviceManagement/managedDevices')
+                .header('ConsistencyLevel', 'eventual')
                 .filter('complianceState eq \'noncompliant\'')
                 .top(top)
                 .select('id,deviceName,operatingSystem,complianceState,lastSyncDateTime,userPrincipalName')
@@ -148,6 +151,7 @@ export const IntuneService = {
             daysAgo.setDate(daysAgo.getDate() - days);
 
             const response = await client.api('/deviceManagement/managedDevices')
+                .header('ConsistencyLevel', 'eventual')
                 .filter(`lastSyncDateTime lt ${daysAgo.toISOString()}`)
                 .top(top)
                 .select('id,deviceName,operatingSystem,lastSyncDateTime,userPrincipalName,complianceState')
@@ -230,6 +234,7 @@ export const IntuneService = {
     async getUserDevices(client, userPrincipalName) {
         try {
             const response = await client.api('/deviceManagement/managedDevices')
+                .header('ConsistencyLevel', 'eventual')
                 .filter(`userPrincipalName eq '${userPrincipalName}'`)
                 .select('id,deviceName,operatingSystem,osVersion,complianceState,lastSyncDateTime')
                 .get();

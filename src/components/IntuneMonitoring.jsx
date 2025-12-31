@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import {
     Smartphone, AlertTriangle, Clock, Shield, Settings,
     Package, Rocket, Lock, Users, UserCog, FileText,
-    TrendingUp, Loader2
+    TrendingUp, Loader2, ArrowRight
 } from 'lucide-react';
 
 const IntuneMonitoring = () => {
@@ -53,156 +53,138 @@ const IntuneMonitoring = () => {
     const tiles = [
         {
             label: 'All Managed Devices',
-            value: stats.totalDevices.toLocaleString(),
+            value: stats.totalDevices,
             trend: 'Manage',
-            color: 'text-blue-400',
+            color: 'var(--accent-blue)',
             path: '/service/intune/devices',
-            icon: Smartphone,
-            description: 'Total devices under management'
+            icon: Smartphone
         },
         {
             label: 'Non-Compliant Devices',
-            value: stats.nonCompliantDevices.toLocaleString(),
+            value: stats.nonCompliantDevices,
             trend: 'High-Risk',
-            color: 'text-red-400',
+            color: 'var(--accent-error)',
             path: '/service/intune/non-compliant',
-            icon: AlertTriangle,
-            description: 'Devices failing compliance'
+            icon: AlertTriangle
         },
         {
             label: 'Inactive Devices',
-            value: stats.inactiveDevices.toLocaleString(),
+            value: stats.inactiveDevices,
             trend: '>30 Days',
-            color: 'text-orange-400',
+            color: 'var(--accent-warning)',
             path: '/service/intune/inactive',
-            icon: Clock,
-            description: 'Stale devices not syncing'
+            icon: Clock
         },
         {
             label: 'Compliance Policies',
-            value: stats.compliancePolicies.toLocaleString(),
+            value: stats.compliancePolicies,
             trend: 'Active',
-            color: 'text-green-400',
+            color: 'var(--accent-success)',
             path: '/service/intune/compliance-policies',
-            icon: Shield,
-            description: 'Compliance policy rules'
+            icon: Shield
         },
         {
             label: 'Configuration Profiles',
-            value: stats.configProfiles.toLocaleString(),
+            value: stats.configProfiles,
             trend: 'Deployed',
-            color: 'text-purple-400',
+            color: 'var(--accent-purple)',
             path: '/service/intune/config-profiles',
-            icon: Settings,
-            description: 'Device configuration policies'
+            icon: Settings
         },
         {
             label: 'Applications',
-            value: stats.mobileApps.toLocaleString(),
+            value: stats.mobileApps,
             trend: 'Managed',
-            color: 'text-cyan-400',
+            color: 'var(--accent-cyan)',
             path: '/service/intune/applications',
-            icon: Package,
-            description: 'Mobile app inventory'
+            icon: Package
         },
         {
             label: 'Autopilot & Enrollment',
-            value: stats.autopilotDevices.toLocaleString(),
+            value: stats.autopilotDevices,
             trend: 'Provisioned',
-            color: 'text-indigo-400',
+            color: 'var(--accent-indigo)',
             path: '/service/intune/autopilot',
-            icon: Rocket,
-            description: 'Windows Autopilot devices'
+            icon: Rocket
         },
         {
             label: 'Security Baselines',
-            value: stats.securityBaselines.toLocaleString(),
+            value: stats.securityBaselines,
             trend: 'Applied',
-            color: 'text-yellow-400',
+            color: 'var(--accent-warning)',
             path: '/service/intune/security-baselines',
-            icon: Lock,
-            description: 'Security baseline policies'
+            icon: Lock
         },
         {
             label: 'User → Devices View',
             value: 'Search',
             trend: 'Enabled',
-            color: 'text-teal-400',
+            color: 'var(--accent-cyan)',
             path: '/service/intune/user-devices',
-            icon: Users,
-            description: 'Find devices by user'
+            icon: Users
         },
         {
             label: 'RBAC & Admin Access',
-            value: stats.adminRoles.toLocaleString(),
+            value: stats.adminRoles,
             trend: 'Roles',
-            color: 'text-pink-400',
+            color: 'var(--accent-purple)',
             path: '/service/intune/rbac',
-            icon: UserCog,
-            description: 'Role-based access control'
+            icon: UserCog
         },
         {
             label: 'Audit & Activity Logs',
             value: 'Recent',
             trend: 'Live',
-            color: 'text-gray-400',
+            color: 'var(--accent-blue)',
             path: '/service/intune/audit-logs',
-            icon: FileText,
-            description: 'Admin action history'
+            icon: FileText
         },
         {
             label: 'Reports & Insights',
             value: 'Analytics',
             trend: 'Trends',
-            color: 'text-emerald-400',
+            color: 'var(--accent-success)',
             path: '/service/intune/reports',
-            icon: TrendingUp,
-            description: 'Compliance and device trends'
+            icon: TrendingUp
         }
     ];
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white">
-            <div className="w-full">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight mb-2">
-                        Microsoft Intune
-                    </h1>
-                    <p className="text-sm text-gray-400">Device management and mobile application management</p>
+        <div className="animate-in">
+            <header className="flex-between spacing-v-8">
+                <div>
+                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Microsoft Intune</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Device management and mobile application management</p>
                 </div>
+            </header>
 
-                {loading ? (
-                    <div className="flex items-center justify-center h-64">
-                        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                    </div>
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
-                    >
-                        {tiles.map((tile, i) => (
-                            <div
-                                key={i}
-                                onClick={() => navigate(tile.path)}
-                                className="glass p-6 cursor-pointer hover:bg-white/5 transition-all hover:scale-[1.02]"
-                            >
-                                <div className="flex justify-between items-start mb-2">
-                                    <p className="text-gray-400 text-sm">{tile.label}</p>
-                                    <tile.icon className={`w-5 h-5 ${tile.color}`} />
-                                </div>
-
-                                <p className="text-3xl font-bold">{tile.value}</p>
-
-                                <div className={`mt-4 flex items-center text-xs ${tile.color}`}>
-                                    <span className="font-bold">{tile.trend}</span>
-                                    <span className="ml-2 text-gray-500 text-[10px] uppercase tracking-wider">Source: Microsoft Graph</span>
-                                </div>
+            {loading ? (
+                <div className="flex-center" style={{ height: '400px' }}>
+                    <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
+                </div>
+            ) : (
+                <div className="stat-grid">
+                    {tiles.map((tile, i) => (
+                        <motion.div
+                            key={i}
+                            whileHover={{ y: -5 }}
+                            className="glass-card stat-card"
+                            onClick={() => navigate(tile.path)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <div className="flex-between spacing-v-4">
+                                <span className="stat-label">{tile.label}</span>
+                                <tile.icon size={20} style={{ color: tile.color }} />
                             </div>
-                        ))}
-                    </motion.div>
-                )}
-            </div>
+                            <div className="stat-value">{typeof tile.value === 'number' ? tile.value.toLocaleString() : tile.value}</div>
+                            <div className="flex-between mt-4" style={{ marginTop: '16px' }}>
+                                <span className="badge badge-info">{tile.trend}</span>
+                                <ArrowRight size={14} style={{ color: 'var(--text-dim)' }} />
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
