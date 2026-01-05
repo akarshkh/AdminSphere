@@ -24,14 +24,14 @@ import IntuneInactiveDevices from './components/IntuneInactiveDevices';
 import IntuneCompliancePolicies from './components/IntuneCompliancePolicies';
 import IntuneConfigProfiles from './components/IntuneConfigProfiles';
 import IntuneApplications from './components/IntuneApplications';
-import IntuneAutopilot from './components/IntuneAutopilot';
 import IntuneSecurityBaselines from './components/IntuneSecurityBaselines';
 import IntuneUserDevices from './components/IntuneUserDevices';
 import IntuneRBAC from './components/IntuneRBAC';
 import IntuneAuditLogs from './components/IntuneAuditLogs';
 import IntuneReports from './components/IntuneReports';
 import EmailActivityPage from './components/EmailActivityPage';
-import ServiceLayout from './components/Layout'; // Imported from Layout.jsx which we updated
+import OverviewDashboard from './components/OverviewDashboard';
+import ServiceLayout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -44,6 +44,10 @@ function App() {
           {/* Protected Service Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/service" element={<ServiceLayout />}>
+              {/* Overview Dashboard */}
+              <Route path="overview" element={<OverviewDashboard />} />
+
+              {/* Admin Center Routes */}
               <Route path="admin" element={<ServicePage serviceId="admin" />} /> {/* /service/admin */}
               <Route path="admin/report" element={<ExchangeReport />} />
               <Route path="admin/domains" element={<DomainsPage />} />
@@ -72,7 +76,6 @@ function App() {
               <Route path="intune/compliance-policies" element={<IntuneCompliancePolicies />} />
               <Route path="intune/config-profiles" element={<IntuneConfigProfiles />} />
               <Route path="intune/applications" element={<IntuneApplications />} />
-              <Route path="intune/autopilot" element={<IntuneAutopilot />} />
               <Route path="intune/security-baselines" element={<IntuneSecurityBaselines />} />
               <Route path="intune/user-devices" element={<IntuneUserDevices />} />
               <Route path="intune/rbac" element={<IntuneRBAC />} />
@@ -81,7 +84,7 @@ function App() {
 
 
               <Route path=":serviceId" element={<ServicePage />} /> {/* generic service handler */}
-              <Route index element={<Navigate to="admin" replace />} /> {/* /service -> /service/admin */}
+              <Route index element={<Navigate to="overview" replace />} /> {/* /service -> /service/overview */}
             </Route>
           </Route>
 

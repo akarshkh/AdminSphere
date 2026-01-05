@@ -101,24 +101,14 @@ export class GraphService {
 
     async getEmailActivityUserDetail(period = 'D7') {
         try {
-            const reportUrl = `https://graph.microsoft.com/beta/reports/getEmailActivityUserDetail(period='${period}')?$format=application/json`;
-            const response = await fetch(reportUrl, {
-                method: "GET",
-                headers: { "Authorization": `Bearer ${this.accessToken}` },
-                redirect: "manual"
-            });
-
-            if (response.status === 302 || response.status === 301) {
-                const redirectUrl = response.headers.get("Location");
-                const dataResponse = await fetch(redirectUrl);
-                const json = await dataResponse.json();
-                return json.value || [];
-            } else if (response.ok) {
-                const json = await response.json();
-                return json.value || [];
-            }
-            return [];
+            // Use the Graph SDK client which handles redirects properly
+            const response = await this.client
+                .api(`/reports/getEmailActivityUserDetail(period='${period}')`)
+                .version('beta')
+                .get();
+            return response.value || [];
         } catch (error) {
+            console.debug('Email activity report fetch failed:', error);
             return [];
         }
     }

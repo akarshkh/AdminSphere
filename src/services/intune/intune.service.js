@@ -9,21 +9,18 @@ export const IntuneService = {
                 managedDevicesResponse,
                 compliancePoliciesResponse,
                 configProfilesResponse,
-                mobileAppsResponse,
-                autopilotDevicesResponse
+                mobileAppsResponse
             ] = await Promise.all([
-                client.api('/deviceManagement/managedDevices').select('id').top(999).get().catch(() => ({ value: [] })),
-                client.api('/deviceManagement/deviceCompliancePolicies').select('id').top(999).get().catch(() => ({ value: [] })),
-                client.api('/deviceManagement/deviceConfigurations').select('id').top(999).get().catch(() => ({ value: [] })),
-                client.api('/deviceAppManagement/mobileApps').select('id').top(999).get().catch(() => ({ value: [] })),
-                client.api('/deviceManagement/windowsAutopilotDeviceIdentities').select('id').top(999).get().catch(() => ({ value: [] }))
+                client.api('/deviceManagement/managedDevices').select('id').top(999).get().catch((err) => { console.debug('Managed devices fetch failed:', err.statusCode); return { value: [] }; }),
+                client.api('/deviceManagement/deviceCompliancePolicies').select('id').top(999).get().catch((err) => { console.debug('Compliance policies fetch failed:', err.statusCode); return { value: [] }; }),
+                client.api('/deviceManagement/deviceConfigurations').select('id').top(999).get().catch((err) => { console.debug('Device configurations fetch failed:', err.statusCode); return { value: [] }; }),
+                client.api('/deviceAppManagement/mobileApps').select('id').top(999).get().catch((err) => { console.debug('Mobile apps fetch failed:', err.statusCode); return { value: [] }; })
             ]);
 
             const managedDevices = managedDevicesResponse.value ? managedDevicesResponse.value.length : 0;
             const compliancePolicies = compliancePoliciesResponse.value ? compliancePoliciesResponse.value.length : 0;
             const configProfiles = configProfilesResponse.value ? configProfilesResponse.value.length : 0;
             const mobileApps = mobileAppsResponse.value ? mobileAppsResponse.value.length : 0;
-            const autopilotDevices = autopilotDevicesResponse.value ? autopilotDevicesResponse.value.length : 0;
 
             // Get non-compliant devices count - fetch actual devices to get accurate count
             const nonCompliantResponse = await client.api('/deviceManagement/managedDevices')
@@ -54,7 +51,6 @@ export const IntuneService = {
                 compliancePolicies,
                 configProfiles,
                 mobileApps,
-                autopilotDevices,
                 securityBaselines: 0, // Placeholder - requires specific endpoint
                 adminRoles: 0 // Placeholder
             };
@@ -67,7 +63,6 @@ export const IntuneService = {
                 compliancePolicies: 0,
                 configProfiles: 0,
                 mobileApps: 0,
-                autopilotDevices: 0,
                 securityBaselines: 0,
                 adminRoles: 0
             };
@@ -217,18 +212,7 @@ export const IntuneService = {
         }
     },
 
-    // Get autopilot devices
-    async getAutopilotDevices(client) {
-        try {
-            const response = await client.api('/deviceManagement/windowsAutopilotDeviceIdentities')
-                .select('id,serialNumber,model,manufacturer,enrollmentState,lastContactedDateTime')
-                .get();
-            return response.value || [];
-        } catch (error) {
-            console.error('Error fetching autopilot devices:', error);
-            return [];
-        }
-    },
+
 
     // Get user's devices
     async getUserDevices(client, userPrincipalName) {

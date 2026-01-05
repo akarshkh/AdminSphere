@@ -1,17 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, AppWindow
+    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command
 } from 'lucide-react';
+import SearchModal from './SearchModal';
 
 const ServiceLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const username = localStorage.getItem('m365_user') || 'Admin';
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+    // Keyboard shortcut for search (Cmd/Ctrl + K)
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                setIsSearchOpen(true);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('m365_user');
@@ -45,6 +60,13 @@ const ServiceLayout = () => {
                 </div>
 
                 <nav className="sidebar-nav">
+                    <NavItem
+                        icon={BarChart3}
+                        label="Overview"
+                        active={isActive('/service/overview')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/overview')}
+                    />
                     <NavItem
                         icon={LayoutDashboard}
                         label="Admin Center"
@@ -90,14 +112,40 @@ const ServiceLayout = () => {
                         <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
                             <Menu size={20} />
                         </button>
-                        <div className="flex-center" style={{ background: 'var(--glass-bg)', padding: '8px 16px', borderRadius: '100px', border: '1px solid var(--glass-border)' }}>
-                            <Search size={16} color="var(--text-dim)" style={{ marginRight: '10px' }} />
-                            <input
-                                type="text"
-                                placeholder="Search services..."
-                                style={{ background: 'none', border: 'none', padding: 0, width: '200px', fontSize: '13px' }}
-                            />
-                        </div>
+
+                        {/* Clickable Search Button */}
+                        <button
+                            onClick={() => setIsSearchOpen(true)}
+                            className="flex-center"
+                            style={{
+                                background: 'var(--glass-bg)',
+                                padding: '8px 16px',
+                                borderRadius: '100px',
+                                border: '1px solid var(--glass-border)',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                flex: '1',
+                                maxWidth: '280px',
+                                justifyContent: 'space-between'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'hsla(0,0%,100%,0.08)';
+                                e.currentTarget.style.borderColor = 'hsla(0,0%,100%,0.2)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'var(--glass-bg)';
+                                e.currentTarget.style.borderColor = 'var(--glass-border)';
+                            }}
+                        >
+                            <div className="flex-center" style={{ gap: '10px' }}>
+                                <Search size={16} color="var(--text-dim)" />
+                                <span style={{ fontSize: '13px', color: 'var(--text-dim)' }}>Search...</span>
+                            </div>
+                            <div className="flex-center" style={{ gap: '4px', fontSize: '10px', color: 'var(--text-dim)', opacity: 0.6 }}>
+                                <Command size={10} />
+                                <span>K</span>
+                            </div>
+                        </button>
                     </div>
 
                     <div className="flex-center flex-gap-4">
@@ -141,6 +189,9 @@ const ServiceLayout = () => {
                     </AnimatePresence>
                 </div>
             </main>
+
+            {/* Search Modal */}
+            <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
         </div>
     );
 };

@@ -61,11 +61,9 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 setExchangeData(exchangeResult.reports || []);
                 setLicensingSummary(licensingResult.skus || []);
 
-                graphService.getEmailActivityUserDetail('D7').then(activity => {
-                    const sent = activity.reduce((acc, curr) => acc + (parseInt(curr.sendCount) || 0), 0);
-                    const received = activity.reduce((acc, curr) => acc + (parseInt(curr.receiveCount) || 0), 0);
-                    setEmailActivity({ sent, received, date: activity[0]?.reportRefreshDate });
-                });
+                // Note: Email activity endpoint removed due to CORS redirect issues
+                // Microsoft redirects to reportssea.office.com which causes browser CORS errors
+                setEmailActivity({ sent: 0, received: 0, date: null });
 
                 graphService.getDomains().then(d => setDomainsCount(d.length));
                 graphService.getGroups().then(g => setGroupsCount(g.length));
