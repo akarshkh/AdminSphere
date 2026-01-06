@@ -19,7 +19,10 @@ export const loginRequest = {
         "MailboxSettings.Read",
         "ServiceHealth.Read.All",
         "AuditLog.Read.All",
-        "DeviceManagementManagedDevices.Read.All"
+        "DeviceManagementManagedDevices.Read.All",
+        "DeviceManagementServiceConfig.Read.All",
+        "DeviceManagementApps.Read.All",
+        "DeviceManagementConfiguration.Read.All"
     ]
 };
 

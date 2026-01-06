@@ -22,7 +22,6 @@ const IntuneMonitoring = () => {
         compliancePolicies: 0,
         configProfiles: 0,
         mobileApps: 0,
-        autopilotDevices: 0,
         securityBaselines: 0,
         adminRoles: 0
     });
@@ -98,14 +97,6 @@ const IntuneMonitoring = () => {
             color: 'var(--accent-cyan)',
             path: '/service/intune/applications',
             icon: Package
-        },
-        {
-            label: 'Autopilot & Enrollment',
-            value: stats.autopilotDevices,
-            trend: 'Provisioned',
-            color: 'var(--accent-indigo)',
-            path: '/service/intune/autopilot',
-            icon: Rocket
         },
         {
             label: 'Security Baselines',

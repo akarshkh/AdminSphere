@@ -17,10 +17,11 @@ const EmailActivityPage = () => {
         const fetchActivity = async () => {
             if (accounts.length === 0) return;
             try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const graphService = new GraphService(response.accessToken);
-                const data = await graphService.getEmailActivityUserDetail('D7');
-                setActivity(data || []);
+                // Note: This endpoint redirects to reportssea.office.com which causes CORS errors in browsers
+                // Microsoft Graph report endpoints with redirects cannot be called directly from frontend
+                // Requires either: backend proxy, PowerShell, or Graph Explorer
+                setError("Email activity reports require backend API access due to Microsoft's CORS restrictions. Use PowerShell or Graph Explorer to retrieve this data.");
+                setActivity([]);
             } catch (err) {
                 setError("Email interaction telemetry could not be synchronized.");
             } finally {
