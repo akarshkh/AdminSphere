@@ -39,24 +39,24 @@ const ServiceLayout = () => {
         <div className="app-container">
             {/* Sidebar */}
             <aside className="sidebar" style={{ width: isSidebarOpen ? 'var(--sidebar-width)' : '80px' }}>
-                <div className="sidebar-header">
+                <div className="sidebar-header" style={{ height: 'var(--header-height)', padding: '0 12px' }}>
                     <div className="flex-center" style={{
-                        width: '40px',
-                        height: '40px',
+                        width: '24px',
+                        height: '24px',
                         background: 'var(--glass-bg)',
-                        borderRadius: '10px',
+                        borderRadius: '6px',
                         border: '1px solid var(--glass-border)',
                         display: 'grid',
                         gridTemplateColumns: 'repeat(2, 1fr)',
-                        gap: '4px',
-                        padding: '6px'
+                        gap: '2px',
+                        padding: '3px'
                     }}>
                         <div style={{ backgroundColor: '#f25022', borderRadius: '1px' }}></div>
                         <div style={{ backgroundColor: '#7fba00', borderRadius: '1px' }}></div>
                         <div style={{ backgroundColor: '#00a4ef', borderRadius: '1px' }}></div>
                         <div style={{ backgroundColor: '#ffb900', borderRadius: '1px' }}></div>
                     </div>
-                    {isSidebarOpen && <span className="font-bold" style={{ fontSize: '18px' }}>M365 Portal</span>}
+                    {isSidebarOpen && <span className="font-bold" style={{ fontSize: '14px', marginLeft: '8px' }}>M365 Portal</span>}
                 </div>
 
                 <nav className="sidebar-nav">
@@ -97,10 +97,10 @@ const ServiceLayout = () => {
                     />
                 </nav>
 
-                <div style={{ padding: '24px', borderTop: '1px solid hsla(0,0%,100%,0.05)' }}>
-                    <button className="btn-secondary w-full" onClick={handleLogout} style={{ justifyContent: isSidebarOpen ? 'flex-start' : 'center', padding: '12px' }}>
-                        <LogOut size={18} />
-                        {isSidebarOpen && <span>Sign Out</span>}
+                <div style={{ padding: '12px', borderTop: '1px solid hsla(0,0%,100%,0.05)' }}>
+                    <button className="btn-secondary w-full" onClick={handleLogout} style={{ justifyContent: isSidebarOpen ? 'flex-start' : 'center', padding: '8px', fontSize: '11px' }}>
+                        <LogOut size={14} />
+                        {isSidebarOpen && <span style={{ marginLeft: '8px' }}>Sign Out</span>}
                     </button>
                 </div>
             </aside>
@@ -110,68 +110,63 @@ const ServiceLayout = () => {
                 <header className="header-top">
                     <div className="flex-center flex-gap-4">
                         <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
-                            <Menu size={20} />
+                            <Menu size={16} />
                         </button>
 
-                        {/* Clickable Search Button */}
+                        {/* Clickable Search Icon */}
                         <button
                             onClick={() => setIsSearchOpen(true)}
                             className="flex-center"
                             style={{
-                                background: 'var(--glass-bg)',
-                                padding: '8px 16px',
-                                borderRadius: '100px',
-                                border: '1px solid var(--glass-border)',
+                                background: 'none',
+                                border: 'none',
                                 cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                flex: '1',
-                                maxWidth: '280px',
-                                justifyContent: 'space-between'
+                                color: 'var(--text-secondary)',
+                                transition: 'color 0.2s',
+                                padding: '6px'
                             }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'hsla(0,0%,100%,0.08)';
-                                e.currentTarget.style.borderColor = 'hsla(0,0%,100%,0.2)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'var(--glass-bg)';
-                                e.currentTarget.style.borderColor = 'var(--glass-border)';
-                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                            title="Search (Ctrl+K)"
                         >
-                            <div className="flex-center" style={{ gap: '10px' }}>
-                                <Search size={16} color="var(--text-dim)" />
-                                <span style={{ fontSize: '13px', color: 'var(--text-dim)' }}>Search...</span>
-                            </div>
-                            <div className="flex-center" style={{ gap: '4px', fontSize: '10px', color: 'var(--text-dim)', opacity: 0.6 }}>
-                                <Command size={10} />
-                                <span>K</span>
-                            </div>
+                            <Search size={18} />
                         </button>
                     </div>
 
                     <div className="flex-center flex-gap-4">
-                        <button style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}><Bell size={20} /></button>
-                        <button style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}><SettingsIcon size={20} /></button>
-                        <div style={{ width: '1px', height: '20px', background: 'var(--glass-border)' }}></div>
-                        <div className="flex-center flex-gap-2">
+                        <button
+                            onClick={() => navigate('/service/admin/alerts')}
+                            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                        >
+                            <Bell size={18} />
+                        </button>
+                        <div style={{ width: '1px', height: '16px', background: 'var(--glass-border)' }}></div>
+                        <button
+                            onClick={() => navigate('/service/admin/profile')}
+                            className="flex-center flex-gap-2"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '8px', transition: 'background 0.2s' }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'hsla(0,0%,100%,0.05)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                        >
                             <div style={{ textAlign: 'right' }}>
-                                <div className="font-semibold" style={{ fontSize: '13px' }}>{username}</div>
-                                <div style={{ fontSize: '10px', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700 }}>Global Admin</div>
+                                <div className="font-semibold" style={{ fontSize: '11px', color: 'var(--text-primary)' }}>{username}</div>
+                                <div style={{ fontSize: '7px', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700 }}>Global Admin</div>
                             </div>
                             <div className="avatar" style={{
-                                width: '36px',
-                                height: '36px',
+                                width: '24px',
+                                height: '24px',
                                 background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-indigo))',
                                 borderRadius: '50%',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 fontWeight: 700,
-                                fontSize: '12px',
-                                border: '2px solid var(--glass-border)'
+                                fontSize: '9px',
+                                border: '1px solid var(--glass-border)'
                             }}>
                                 {username.substring(0, 2).toUpperCase()}
                             </div>
-                        </div>
+                        </button>
                     </div>
                 </header>
 
@@ -202,7 +197,7 @@ const NavItem = ({ icon: Icon, label, active, isOpen, onClick }) => (
         className={`nav-item ${active ? 'active' : ''}`}
         style={{ justifyContent: isOpen ? 'flex-start' : 'center' }}
     >
-        <Icon size={20} style={{ flexShrink: 0 }} />
+        <Icon size={13} style={{ flexShrink: 0 }} />
         {isOpen && <span>{label}</span>}
     </div>
 );

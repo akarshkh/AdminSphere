@@ -167,17 +167,7 @@ const SearchModal = ({ isOpen, onClose }) => {
 
                 {/* Footer */}
                 <div className={styles.footer}>
-                    <div className={styles.hints}>
-                        <span className={styles.hint}>
-                            <kbd>↑↓</kbd> Navigate
-                        </span>
-                        <span className={styles.hint}>
-                            <kbd>Enter</kbd> Select
-                        </span>
-                        <span className={styles.hint}>
-                            <kbd>Esc</kbd> Close
-                        </span>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -202,7 +192,7 @@ const ResultItem = ({ item, isSelected, onClick, query }) => {
             onClick={onClick}
         >
             <div className={styles.iconWrapper}>
-                <Icon size={24} />
+                <Icon size={14} />
             </div>
             <div className={styles.content}>
                 <div className={styles.title}>

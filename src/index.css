@@ -26,8 +26,8 @@
   --glass-border-hover: hsla(0, 0%, 100%, 0.15);
 
   --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --sidebar-width: 280px;
-  --header-height: 72px;
+  --sidebar-width: 180px;
+  --header-height: 44px;
 
   /* Global Setup */
   font-family: 'Inter', sans-serif;
@@ -96,7 +96,7 @@ h6 {
 }
 
 .main-content {
-  padding: 40px;
+  padding: 16px;
   max-width: 1600px;
   margin: 0 auto;
   min-height: calc(100vh - var(--header-height));
@@ -138,12 +138,13 @@ h6 {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 12px;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
   color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
+  font-size: 11px;
   transition: all 0.3s var(--transition-smooth);
 }
 
@@ -180,9 +181,9 @@ h6 {
   background: var(--glass-bg);
   backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  padding: 32px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   transition: all 0.4s var(--transition-smooth);
 }
 
@@ -223,9 +224,9 @@ h6 {
 }
 
 .modern-table td {
-  padding: 16px 24px;
+  padding: 10px 16px;
   border-bottom: 1px solid hsla(0, 0%, 100%, 0.03);
-  font-size: 14px;
+  font-size: 11px;
   color: var(--text-secondary);
 }
 
@@ -375,29 +376,37 @@ select.input {
   border-color: hsla(217, 91%, 60%, 0.2);
 }
 
-/* Stats Grid */
+/* Stats Grid - Robust Responsive layout */
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 480px) {
+  .stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+  }
 }
 
 .stat-card {
-  padding: 24px;
+  padding: 12px;
   position: relative;
   overflow: hidden;
+  height: 100%;
 }
 
 .stat-label {
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .stat-value {
-  font-size: 32px;
+  font-size: 18px;
   font-weight: 700;
   font-family: 'Outfit', sans-serif;
 }

@@ -184,8 +184,38 @@ const OverviewDashboard = () => {
 
     return (
         <div className="animate-in">
-            {/* Charts Grid with Enhanced Designs */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: '32px' }}>
+            {/* Quick Stats Section */}
+            <div className="stat-grid" style={{ marginBottom: '32px' }}>
+                {quickStats.map((stat, idx) => (
+                    <motion.div
+                        key={idx}
+                        whileHover={{ y: -4 }}
+                        className="glass-card stat-card"
+                        onClick={() => stat.path && navigate(stat.path)}
+                        style={{ cursor: stat.path ? 'pointer' : 'default', borderLeft: `4px solid ${stat.color}` }}
+                    >
+                        <div className="flex-between spacing-v-2">
+                            <span className="stat-label">{stat.label}</span>
+                            <stat.icon size={14} style={{ color: stat.color }} />
+                        </div>
+                        <div className="stat-value" style={{
+                            background: stat.gradient,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            fontSize: '22px'
+                        }}>
+                            {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+
+            {/* Charts Grid with Responsive Alignment */}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+                gap: '16px'
+            }}>
 
                 {/* Enhanced Service Health - Radial Chart */}
                 {data?.charts.serviceHealth?.length > 0 && (
@@ -194,18 +224,18 @@ const OverviewDashboard = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5 }}
                         className="glass-card"
-                        style={{ padding: '28px' }}
+                        style={{ padding: '14px' }}
                     >
                         <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                            <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-success), var(--accent-cyan))', borderRadius: '10px' }}>
-                                <Activity size={20} color="white" />
+                            <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-success), var(--accent-cyan))', borderRadius: '6px' }}>
+                                <Activity size={14} color="white" />
                             </div>
                             <div>
-                                <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Service Health</h3>
-                                <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Real-time Status</p>
+                                <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Service Health</h3>
+                                <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Real-time Status</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={160}>
                             <PieChart>
                                 <defs>
                                     <linearGradient id="gradSuccess" x1="0" y1="0" x2="0" y2="1">
@@ -248,18 +278,18 @@ const OverviewDashboard = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
                         className="glass-card"
-                        style={{ padding: '28px' }}
+                        style={{ padding: '14px' }}
                     >
                         <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                            <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-indigo))', borderRadius: '10px' }}>
-                                <Users size={20} color="white" />
+                            <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-indigo))', borderRadius: '6px' }}>
+                                <Users size={14} color="white" />
                             </div>
                             <div>
-                                <h3 style={{ fontSize: '18px', fontWeight: 700 }}>User Distribution</h3>
-                                <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Active vs Inactive</p>
+                                <h3 style={{ fontSize: '12px', fontWeight: 700 }}>User Distribution</h3>
+                                <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Active vs Inactive</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={160}>
                             <PieChart>
                                 <defs>
                                     <linearGradient id="gradActive" x1="0" y1="0" x2="0" y2="1">
@@ -302,18 +332,18 @@ const OverviewDashboard = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="glass-card"
-                        style={{ padding: '28px' }}
+                        style={{ padding: '14px' }}
                     >
                         <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                            <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-purple), var(--accent-indigo))', borderRadius: '10px' }}>
-                                <Shield size={20} color="white" />
+                            <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-purple), var(--accent-indigo))', borderRadius: '6px' }}>
+                                <Shield size={14} color="white" />
                             </div>
                             <div>
-                                <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Device Compliance</h3>
-                                <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Security Posture</p>
+                                <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Device Compliance</h3>
+                                <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Security Posture</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={160}>
                             <BarChart data={data.charts.deviceCompliance} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
                                 <defs>
                                     <linearGradient id="compGradSuccess" x1="0" y1="0" x2="0" y2="1">
@@ -353,19 +383,19 @@ const OverviewDashboard = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5, delay: 0.3 }}
                         className="glass-card"
-                        style={{ padding: '28px' }}
+                        style={{ padding: '14px' }}
                     >
-                        <div className="flex-center justify-start flex-gap-4 spacing-v-8" style={{ marginBottom: '24px' }}>
-                            <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-blue))', borderRadius: '10px' }}>
-                                <CreditCard size={20} color="white" />
+                        <div className="flex-center justify-start flex-gap-4 spacing-v-8" style={{ marginBottom: '16px' }}>
+                            <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-blue))', borderRadius: '6px' }}>
+                                <CreditCard size={14} color="white" />
                             </div>
                             <div>
-                                <h3 style={{ fontSize: '18px', fontWeight: 700 }}>License Utilization</h3>
-                                <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Core Subscriptions</p>
+                                <h3 style={{ fontSize: '12px', fontWeight: 700 }}>License Utilization</h3>
+                                <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Core Subscriptions</p>
                             </div>
                         </div>
 
-                        <div className="flex-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        <div className="flex-column" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             {data.charts.licenseUsage.map((license, idx) => {
                                 const total = license.assigned + license.available;
                                 const percentage = total > 0 ? (license.assigned / total) * 100 : 0;
@@ -373,10 +403,10 @@ const OverviewDashboard = () => {
                                 return (
                                     <div key={idx}>
                                         <div className="flex-between" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                            <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-secondary)', letterSpacing: '0.5px' }}>
+                                            <span style={{ fontSize: '10px', fontWeight: 500, color: 'var(--text-secondary)', letterSpacing: '0.5px' }}>
                                                 {license.name.toUpperCase()}
                                             </span>
-                                            <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                                            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-primary)' }}>
                                                 {license.assigned.toLocaleString()} / {total.toLocaleString()}
                                             </span>
                                         </div>
@@ -414,18 +444,18 @@ const OverviewDashboard = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5, delay: 0.4 }}
                         className="glass-card"
-                        style={{ padding: '28px' }}
+                        style={{ padding: '14px' }}
                     >
                         <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                            <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-indigo), var(--accent-purple))', borderRadius: '10px' }}>
-                                <Mail size={20} color="white" />
+                            <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-indigo), var(--accent-purple))', borderRadius: '6px' }}>
+                                <Mail size={14} color="white" />
                             </div>
                             <div>
-                                <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Email Activity</h3>
-                                <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Last 7 Days</p>
+                                <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Email Activity</h3>
+                                <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Last 7 Days</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={160}>
                             <BarChart data={data.charts.emailTrend} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
                                 <defs>
                                     <linearGradient id="emailGradSent" x1="0" y1="0" x2="0" y2="1">
@@ -460,18 +490,18 @@ const OverviewDashboard = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5, delay: 0.5 }}
                         className="glass-card"
-                        style={{ padding: '28px' }}
+                        style={{ padding: '14px' }}
                     >
                         <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                            <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-success), var(--accent-cyan))', borderRadius: '10px' }}>
-                                <Smartphone size={20} color="white" />
+                            <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-success), var(--accent-cyan))', borderRadius: '6px' }}>
+                                <Smartphone size={14} color="white" />
                             </div>
                             <div>
-                                <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Devices by Platform</h3>
-                                <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Operating Systems</p>
+                                <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Devices by Platform</h3>
+                                <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Operating Systems</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={160}>
                             <BarChart data={data.charts.deviceByPlatform} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
                                 <defs>
                                     <linearGradient id="platformGrad" x1="0" y1="0" x2="0" y2="1">
@@ -493,15 +523,19 @@ const OverviewDashboard = () => {
             </div>
 
             {/* NEW SECTION: Advanced Multi-Dimensional Charts */}
-            <div style={{ marginTop: '48px' }}>
-                <h2 style={{ fontSize: '28px', marginBottom: '8px', fontWeight: 700, background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <div style={{ marginTop: '24px' }}>
+                <h2 style={{ fontSize: '16px', marginBottom: '4px', fontWeight: 700, background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                     Advanced Analytics
                 </h2>
-                <p style={{ color: 'var(--text-dim)', fontSize: '14px', marginBottom: '32px' }}>
+                <p style={{ color: 'var(--text-dim)', fontSize: '10px', marginBottom: '16px' }}>
                     Multi-dimensional views and complex correlations
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: '32px' }}>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+                    gap: '16px'
+                }}>
 
                     {/* Security Posture Radar Chart */}
                     {data?.charts.securityRadar && (
@@ -510,18 +544,18 @@ const OverviewDashboard = () => {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.6, delay: 0.6 }}
                             className="glass-card"
-                            style={{ padding: '28px' }}
+                            style={{ padding: '14px' }}
                         >
                             <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                                <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-error), var(--accent-warning))', borderRadius: '10px' }}>
-                                    <Shield size={20} color="white" />
+                                <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-error), var(--accent-warning))', borderRadius: '6px' }}>
+                                    <Shield size={14} color="white" />
                                 </div>
                                 <div>
-                                    <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Security Posture</h3>
-                                    <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>5-Dimensional View</p>
+                                    <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Security Posture</h3>
+                                    <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>5-Dimensional View</p>
                                 </div>
                             </div>
-                            <ResponsiveContainer width="100%" height={320}>
+                            <ResponsiveContainer width="100%" height={200}>
                                 <RadarChart data={data.charts.securityRadar}>
                                     <defs>
                                         <linearGradient id="radarGrad" x1="0" y1="0" x2="0" y2="1">
@@ -540,91 +574,6 @@ const OverviewDashboard = () => {
                         </motion.div>
                     )}
 
-                    {/* User Growth Trend - Stacked Area Chart */}
-                    {data?.charts.userGrowthTrend && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.6, delay: 0.7 }}
-                            className="glass-card"
-                            style={{ padding: '28px' }}
-                        >
-                            <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                                <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-cyan))', borderRadius: '10px' }}>
-                                    <TrendingUp size={20} color="white" />
-                                </div>
-                                <div>
-                                    <h3 style={{ fontSize: '18px', fontWeight: 700 }}>User Growth Trend</h3>
-                                    <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>5-Week History</p>
-                                </div>
-                            </div>
-                            <ResponsiveContainer width="100%" height={320}>
-                                <AreaChart data={data.charts.userGrowthTrend} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-                                    <defs>
-                                        <linearGradient id="areaActive" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
-                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0.1} />
-                                        </linearGradient>
-                                        <linearGradient id="areaInactive" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
-                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.1} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                    <XAxis dataKey="week" stroke="var(--text-dim)" style={{ fontSize: '11px' }} />
-                                    <YAxis stroke="var(--text-dim)" style={{ fontSize: '12px' }} />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Legend wrapperStyle={{ fontSize: '13px' }} />
-                                    <Area type="monotone" dataKey="active" stackId="1" stroke="#10b981" fill="url(#areaActive)" strokeWidth={2} animationDuration={1500} />
-                                    <Area type="monotone" dataKey="inactive" stackId="1" stroke="#f59e0b" fill="url(#areaInactive)" strokeWidth={2} animationDuration={1700} />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </motion.div>
-                    )}
-
-
-                    {/* Enrollment Funnel */}
-                    {data?.charts.enrollmentFunnel && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.6, delay: 0.9 }}
-                            className="glass-card"
-                            style={{ padding: '28px' }}
-                        >
-                            <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                                <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-success), var(--accent-blue))', borderRadius: '10px' }}>
-                                    <Users size={20} color="white" />
-                                </div>
-                                <div>
-                                    <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Enrollment Funnel</h3>
-                                    <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>User Journey</p>
-                                </div>
-                            </div>
-                            <ResponsiveContainer width="100%" height={320}>
-                                <BarChart data={data.charts.enrollmentFunnel} layout="horizontal" margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-                                    <defs>
-                                        {data.charts.enrollmentFunnel.map((item, idx) => (
-                                            <linearGradient key={`funnel${idx}`} id={`funnelGrad${idx}`} x1="0" y1="0" x2="1" y2="0">
-                                                <stop offset="5%" stopColor={item.fill} stopOpacity={1} />
-                                                <stop offset="95%" stopColor={item.fill} stopOpacity={0.7} />
-                                            </linearGradient>
-                                        ))}
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                    <XAxis type="number" stroke="var(--text-dim)" style={{ fontSize: '12px' }} />
-                                    <YAxis type="category" dataKey="stage" stroke="var(--text-dim)" style={{ fontSize: '12px' }} width={130} />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Bar dataKey="count" radius={[0, 12, 12, 0]} animationDuration={1400}>
-                                        <LabelList dataKey="count" position="right" style={{ fill: 'var(--text-primary)', fontSize: '13px', fontWeight: 700 }} formatter={(val) => val.toLocaleString()} />
-                                        {data.charts.enrollmentFunnel.map((entry, idx) => (
-                                            <Cell key={`cell-${idx}`} fill={`url(#funnelGrad${idx})`} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </motion.div>
-                    )}
 
                 </div>
             </div>

@@ -131,18 +131,18 @@ const ServicePage = ({ serviceId: propServiceId }) => {
 
     return (
         <div className="animate-in">
-            <header className="flex-between spacing-v-8">
+            <header className="flex-between spacing-v-4">
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>{serviceNames[serviceId]} Overview</h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Real-time operational telemetry and management</p>
+                    <h1 className="title-gradient" style={{ fontSize: '18px' }}>{serviceNames[serviceId]} Overview</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '10px' }}>Real-time operational telemetry and management</p>
                 </div>
-                <div className="flex-gap-4">
-                    <button className="btn btn-secondary" onClick={fetchData}>
-                        <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                <div className="flex-gap-2">
+                    <button className="btn btn-secondary" onClick={fetchData} style={{ padding: '6px 12px', fontSize: '11px' }}>
+                        <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
                         Refresh
                     </button>
-                    <button className="btn btn-primary">
-                        <Download size={16} />
+                    <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '11px' }}>
+                        <Download size={12} />
                         Export Data
                     </button>
                 </div>
@@ -166,9 +166,9 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                         onClick={() => stat.path && navigate(stat.path)}
                         style={{ cursor: stat.path ? 'pointer' : 'default' }}
                     >
-                        <div className="flex-between spacing-v-4">
+                        <div className="flex-between spacing-v-2">
                             <span className="stat-label">{stat.label}</span>
-                            <stat.icon size={20} style={{ color: stat.color }} />
+                            <stat.icon size={14} style={{ color: stat.color }} />
                         </div>
                         <div className="stat-value">{stat.value}</div>
                         {stat.trend && (
@@ -222,10 +222,14 @@ const ServicePage = ({ serviceId: propServiceId }) => {
             )}
 
             {isEntra && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
-                    <div className="glass-card">
-                        <h3 className="spacing-v-8 flex-center justify-start flex-gap-4">
-                            <Activity size={20} color="var(--accent-purple)" />
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+                    gap: '24px'
+                }}>
+                    <div className="glass-card" style={{ padding: '14px' }}>
+                        <h3 className="spacing-v-4 flex-center justify-start flex-gap-2" style={{ fontSize: '12px' }}>
+                            <Activity size={14} color="var(--accent-purple)" />
                             Directory Audits
                         </h3>
                         <div className="table-container">
@@ -254,9 +258,9 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                         </div>
                     </div>
 
-                    <div className="glass-card">
-                        <h3 className="spacing-v-8 flex-center justify-start flex-gap-4">
-                            <Shield size={20} color="var(--accent-blue)" />
+                    <div className="glass-card" style={{ padding: '14px' }}>
+                        <h3 className="spacing-v-4 flex-center justify-start flex-gap-2" style={{ fontSize: '12px' }}>
+                            <Shield size={14} color="var(--accent-blue)" />
                             CA Policies
                         </h3>
                         <div className="table-container">
@@ -286,13 +290,33 @@ const ServicePage = ({ serviceId: propServiceId }) => {
             )}
 
             {isAdmin && exchangeData.length > 0 && (
-                <div className="glass-card" style={{ marginTop: '32px' }}>
-                    <div className="flex-between spacing-v-8">
-                        <h3 className="flex-center flex-gap-4">
-                            <Mail size={20} color="var(--accent-blue)" />
+                <div className="glass-card" style={{ marginTop: '16px', padding: '14px' }}>
+                    <div className="flex-between spacing-v-4">
+                        <h3 className="flex-center flex-gap-2" style={{ fontSize: '12px' }}>
+                            <Mail size={14} color="var(--accent-blue)" />
                             Recent Mailboxes
                         </h3>
-                        <button className="btn-secondary" onClick={() => navigate('/service/admin/report')}>View All Reports</button>
+                        <motion.button
+                            whileHover={{ scale: 1.05, x: -4 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="btn btn-secondary"
+                            style={{
+                                padding: '6px 14px',
+                                fontSize: '11px',
+                                border: '1px solid var(--glass-border)',
+                                background: 'hsla(0,0%,100%,0.05)',
+                                color: 'var(--text-secondary)',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                fontWeight: 600
+                            }}
+                            onClick={() => navigate('/service/admin/report')}
+                        >
+                            View All Reports
+                            <ArrowRight size={12} />
+                        </motion.button>
                     </div>
                     <div className="table-container">
                         <table className="modern-table">
