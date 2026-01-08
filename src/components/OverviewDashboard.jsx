@@ -346,7 +346,7 @@ const OverviewDashboard = () => {
                     </motion.div>
                 )}
 
-                {/* Enhanced License Utilization - Stacked Bars with Better Colors */}
+                {/* Custom License Utilization - List with Progress Bars */}
                 {data?.charts.licenseUsage?.length > 0 && (
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -355,36 +355,55 @@ const OverviewDashboard = () => {
                         className="glass-card"
                         style={{ padding: '28px' }}
                     >
-                        <div className="flex-center justify-start flex-gap-4 spacing-v-8">
+                        <div className="flex-center justify-start flex-gap-4 spacing-v-8" style={{ marginBottom: '24px' }}>
                             <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-blue))', borderRadius: '10px' }}>
                                 <CreditCard size={20} color="white" />
                             </div>
                             <div>
                                 <h3 style={{ fontSize: '18px', fontWeight: 700 }}>License Utilization</h3>
-                                <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Top 5 SKUs</p>
+                                <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Core Subscriptions</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={data.charts.licenseUsage} layout="horizontal" margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-                                <defs>
-                                    <linearGradient id="licGradAssigned" x1="0" y1="0" x2="1" y2="0">
-                                        <stop offset="5%" stopColor="#a855f7" stopOpacity={1} />
-                                        <stop offset="95%" stopColor="#9333ea" stopOpacity={0.9} />
-                                    </linearGradient>
-                                    <linearGradient id="licGradAvailable" x1="0" y1="0" x2="1" y2="0">
-                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={1} />
-                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0.9} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis type="number" stroke="var(--text-dim)" style={{ fontSize: '12px' }} />
-                                <YAxis type="category" dataKey="name" stroke="var(--text-dim)" style={{ fontSize: '11px' }} width={140} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend wrapperStyle={{ fontSize: '13px' }} />
-                                <Bar dataKey="assigned" fill="url(#licGradAssigned)" radius={[0, 8, 8, 0]} animationDuration={1000} />
-                                <Bar dataKey="available" fill="url(#licGradAvailable)" radius={[0, 8, 8, 0]} animationDuration={1200} />
-                            </BarChart>
-                        </ResponsiveContainer>
+
+                        <div className="flex-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            {data.charts.licenseUsage.map((license, idx) => {
+                                const total = license.assigned + license.available;
+                                const percentage = total > 0 ? (license.assigned / total) * 100 : 0;
+
+                                return (
+                                    <div key={idx}>
+                                        <div className="flex-between" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                            <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-secondary)', letterSpacing: '0.5px' }}>
+                                                {license.name.toUpperCase()}
+                                            </span>
+                                            <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                                                {license.assigned.toLocaleString()} / {total.toLocaleString()}
+                                            </span>
+                                        </div>
+                                        <div style={{
+                                            width: '100%',
+                                            height: '6px',
+                                            background: 'rgba(255, 255, 255, 0.05)',
+                                            borderRadius: '3px',
+                                            overflow: 'hidden'
+                                        }}>
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${Math.max(1, percentage)}%` }}
+                                                transition={{ duration: 1.5, delay: 0.2 + (idx * 0.1), ease: "easeOut" }}
+                                                style={{
+                                                    height: '100%',
+                                                    background: percentage > 90 ? 'var(--accent-error)' :
+                                                        percentage > 75 ? 'var(--accent-warning)' :
+                                                            '#10b981', // Specifically using the green from the image
+                                                    boxShadow: `0 0 10px ${percentage > 90 ? 'var(--accent-error)' : '#10b981'}40`
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </motion.div>
                 )}
 
@@ -563,73 +582,6 @@ const OverviewDashboard = () => {
                         </motion.div>
                     )}
 
-                    {/* License Distribution Treemap */}
-                    {data?.charts.licenseTreemap && data.charts.licenseTreemap.length > 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.6, delay: 0.8 }}
-                            className="glass-card"
-                            style={{ padding: '28px' }}
-                        >
-                            <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                                <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-purple), var(--accent-indigo))', borderRadius: '10px' }}>
-                                    <LayoutGrid size={20} color="white" />
-                                </div>
-                                <div>
-                                    <h3 style={{ fontSize: '18px', fontWeight: 700 }}>License Distribution</h3>
-                                    <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Treemap View</p>
-                                </div>
-                            </div>
-                            <ResponsiveContainer width="100%" height={320}>
-                                <Treemap
-                                    data={data.charts.licenseTreemap}
-                                    dataKey="size"
-                                    stroke="#fff"
-                                    strokeWidth={2}
-                                    fill="#8884d8"
-                                    content={({ x, y, width, height, index, name, size, fill }) => {
-                                        if (width < 60 || height < 40) return null;
-                                        return (
-                                            <g>
-                                                <rect
-                                                    x={x}
-                                                    y={y}
-                                                    width={width}
-                                                    height={height}
-                                                    style={{
-                                                        fill: fill,
-                                                        stroke: 'rgba(255,255,255,0.2)',
-                                                        strokeWidth: 2,
-                                                        opacity: 0.9
-                                                    }}
-                                                />
-                                                <text
-                                                    x={x + width / 2}
-                                                    y={y + height / 2 - 10}
-                                                    textAnchor="middle"
-                                                    fill="#fff"
-                                                    style={{ fontSize: '12px', fontWeight: 600 }}
-                                                >
-                                                    {name}
-                                                </text>
-                                                <text
-                                                    x={x + width / 2}
-                                                    y={y + height / 2 + 10}
-                                                    textAnchor="middle"
-                                                    fill="rgba(255,255,255,0.8)"
-                                                    style={{ fontSize: '14px', fontWeight: 700 }}
-                                                >
-                                                    {size?.toLocaleString()}
-                                                </text>
-                                            </g>
-                                        );
-                                    }}
-                                    animationDuration={1000}
-                                />
-                            </ResponsiveContainer>
-                        </motion.div>
-                    )}
 
                     {/* Enrollment Funnel */}
                     {data?.charts.enrollmentFunnel && (
@@ -674,51 +626,6 @@ const OverviewDashboard = () => {
                         </motion.div>
                     )}
 
-                    {/* License Trend - Composed Chart (Bar + Line) */}
-                    {data?.charts.licenseTrendComposed && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.6, delay: 1.0 }}
-                            className="glass-card"
-                            style={{ padding: '28px' }}
-                        >
-                            <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                                <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-purple))', borderRadius: '10px' }}>
-                                    <CreditCard size={20} color="white" />
-                                </div>
-                                <div>
-                                    <h3 style={{ fontSize: '18px', fontWeight: 700 }}>License Trend</h3>
-                                    <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Utilization Over Time</p>
-                                </div>
-                            </div>
-                            <ResponsiveContainer width="100%" height={320}>
-                                <ComposedChart data={data.charts.licenseTrendComposed} margin={{ top: 20, right: 40, left: 0, bottom: 20 }}>
-                                    <defs>
-                                        <linearGradient id="compAssigned" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#a855f7" stopOpacity={1} />
-                                            <stop offset="95%" stopColor="#9333ea" stopOpacity={0.8} />
-                                        </linearGradient>
-                                        <linearGradient id="compAvailable" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={1} />
-                                            <stop offset="95%" stopColor="#2563eb" stopOpacity={0.8} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                    <XAxis dataKey="month" stroke="var(--text-dim)" style={{ fontSize: '11px' }} />
-                                    <YAxis yAxisId="left" stroke="var(--text-dim)" style={{ fontSize: '12px' }} />
-                                    <YAxis yAxisId="right" orientation="right" stroke="#f59e0b" style={{ fontSize: '12px' }} domain={[0, 100]} />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Legend wrapperStyle={{ fontSize: '13px' }} />
-                                    <Bar yAxisId="left" dataKey="assigned" fill="url(#compAssigned)" radius={[8, 8, 0, 0]} animationDuration={1000} />
-                                    <Bar yAxisId="left" dataKey="available" fill="url(#compAvailable)" radius={[8, 8, 0, 0]} animationDuration={1200} />
-                                    <Line yAxisId="right" type="monotone" dataKey="utilization" stroke="#f59e0b" strokeWidth={3} dot={{ fill: '#f59e0b', r: 5 }} activeDot={{ r: 7 }} animationDuration={1400}>
-                                        <LabelList dataKey="utilization" position="top" formatter={(val) => `${val}%`} style={{ fill: '#f59e0b', fontSize: '12px', fontWeight: 700 }} />
-                                    </Line>
-                                </ComposedChart>
-                            </ResponsiveContainer>
-                        </motion.div>
-                    )}
                 </div>
             </div>
 
