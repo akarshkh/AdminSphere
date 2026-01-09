@@ -13,8 +13,9 @@ import {
 import {
     Users, Smartphone, CreditCard, Shield, Activity,
     TrendingUp, AlertTriangle, Mail, Loader2, Download,
-    ShieldCheck, Lock, LayoutGrid
+    ShieldCheck, Lock, LayoutGrid, RefreshCw
 } from 'lucide-react';
+import { DataPersistenceService } from '../services/dataPersistence';
 
 const OverviewDashboard = () => {
     const navigate = useNavigate();
@@ -23,22 +24,60 @@ const OverviewDashboard = () => {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchOverviewData = async () => {
-            if (accounts.length === 0) return;
-            try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const client = new GraphService(response.accessToken).client;
-                const overviewData = await AggregationService.getOverviewData(client);
-                setData(overviewData);
-            } catch (err) {
-                console.error('Overview fetch error:', err);
-                setError('Failed to load overview data');
-            } finally {
-                setLoading(false);
+    const fetchOverviewData = async (isManual = false) => {
+        if (accounts.length === 0) return;
+        setLoading(true);
+        try {
+            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+            const client = new GraphService(response.accessToken).client;
+            const overviewData = await AggregationService.getOverviewData(client);
+
+            // Map to our persistence schema
+            const persistenceData = {
+                overview: {
+                    statistics: {
+                        total_users: overviewData.quickStats.totalUsers,
+                        total_devices: overviewData.quickStats.totalDevices,
+                        total_licenses: overviewData.quickStats.totalLicenses,
+                        secure_score: overviewData.quickStats.secureScore
+                    },
+                    health_and_security: {
+                        service_issues: overviewData.charts.serviceHealth.find(d => d.name === 'Issues')?.value || 0,
+                        failed_signins: overviewData.charts.signIns[0]?.failed || 0,
+                        compliance_rate: overviewData.charts.securityRadar.find(d => d.subject === 'Compliance')?.value || 0
+                    }
+                },
+                raw: overviewData
+            };
+
+            // Save to Cache & JSON
+            await DataPersistenceService.save('Overview', persistenceData);
+            setData(overviewData);
+        } catch (err) {
+            console.error('Overview fetch error:', err);
+            setError('Failed to load overview data');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadData = async () => {
+        const cached = await DataPersistenceService.load('Overview');
+        if (cached && cached.raw) {
+            setData(cached.raw);
+            setLoading(false);
+
+            // Background revalidate if stale (30 mins)
+            if (DataPersistenceService.isExpired('Overview', 30)) {
+                fetchOverviewData(false);
             }
-        };
-        fetchOverviewData();
+        } else {
+            fetchOverviewData(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
     }, [accounts, instance]);
 
     if (loading) {
@@ -184,6 +223,17 @@ const OverviewDashboard = () => {
 
     return (
         <div className="animate-in">
+            <header className="flex-between spacing-v-8">
+                <div>
+                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Overview Dashboard</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Unified monitoring and operational intelligence</p>
+                </div>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchOverviewData(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
+                </div>
+            </header>
             {/* Quick Stats Section */}
             <div className="stat-grid" style={{ marginBottom: '32px' }}>
                 {quickStats.map((stat, idx) => (

@@ -59,10 +59,11 @@ const DeletedUsersPage = () => {
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Directory Recycle Bin</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Restore soft-deleted identities or permanently purge accounts</p>
                 </div>
-                <button className="btn btn-secondary" onClick={fetchData}>
-                    <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-                    Sync Bin
-                </button>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={fetchData} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
+                </div>
             </header>
 
             <div className="glass-card" style={{ marginBottom: '24px', padding: '24px' }}>

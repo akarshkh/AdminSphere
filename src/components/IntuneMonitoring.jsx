@@ -8,8 +8,9 @@ import { motion } from 'framer-motion';
 import {
     Smartphone, AlertTriangle, Clock, Shield, Settings,
     Package, Rocket, Lock, Users, UserCog, FileText,
-    TrendingUp, Loader2, ArrowRight
+    TrendingUp, Loader2, ArrowRight, RefreshCw
 } from 'lucide-react';
+import { DataPersistenceService } from '../services/dataPersistence';
 
 const IntuneMonitoring = () => {
     const navigate = useNavigate();
@@ -27,26 +28,62 @@ const IntuneMonitoring = () => {
     });
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            if (accounts.length > 0) {
-                try {
-                    const response = await instance.acquireTokenSilent({
-                        ...loginRequest,
-                        account: accounts[0]
-                    });
-                    const client = new GraphService(response.accessToken).client;
+    const fetchDashboardData = async (isManual = false) => {
+        if (accounts.length === 0) return;
+        setLoading(true);
+        try {
+            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+            const client = new GraphService(response.accessToken).client;
+            const dashboardStats = await IntuneService.getDashboardStats(client);
 
-                    const dashboardStats = await IntuneService.getDashboardStats(client);
-                    setStats(dashboardStats);
-                } catch (error) {
-                    console.error("Intune dashboard fetch error:", error);
-                } finally {
-                    setLoading(false);
-                }
+            // Map to our persistence schema
+            const persistenceData = {
+                intune: {
+                    devices: {
+                        total: dashboardStats.totalDevices,
+                        non_compliant: dashboardStats.nonCompliantDevices,
+                        inactive: dashboardStats.inactiveDevices
+                    },
+                    policies: {
+                        compliance: dashboardStats.compliancePolicies,
+                        configuration: dashboardStats.configProfiles
+                    },
+                    apps: {
+                        total_managed: dashboardStats.mobileApps
+                    },
+                    security: {
+                        baselines: dashboardStats.securityBaselines,
+                        admin_roles: dashboardStats.adminRoles
+                    }
+                },
+                raw: dashboardStats
+            };
+
+            await DataPersistenceService.save('Intune', persistenceData);
+            setStats(dashboardStats);
+        } catch (error) {
+            console.error("Intune dashboard fetch error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadData = async () => {
+        const cached = await DataPersistenceService.load('Intune');
+        if (cached && cached.raw) {
+            setStats(cached.raw);
+            setLoading(false);
+
+            if (DataPersistenceService.isExpired('Intune', 30)) {
+                fetchDashboardData(false);
             }
-        };
-        fetchDashboardData();
+        } else {
+            fetchDashboardData(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
     }, [accounts, instance]);
 
     const tiles = [
@@ -146,6 +183,11 @@ const IntuneMonitoring = () => {
                 <div>
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Microsoft Intune</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Device management and mobile application management</p>
+                </div>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchDashboardData(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
                 </div>
             </header>
 

@@ -95,9 +95,8 @@ const ExchangeReport = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Real-time mailbox configuration and activity telemetry</p>
                 </div>
                 <div className="flex-gap-4">
-                    <button className="btn btn-secondary" onClick={fetchData}>
-                        <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-                        Sync
+                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={fetchData} title="Sync & Refresh">
+                        <RefreshCw size={16} />
                     </button>
                     <button className="btn btn-primary" onClick={handleDownloadCSV}>
                         <Download size={16} />

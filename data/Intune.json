@@ -1,0 +1,33 @@
+{
+  "timestamp": 1767953352073,
+  "data": {
+    "intune": {
+      "devices": {
+        "total": 4,
+        "non_compliant": 1,
+        "inactive": 1
+      },
+      "policies": {
+        "compliance": 2,
+        "configuration": 9
+      },
+      "apps": {
+        "total_managed": 6
+      },
+      "security": {
+        "baselines": 0,
+        "admin_roles": 0
+      }
+    },
+    "raw": {
+      "totalDevices": 4,
+      "nonCompliantDevices": 1,
+      "inactiveDevices": 1,
+      "compliancePolicies": 2,
+      "configProfiles": 9,
+      "mobileApps": 6,
+      "securityBaselines": 0,
+      "adminRoles": 0
+    }
+  }
+}

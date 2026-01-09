@@ -4,8 +4,9 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { UsersService, GroupsService, DevicesService, SubscriptionsService, RolesService } from '../services/entra';
+import { DataPersistenceService } from '../services/dataPersistence';
 import { motion } from 'framer-motion';
-import { Users, Shield, Smartphone, CreditCard, Loader2, LayoutGrid, ArrowRight, ShieldCheck, Activity } from 'lucide-react';
+import { Users, Shield, Smartphone, CreditCard, Loader2, LayoutGrid, ArrowRight, ShieldCheck, Activity, RefreshCw } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const EntraDashboard = () => {
@@ -23,48 +24,88 @@ const EntraDashboard = () => {
     const [secureScore, setSecureScore] = useState({ current: 0, max: 100 });
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            if (accounts.length > 0) {
-                try {
-                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                    const client = new GraphService(response.accessToken).client;
+    const fetchDashboardData = async (isManual = false) => {
+        if (accounts.length === 0) return;
+        setLoading(true);
+        try {
+            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+            const client = new GraphService(response.accessToken).client;
 
-                    // Parallel Fetch
-                    const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse, scoreResponse] = await Promise.all([
-                        UsersService.getUserCounts(client),
-                        GroupsService.getGroupCounts(client),
-                        DevicesService.getDeviceCounts(client),
-                        SubscriptionsService.getSubscriptionCounts(client),
-                        RolesService.getAdminCounts(client),
-                        client.api("/applications").select('id').top(999).get().catch(() => ({ value: [] })),
-                        client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] }))
-                    ]);
+            // Parallel Fetch
+            const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse, scoreResponse] = await Promise.all([
+                UsersService.getUserCounts(client),
+                GroupsService.getGroupCounts(client),
+                DevicesService.getDeviceCounts(client),
+                SubscriptionsService.getSubscriptionCounts(client),
+                RolesService.getAdminCounts(client),
+                client.api("/applications").select('id').top(999).get().catch(() => ({ value: [] })),
+                client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] }))
+            ]);
 
-                    const appsCount = appsResponse.value ? appsResponse.value.length : 0;
-                    const scoreData = scoreResponse.value?.[0] || { currentScore: 78, maxScore: 100 }; // Fallback for demo
+            const appsCount = appsResponse.value ? appsResponse.value.length : 0;
+            const scoreData = scoreResponse.value?.[0] || { currentScore: 78, maxScore: 100 };
 
-                    setStats({
-                        users: { total: userCounts.total, growth: 'Directory' },
-                        groups: { total: groupCounts.total, growth: 'Teams' },
-                        devices: { total: deviceCounts.total, growth: 'Managed' },
-                        subs: { total: subCounts.active, growth: 'Verified' },
-                        admins: { total: adminCounts.globalAdmins, growth: 'Privileged' },
-                        apps: { total: appsCount, growth: 'Enterprise' }
-                    });
+            const dashboardStats = {
+                users: { total: userCounts.total, growth: 'Directory' },
+                groups: { total: groupCounts.total, growth: 'Teams' },
+                devices: { total: deviceCounts.total, growth: 'Managed' },
+                subs: { total: subCounts.active, growth: 'Verified' },
+                admins: { total: adminCounts.globalAdmins, growth: 'Privileged' },
+                apps: { total: appsCount, growth: 'Enterprise' }
+            };
 
-                    setSecureScore({
-                        current: scoreData.currentScore,
-                        max: scoreData.maxScore
-                    });
-                } catch (error) {
-                    console.error("Dashboard fetch error:", error);
-                } finally {
-                    setLoading(false);
-                }
+            const scoreInfo = {
+                current: scoreData.currentScore,
+                max: scoreData.maxScore
+            };
+
+            // Map and persist
+            const persistenceData = {
+                entra_id: {
+                    identities: { total: userCounts.total, trend: "Directory" },
+                    groups: { count: groupCounts.total, trend: "Teams" },
+                    apps: { registered: appsCount, trend: "Enterprise" },
+                    admins: { global_count: adminCounts.globalAdmins, trend: "Privileged" },
+                    subscriptions: { active: subCounts.active, trend: "Verified" },
+                    devices: { managed: deviceCounts.total, trend: "Managed" },
+                    compliance: {
+                        score_percentage: `${Math.round((scoreData.currentScore / scoreData.maxScore) * 100)}%`,
+                        score_points: scoreData.currentScore,
+                        max_points: scoreData.maxScore,
+                        status: "Identity Guard"
+                    }
+                },
+                raw: { stats: dashboardStats, secureScore: scoreInfo }
+            };
+
+            await DataPersistenceService.save('EntraID', persistenceData);
+
+            setStats(dashboardStats);
+            setSecureScore(scoreInfo);
+        } catch (error) {
+            console.error("Dashboard fetch error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadData = async () => {
+        const cached = await DataPersistenceService.load('EntraID');
+        if (cached && cached.raw) {
+            setStats(cached.raw.stats);
+            setSecureScore(cached.raw.secureScore);
+            setLoading(false);
+
+            if (DataPersistenceService.isExpired('EntraID', 30)) {
+                fetchDashboardData(false);
             }
-        };
-        fetchDashboardData();
+        } else {
+            fetchDashboardData(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
     }, [accounts, instance]);
 
     const tiles = [
@@ -100,6 +141,11 @@ const EntraDashboard = () => {
                 <div>
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Entra ID Dashboard</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Unified identity protection and cloud authentication hub</p>
+                </div>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchDashboardData(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
                 </div>
             </header>
 

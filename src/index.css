@@ -433,10 +433,14 @@ select.input {
 }
 
 .flex-gap-2 {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
 .flex-gap-4 {
+  display: flex;
+  align-items: center;
   gap: 16px;
 }
 
@@ -480,6 +484,51 @@ select.input {
   }
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .animate-in {
   animation: fadeIn 0.6s var(--transition-smooth) forwards;
+}
+
+.sync-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s var(--transition-smooth);
+  padding: 0;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sync-btn:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.2);
+}
+
+.sync-btn:active {
+  transform: scale(0.95);
+}
+
+.sync-btn.spinning svg {
+  animation: spin 1s linear infinite;
+  color: var(--accent-blue);
 }

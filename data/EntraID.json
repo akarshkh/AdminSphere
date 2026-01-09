@@ -1,0 +1,69 @@
+{
+  "timestamp": 1767953341858,
+  "data": {
+    "entra_id": {
+      "identities": {
+        "total": 11,
+        "trend": "Directory"
+      },
+      "groups": {
+        "count": 58,
+        "trend": "Teams"
+      },
+      "apps": {
+        "registered": 31,
+        "trend": "Enterprise"
+      },
+      "admins": {
+        "global_count": 5,
+        "trend": "Privileged"
+      },
+      "subscriptions": {
+        "active": 5,
+        "trend": "Verified"
+      },
+      "devices": {
+        "managed": 19,
+        "trend": "Managed"
+      },
+      "compliance": {
+        "score_percentage": "64%",
+        "score_points": 181.45,
+        "max_points": 283,
+        "status": "Identity Guard"
+      }
+    },
+    "raw": {
+      "stats": {
+        "users": {
+          "total": 11,
+          "growth": "Directory"
+        },
+        "groups": {
+          "total": 58,
+          "growth": "Teams"
+        },
+        "devices": {
+          "total": 19,
+          "growth": "Managed"
+        },
+        "subs": {
+          "total": 5,
+          "growth": "Verified"
+        },
+        "admins": {
+          "total": 5,
+          "growth": "Privileged"
+        },
+        "apps": {
+          "total": 31,
+          "growth": "Enterprise"
+        }
+      },
+      "secureScore": {
+        "current": 181.45,
+        "max": 283
+      }
+    }
+  }
+}

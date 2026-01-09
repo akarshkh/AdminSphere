@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
+import { DataPersistenceService } from '../services/dataPersistence';
 import { motion } from 'framer-motion';
 import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2, ArrowRight, Lock } from 'lucide-react';
 
@@ -46,36 +47,60 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const isLicensing = serviceId === 'licensing';
     const isPurview = serviceId === 'purview';
 
-    const fetchData = async () => {
+    const fetchData = async (isManual = false) => {
+        if (accounts.length === 0) return;
         setLoading(true);
         setError(null);
         try {
-            if (accounts.length === 0) return;
             const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
             const graphService = new GraphService(response.accessToken);
 
             if (isAdmin) {
-                const [exchangeResult, licensingResult] = await Promise.all([
+                const [exchangeResult, licensingResult, domainsCount, groupsCount, deletedUsersCount, score, health, signIns] = await Promise.all([
                     graphService.getExchangeMailboxReport().catch(() => ({ reports: [] })),
-                    graphService.getLicensingData().catch(() => ({ skus: [], users: [] }))
-                ]);
-                setExchangeData(exchangeResult.reports || []);
-                setLicensingSummary(licensingResult.skus || []);
-
-                // Note: Email activity endpoint removed due to CORS redirect issues
-                // Microsoft redirects to reportssea.office.com which causes browser CORS errors
-                setEmailActivity({ sent: 0, received: 0, date: null });
-
-                graphService.getDomains().then(d => setDomainsCount(d.length));
-                graphService.getGroups().then(g => setGroupsCount(g.length));
-                graphService.getDeletedUsers().then(u => setDeletedUsersCount(u?.length || 0));
-                graphService.getDeviceComplianceStats().then(s => setDeviceSummary(s));
-
-                const [score, health, signIns] = await Promise.all([
+                    graphService.getLicensingData().catch(() => ({ skus: [], users: [] })),
+                    graphService.getDomains().then(d => d.length),
+                    graphService.getGroups().then(g => g.length),
+                    graphService.getDeletedUsers().then(u => u?.length || 0),
                     graphService.getSecureScore(),
                     graphService.getServiceHealth(),
                     graphService.getFailedSignIns()
                 ]);
+
+                const persistenceData = {
+                    admincenter: {
+                        mailboxes: { total: exchangeResult.reports?.length || 0, status: "Live" },
+                        licenses: { used: licensingResult.skus?.reduce((acc, curr) => acc + (curr.consumedUnits || 0), 0) || 0, status: "Active" },
+                        groups: { count: groupsCount, action: "Manage" },
+                        domains: { count: domainsCount, action: "Manage" },
+                        users: { deleted_count: deletedUsersCount, action: "Restore" },
+                        security: {
+                            secure_score_percentage: score ? `${Math.round((score.currentScore / score.maxScore) * 100)}%` : "0%",
+                            secure_score_points: score?.currentScore || 0,
+                            failed_logins_24h: signIns?.length || 0,
+                            action: "Review"
+                        },
+                        service_health: { issues_count: health?.filter(s => s.status !== 'ServiceOperational').length || 0, status: "View Status" }
+                    },
+                    raw: {
+                        exchangeData: exchangeResult.reports || [],
+                        licensingSummary: licensingResult.skus || [],
+                        domainsCount,
+                        groupsCount,
+                        deletedUsersCount,
+                        secureScore: score,
+                        serviceHealth: health,
+                        failedSignIns: signIns
+                    }
+                };
+
+                await DataPersistenceService.save('AdminCenter', persistenceData);
+
+                setExchangeData(exchangeResult.reports || []);
+                setLicensingSummary(licensingResult.skus || []);
+                setDomainsCount(domainsCount);
+                setGroupsCount(groupsCount);
+                setDeletedUsersCount(deletedUsersCount);
                 if (score) setSecureScore(score);
                 if (health) setServiceHealth(health);
                 if (signIns) setFailedSignIns(signIns);
@@ -90,6 +115,8 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                     graphService.getConditionalAccessPolicies(),
                     graphService.getGlobalAdmins()
                 ]);
+
+                // Persistence Logic for Entra could go here if needed, but usually handled in EntraDashboard
                 setAppsCount(apps?.length || 0);
                 setGroupsCount(groups?.length || 0);
                 setExchangeData(usersData.reports || []);
@@ -106,7 +133,39 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         }
     };
 
-    useEffect(() => { fetchData(); }, [serviceId]);
+    const loadData = async () => {
+        const cacheName = isAdmin ? 'AdminCenter' : (isEntra ? 'EntraID' : null);
+        if (!cacheName) {
+            fetchData(false);
+            return;
+        }
+
+        const cached = await DataPersistenceService.load(cacheName);
+        if (cached && cached.raw) {
+            if (isAdmin) {
+                setExchangeData(cached.raw.exchangeData);
+                setLicensingSummary(cached.raw.licensingSummary);
+                setDomainsCount(cached.raw.domainsCount);
+                setGroupsCount(cached.raw.groupsCount);
+                setDeletedUsersCount(cached.raw.deletedUsersCount);
+                setSecureScore(cached.raw.secureScore);
+                setServiceHealth(cached.raw.serviceHealth);
+                setFailedSignIns(cached.raw.failedSignIns);
+            }
+            // Add Entra hydrations here if needed
+            setLoading(false);
+
+            if (DataPersistenceService.isExpired(cacheName, 30)) {
+                fetchData(false);
+            }
+        } else {
+            fetchData(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, [serviceId]);
 
     const stats = isAdmin ? [
         { label: 'Total Mailboxes', value: exchangeData.length, icon: Mail, color: 'var(--accent-blue)', path: '/service/admin/report', trend: 'Live' },
@@ -137,12 +196,11 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '10px' }}>Real-time operational telemetry and management</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className="btn btn-secondary" onClick={fetchData} style={{ padding: '6px 12px', fontSize: '11px' }}>
-                        <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
-                        Refresh
+                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
+                        <RefreshCw size={14} />
                     </button>
                     <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '11px' }}>
-                        <Download size={12} />
+                        <Download size={14} />
                         Export Data
                     </button>
                 </div>
