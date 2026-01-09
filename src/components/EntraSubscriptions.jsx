@@ -36,7 +36,7 @@ const EntraSubscriptions = () => {
                 <Loader2 className="animate-spin" size={40} color="var(--accent-success)" />
             </div>
         );
-    }
+    }//
 
     return (
         <div className="animate-in">
