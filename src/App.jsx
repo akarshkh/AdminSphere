@@ -35,6 +35,7 @@ import AlertsPage from './components/AlertsPage';
 import UserDetailsPage from './components/UserDetailsPage';
 import ServiceLayout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import DocumentationPage from './components/DocumentationPage';
 
 function App() {
   return (
@@ -87,6 +88,7 @@ function App() {
               <Route path="intune/reports" element={<IntuneReports />} />
 
 
+              <Route path="documentation" element={<DocumentationPage />} />
               <Route path=":serviceId" element={<ServicePage />} /> {/* generic service handler */}
               <Route index element={<Navigate to="overview" replace />} /> {/* /service -> /service/overview */}
             </Route>
