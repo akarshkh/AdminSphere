@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768195083316,
+  "timestamp": 1768202607405,
   "data": {
     "admincenter": {
       "mailboxes": {
@@ -1018,11 +1018,11 @@
             "basis": "AllTenants",
             "averageScore": 53.38,
             "appsScore": 40.22,
-            "appsScoreMax": 103.74,
+            "appsScoreMax": 103.75,
             "dataScore": 0.66,
             "dataScoreMax": 4.32,
             "deviceScore": 11.26,
-            "deviceScoreMax": 20.86,
+            "deviceScoreMax": 20.85,
             "identityScore": 37.21,
             "identityScoreMax": 60.19,
             "infrastructureScore": 0,
@@ -1030,11 +1030,11 @@
           },
           {
             "basis": "TotalSeats",
-            "averageScore": 46.69,
+            "averageScore": 46.68,
             "SeatSizeRangeLowerValue": "1",
             "SeatSizeRangeUpperValue": "100",
-            "appsScore": 46.72,
-            "appsScoreMax": 127.97,
+            "appsScore": 46.73,
+            "appsScoreMax": 127.98,
             "dataScore": 0.67,
             "dataScoreMax": 5.4,
             "deviceScore": 8.93,
@@ -1929,6 +1929,199 @@
       ],
       "failedSignIns": [
         {
+          "id": "dcd85348-e0c6-4921-bb0a-3567715e1b00",
+          "createdDateTime": "2026-01-12T06:27:40Z",
+          "userDisplayName": "Vishal",
+          "userPrincipalName": "vishal@intunetraininglabs.onmicrosoft.com",
+          "userId": "99ff6360-9526-4142-81bc-f8abe5d3bf78",
+          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
+          "appDisplayName": "Azure Portal",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Browser",
+          "correlationId": "439b1cb2-267c-434c-aadc-fad41e138a29",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Azure Resource Manager",
+          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+          "status": {
+            "errorCode": 50072,
+            "failureReason": "Due to a configuration change made by your administrator, or because you moved to a new location, you must enroll in multi-factor authentication to access '{identifier}'.",
+            "additionalDetails": "The user was presented options to provide contact options so that they can do MFA."
+          },
+          "deviceDetail": {
+            "deviceId": "",
+            "displayName": "",
+            "operatingSystem": "Windows10",
+            "browser": "Edge 143.0.0",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": ""
+          },
+          "location": {
+            "city": "New Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": [
+            {
+              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+              "displayName": "Mac Require",
+              "enforcedGrantControls": [
+                "RequireCompliantDevice"
+              ],
+              "enforcedSessionControls": [],
+              "result": "notApplied"
+            },
+            {
+              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+              "displayName": "Require phishing-resistant multifactor authentication for admins",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [],
+              "result": "reportOnlyInterrupted"
+            },
+            {
+              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+              "displayName": "Use application enforced restrictions for O365 apps",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [
+                "AppEnforcedRestrictions"
+              ],
+              "result": "reportOnlyNotApplied"
+            }
+          ]
+        },
+        {
+          "id": "bdc760bf-1c53-477c-97a1-56a04d003000",
+          "createdDateTime": "2026-01-12T06:27:33Z",
+          "userDisplayName": "Vishal",
+          "userPrincipalName": "vishal@intunetraininglabs.onmicrosoft.com",
+          "userId": "99ff6360-9526-4142-81bc-f8abe5d3bf78",
+          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
+          "appDisplayName": "Azure Portal",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Browser",
+          "correlationId": "439b1cb2-267c-434c-aadc-fad41e138a29",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Azure Resource Manager",
+          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+          "status": {
+            "errorCode": 50140,
+            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
+            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
+          },
+          "deviceDetail": {
+            "deviceId": "",
+            "displayName": "",
+            "operatingSystem": "Windows10",
+            "browser": "Edge 143.0.0",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": ""
+          },
+          "location": {
+            "city": "New Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": [
+            {
+              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+              "displayName": "Mac Require",
+              "enforcedGrantControls": [
+                "RequireCompliantDevice"
+              ],
+              "enforcedSessionControls": [],
+              "result": "notApplied"
+            },
+            {
+              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+              "displayName": "Require phishing-resistant multifactor authentication for admins",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [],
+              "result": "reportOnlyInterrupted"
+            },
+            {
+              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+              "displayName": "Use application enforced restrictions for O365 apps",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [
+                "AppEnforcedRestrictions"
+              ],
+              "result": "reportOnlyNotApplied"
+            }
+          ]
+        },
+        {
+          "id": "bdc760bf-1c53-477c-97a1-56a036003000",
+          "createdDateTime": "2026-01-12T06:27:32Z",
+          "userDisplayName": "Vishal",
+          "userPrincipalName": "vishal@intunetraininglabs.onmicrosoft.com",
+          "userId": "99ff6360-9526-4142-81bc-f8abe5d3bf78",
+          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
+          "appDisplayName": "Azure Portal",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Browser",
+          "correlationId": "439b1cb2-267c-434c-aadc-fad41e138a29",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Azure Resource Manager",
+          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+          "status": {
+            "errorCode": 50207,
+            "failureReason": "This web native bridge interrupt will be shown to the user during login when the application is requesting login through the native broker and needs eSTS to ensure the broker is properly configured.",
+            "additionalDetails": null
+          },
+          "deviceDetail": {
+            "deviceId": "",
+            "displayName": "",
+            "operatingSystem": "Windows10",
+            "browser": "Edge 143.0.0",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": ""
+          },
+          "location": {
+            "city": "New Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": []
+        },
+        {
           "id": "7a1f7068-5123-4dca-9578-4c9b97f30800",
           "createdDateTime": "2026-01-12T05:12:12Z",
           "userDisplayName": "Demo User",
@@ -2004,147 +2197,6 @@
         {
           "id": "7ff5049f-01eb-4de8-b908-9fbc1dcb2900",
           "createdDateTime": "2026-01-10T14:11:46Z",
-          "userDisplayName": "Parth Narang",
-          "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
-          "userId": "ee17efc3-3e5f-40e2-b0d9-26dd89484e45",
-          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-          "appDisplayName": "Azure Portal",
-          "ipAddress": "146.196.32.183",
-          "clientAppUsed": "Browser",
-          "correlationId": "65999c4a-7f40-4882-8eb4-e4c89a9dc32e",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Azure Resource Manager",
-          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
-          "status": {
-            "errorCode": 50207,
-            "failureReason": "This web native bridge interrupt will be shown to the user during login when the application is requesting login through the native broker and needs eSTS to ensure the broker is properly configured.",
-            "additionalDetails": "MFA requirement satisfied by claim in the token"
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Chrome 143.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": ""
-          },
-          "location": {
-            "city": "Indraprastha",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.655,
-              "longitude": 77.231
-            }
-          },
-          "appliedConditionalAccessPolicies": []
-        },
-        {
-          "id": "37cc56ee-3444-4ec5-af30-8f0b1299fa01",
-          "createdDateTime": "2026-01-10T14:11:32Z",
-          "userDisplayName": "Parth Narang",
-          "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
-          "userId": "ee17efc3-3e5f-40e2-b0d9-26dd89484e45",
-          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-          "appDisplayName": "Azure Portal",
-          "ipAddress": "146.196.32.183",
-          "clientAppUsed": "Browser",
-          "correlationId": "65999c4a-7f40-4882-8eb4-e4c89a9dc32e",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Azure Resource Manager",
-          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
-          "status": {
-            "errorCode": 50207,
-            "failureReason": "This web native bridge interrupt will be shown to the user during login when the application is requesting login through the native broker and needs eSTS to ensure the broker is properly configured.",
-            "additionalDetails": "MFA requirement satisfied by claim in the token"
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Chrome 143.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": ""
-          },
-          "location": {
-            "city": "Indraprastha",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.655,
-              "longitude": 77.231
-            }
-          },
-          "appliedConditionalAccessPolicies": []
-        },
-        {
-          "id": "bf5d0357-e725-44c3-b5ce-a4aeddd13300",
-          "createdDateTime": "2026-01-10T14:11:31Z",
-          "userDisplayName": "Parth Narang",
-          "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
-          "userId": "ee17efc3-3e5f-40e2-b0d9-26dd89484e45",
-          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-          "appDisplayName": "Azure Portal",
-          "ipAddress": "146.196.32.183",
-          "clientAppUsed": "Browser",
-          "correlationId": "65999c4a-7f40-4882-8eb4-e4c89a9dc32e",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Azure Resource Manager",
-          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
-          "status": {
-            "errorCode": 50207,
-            "failureReason": "This web native bridge interrupt will be shown to the user during login when the application is requesting login through the native broker and needs eSTS to ensure the broker is properly configured.",
-            "additionalDetails": "MFA requirement satisfied by claim in the token"
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Chrome 143.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": ""
-          },
-          "location": {
-            "city": "Indraprastha",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.655,
-              "longitude": 77.231
-            }
-          },
-          "appliedConditionalAccessPolicies": []
-        },
-        {
-          "id": "bf5d0357-e725-44c3-b5ce-a4ae72d13300",
-          "createdDateTime": "2026-01-10T14:11:21Z",
           "userDisplayName": "Parth Narang",
           "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
           "userId": "ee17efc3-3e5f-40e2-b0d9-26dd89484e45",
