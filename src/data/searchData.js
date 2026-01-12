@@ -1,4 +1,4 @@
-import { Home, Users, Shield, Smartphone, Globe, CreditCard, Mail, Activity, AlertTriangle, Trash2, Settings, Package, Lock, FileText, TrendingUp, LayoutGrid, Rocket, UserCog, Clock, AlertCircle } from 'lucide-react';
+import { Home, Users, Shield, Smartphone, Globe, CreditCard, Mail, Activity, AlertTriangle, Trash2, Settings, Package, Lock, FileText, TrendingUp, LayoutGrid, Rocket, UserCog, Clock, AlertCircle, BookOpen } from 'lucide-react';
 
 // Comprehensive search index for all pages and features
 export const searchableItems = [
@@ -11,6 +11,15 @@ export const searchableItems = [
         category: 'Overview',
         icon: Home,
         tags: ['overview', 'dashboard', 'home', 'main', 'analytics', 'insights', 'stats', 'charts']
+    },
+    {
+        id: 'documentation',
+        title: 'System Documentation',
+        description: 'Guided portal features and operational reference',
+        path: '/service/documentation',
+        category: 'Support',
+        icon: BookOpen,
+        tags: ['documentation', 'help', 'guide', 'faq', 'support', 'reference', 'learn']
     },
 
     // Admin Center
@@ -287,7 +296,8 @@ export const categories = [
     { id: 'overview', name: 'Overview', color: 'var(--accent-purple)' },
     { id: 'admin', name: 'Admin Center', color: 'var(--accent-blue)' },
     { id: 'entra', name: 'Entra ID', color: 'var(--accent-cyan)' },
-    { id: 'intune', name: 'Intune', color: 'var(--accent-success)' }
+    { id: 'intune', name: 'Intune', color: 'var(--accent-success)' },
+    { id: 'support', name: 'Support', color: 'var(--accent-indigo)' }
 ];
 
 // Simple fuzzy search function

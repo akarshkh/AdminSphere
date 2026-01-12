@@ -3,7 +3,7 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMsal } from '@azure/msal-react';
 import {
-    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command
+    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command, BookOpen
 } from 'lucide-react';
 import SearchModal from './SearchModal';
 
@@ -131,6 +131,13 @@ const ServiceLayout = () => {
                         active={isActive('/service/purview')}
                         isOpen={isSidebarOpen}
                         onClick={() => navigate('/service/purview')}
+                    />
+                    <NavItem
+                        icon={BookOpen}
+                        label="Documentation"
+                        active={isActive('/service/documentation')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/documentation')}
                     />
                 </nav>
 
