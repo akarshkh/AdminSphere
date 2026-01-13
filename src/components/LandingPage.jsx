@@ -5,6 +5,7 @@ import { loginRequest } from '../authConfig';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Zap, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import styles from './LandingPage.module.css';
+import Logo from './Logo';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -44,12 +45,7 @@ const LandingPage = () => {
           className={styles.brandingSection}
         >
           <div className={styles.logoContainer}>
-            <div className={styles.logoGrid}>
-              <div style={{ backgroundColor: '#f25022' }}></div>
-              <div style={{ backgroundColor: '#7fba00' }}></div>
-              <div style={{ backgroundColor: '#00a4ef' }}></div>
-              <div style={{ backgroundColor: '#ffb900' }}></div>
-            </div>
+            <Logo size={48} />
             <span className={styles.logoText}>AdminSphere</span>
           </div>
 

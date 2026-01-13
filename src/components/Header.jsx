@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, Search, Command } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SearchModal from './SearchModal';
+import Logo from './Logo';
 
 const Header = ({
     toggleSidebar,
@@ -41,11 +42,8 @@ const Header = ({
 
                     {/* Logo Section */}
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-                        <div className="grid grid-cols-2 gap-1 flex-shrink-0 p-1.5 bg-white/5 rounded-lg border border-white/10">
-                            <div className="w-2.5 h-2.5 bg-[#f25022] rounded-[1px]"></div>
-                            <div className="w-2.5 h-2.5 bg-[#7fba00] rounded-[1px]"></div>
-                            <div className="w-2.5 h-2.5 bg-[#00a4ef] rounded-[1px]"></div>
-                            <div className="w-2.5 h-2.5 bg-[#ffb900] rounded-[1px]"></div>
+                        <div className="flex-shrink-0">
+                            <Logo size={32} />
                         </div>
                         <div className="hidden md:flex flex-col">
                             <h1 className="text-white font-semibold text-lg leading-tight">AdminSphere</h1>

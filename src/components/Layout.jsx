@@ -7,6 +7,7 @@ import {
     ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command, BookOpen, Sun, Moon
 } from 'lucide-react';
 import SearchModal from './SearchModal';
+import Logo from './Logo';
 
 const ServiceLayout = () => {
     const navigate = useNavigate();
@@ -79,21 +80,8 @@ const ServiceLayout = () => {
             {/* Sidebar */}
             <aside className="sidebar" style={{ width: isSidebarOpen ? 'var(--sidebar-width)' : '80px' }}>
                 <div className="sidebar-header" style={{ height: 'var(--header-height)', padding: '0 12px' }}>
-                    <div className="flex-center" style={{
-                        width: '24px',
-                        height: '24px',
-                        background: 'var(--glass-bg)',
-                        borderRadius: '6px',
-                        border: '1px solid var(--glass-border)',
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(2, 1fr)',
-                        gap: '2px',
-                        padding: '3px'
-                    }}>
-                        <div style={{ backgroundColor: '#f25022', borderRadius: '1px' }}></div>
-                        <div style={{ backgroundColor: '#7fba00', borderRadius: '1px' }}></div>
-                        <div style={{ backgroundColor: '#00a4ef', borderRadius: '1px' }}></div>
-                        <div style={{ backgroundColor: '#ffb900', borderRadius: '1px' }}></div>
+                    <div className="flex-center">
+                        <Logo size={28} />
                     </div>
                     {isSidebarOpen && <span className="font-bold" style={{ fontSize: '14px', marginLeft: '8px' }}>AdminSphere</span>}
                 </div>
