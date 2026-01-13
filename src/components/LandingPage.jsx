@@ -50,7 +50,7 @@ const LandingPage = () => {
               <div style={{ backgroundColor: '#00a4ef' }}></div>
               <div style={{ backgroundColor: '#ffb900' }}></div>
             </div>
-            <span className={styles.logoText}>M365 Operations</span>
+            <span className={styles.logoText}>AdminSphere</span>
           </div>
 
           <h1 className={styles.heroTitle}>

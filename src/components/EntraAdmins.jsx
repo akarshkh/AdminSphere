@@ -107,7 +107,7 @@ const EntraAdmins = () => {
                                                                     <User size={14} color="var(--text-dim)" />
                                                                 </div>
                                                                 <div style={{ overflow: 'hidden' }}>
-                                                                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'white' }}>{member.displayName}</div>
+                                                                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{member.displayName}</div>
                                                                     <div style={{ fontSize: '11px', color: 'var(--text-dim)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{member.userPrincipalName}</div>
                                                                 </div>
                                                             </div>

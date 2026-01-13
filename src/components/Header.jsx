@@ -48,8 +48,8 @@ const Header = ({
                             <div className="w-2.5 h-2.5 bg-[#ffb900] rounded-[1px]"></div>
                         </div>
                         <div className="hidden md:flex flex-col">
-                            <h1 className="text-white font-semibold text-lg leading-tight">Microsoft 365</h1>
-                            <span className="text-gray-500 text-[10px] font-medium uppercase tracking-widest">Admin Center</span>
+                            <h1 className="text-white font-semibold text-lg leading-tight">AdminSphere</h1>
+                            <span className="text-gray-500 text-[10px] font-medium uppercase tracking-widest">Unified Portal</span>
                         </div>
                     </div>
                 </div>

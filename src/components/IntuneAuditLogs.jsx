@@ -106,7 +106,7 @@ const IntuneAuditLogs = () => {
                                             <td>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                                     <FileText style={{ width: '1.25rem', height: '1.25rem', color: '#9ca3af' }} />
-                                                    <span style={{ fontWeight: 500, color: 'white' }}>{event.displayName || 'Unknown Activity'}</span>
+                                                    <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{event.displayName || 'Unknown Activity'}</span>
                                                 </div>
                                             </td>
                                             <td>
@@ -114,11 +114,11 @@ const IntuneAuditLogs = () => {
                                                     {event.activityType || 'Unknown'}
                                                 </span>
                                             </td>
-                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{event.category || 'N/A'}</td>
-                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>
+                                            <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{event.category || 'N/A'}</td>
+                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
                                                 {event.actor?.userPrincipalName || 'System'}
                                             </td>
-                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>
+                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
                                                 {event.activityDateTime ? new Date(event.activityDateTime).toLocaleString() : 'Unknown'}
                                             </td>
                                         </tr>

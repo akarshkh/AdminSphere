@@ -159,13 +159,13 @@ const IntuneManagedDevices = () => {
                                         <tr key={i} className={styles.tableRow}>
                                             <td>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                    <div style={{ width: '2rem', height: '2rem', borderRadius: '0.5rem', background: 'rgba(59, 130, 246, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Monitor style={{ width: '1rem', height: '1rem', color: '#3b82f6' }} />
+                                                    <div style={{ width: '2rem', height: '2rem', borderRadius: '0.5rem', background: 'var(--glass-bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <Monitor style={{ width: '1rem', height: '1rem', color: 'var(--accent-blue)' }} />
                                                     </div>
-                                                    <span style={{ fontWeight: 500, color: 'white' }}>{device.deviceName || 'Unknown'}</span>
+                                                    <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{device.deviceName || 'Unknown'}</span>
                                                 </div>
                                             </td>
-                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>
+                                            <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
                                                 {device.operatingSystem} {device.osVersion}
                                             </td>
                                             <td>
@@ -188,8 +188,8 @@ const IntuneManagedDevices = () => {
                                                     {device.managedDeviceOwnerType === 'company' ? 'Corporate' : device.managedDeviceOwnerType === 'personal' ? 'Personal' : 'Unknown'}
                                                 </span>
                                             </td>
-                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{device.userPrincipalName || 'N/A'}</td>
-                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>
+                                            <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{device.userPrincipalName || 'N/A'}</td>
+                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
                                                 {device.lastSyncDateTime ? new Date(device.lastSyncDateTime).toLocaleString() : 'Never'}
                                             </td>
                                         </tr>

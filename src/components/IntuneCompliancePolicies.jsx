@@ -105,14 +105,14 @@ const IntuneCompliancePolicies = () => {
                                             <td>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                                     <Shield style={{ width: '1.25rem', height: '1.25rem', color: '#22c55e' }} />
-                                                    <span style={{ fontWeight: 500, color: 'white' }}>{policy.displayName}</span>
+                                                    <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{policy.displayName}</span>
                                                 </div>
                                             </td>
-                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{policy.description || 'No description'}</td>
-                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>
+                                            <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{policy.description || 'No description'}</td>
+                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
                                                 {policy.createdDateTime ? new Date(policy.createdDateTime).toLocaleDateString() : 'N/A'}
                                             </td>
-                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>
+                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
                                                 {policy.lastModifiedDateTime ? new Date(policy.lastModifiedDateTime).toLocaleDateString() : 'N/A'}
                                             </td>
                                             <td>

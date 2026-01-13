@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768284138011,
+  "timestamp": 1768297739487,
   "data": {
     "admincenter": {
       "mailboxes": {
@@ -1022,7 +1022,7 @@
             "dataScore": 0.66,
             "dataScoreMax": 4.33,
             "deviceScore": 11.27,
-            "deviceScoreMax": 20.85,
+            "deviceScoreMax": 20.86,
             "identityScore": 37.21,
             "identityScoreMax": 60.19,
             "infrastructureScore": 0,
@@ -1034,7 +1034,7 @@
             "SeatSizeRangeLowerValue": "1",
             "SeatSizeRangeUpperValue": "100",
             "appsScore": 46.74,
-            "appsScoreMax": 128.01,
+            "appsScoreMax": 128,
             "dataScore": 0.67,
             "dataScoreMax": 5.4,
             "deviceScore": 8.93,

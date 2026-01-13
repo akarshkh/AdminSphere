@@ -105,14 +105,14 @@ const IntuneConfigProfiles = () => {
                                             <td>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                                     <Settings style={{ width: '1.25rem', height: '1.25rem', color: '#a855f7' }} />
-                                                    <span style={{ fontWeight: 500, color: 'white' }}>{profile.displayName}</span>
+                                                    <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{profile.displayName}</span>
                                                 </div>
                                             </td>
-                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{profile.description || 'No description'}</td>
-                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>
+                                            <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{profile.description || 'No description'}</td>
+                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
                                                 {profile.createdDateTime ? new Date(profile.createdDateTime).toLocaleDateString() : 'N/A'}
                                             </td>
-                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>
+                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
                                                 {profile.lastModifiedDateTime ? new Date(profile.lastModifiedDateTime).toLocaleDateString() : 'N/A'}
                                             </td>
                                             <td>

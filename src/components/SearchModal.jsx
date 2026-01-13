@@ -209,3 +209,4 @@ const ResultItem = ({ item, isSelected, onClick, query }) => {
 };
 
 export default SearchModal;
+

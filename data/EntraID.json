@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768201240856,
+  "timestamp": 1768295910364,
   "data": {
     "entra_id": {
       "identities": {
@@ -23,7 +23,7 @@
         "trend": "Verified"
       },
       "devices": {
-        "managed": 19,
+        "managed": 18,
         "trend": "Managed"
       },
       "compliance": {
@@ -44,7 +44,7 @@
           "growth": "Teams"
         },
         "devices": {
-          "total": 19,
+          "total": 18,
           "growth": "Managed"
         },
         "subs": {

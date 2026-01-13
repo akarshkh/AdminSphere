@@ -1,7 +1,11 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { executeExchangeJobSync } from '../jobs/exchange.sync';
-import { listAudits } from '../shared/logging/exchangeAudit';
+import { executeExchangeJobSync } from '../jobs/exchange.sync.ts';
+import { listAudits } from '../shared/logging/exchangeAudit.ts';
+import connectDB from './config/db.ts';
+
+// Connect to MongoDB
+connectDB();
 
 // If Redis is available, ensure worker is started
 try {

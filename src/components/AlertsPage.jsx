@@ -141,12 +141,12 @@ const AlertsPage = () => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{
-                                    background: 'hsla(0, 0%, 100%, 0.05)',
+                                    background: 'var(--glass-bg)',
                                     border: '1px solid var(--glass-border)',
                                     borderRadius: '8px',
                                     padding: '8px 12px 8px 36px',
                                     fontSize: '12px',
-                                    color: 'white',
+                                    color: 'var(--text-primary)',
                                     width: '280px'
                                 }}
                             />

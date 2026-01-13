@@ -112,9 +112,9 @@ const IntuneUserDevices = () => {
                                 <tbody>
                                     {searchResults.map((user, i) => (
                                         <tr key={i} className={styles.tableRow}>
-                                            <td style={{ fontWeight: 500, color: 'white' }}>{user.displayName}</td>
-                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{user.userPrincipalName}</td>
-                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{user.mail || 'N/A'}</td>
+                                            <td style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{user.displayName}</td>
+                                            <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{user.userPrincipalName}</td>
+                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>{user.mail || 'N/A'}</td>
                                             <td>
                                                 <button
                                                     onClick={() => handleUserSelect(user)}
@@ -137,7 +137,7 @@ const IntuneUserDevices = () => {
                         <div className={styles.cardHeader}>
                             <div>
                                 <h2 className={styles.cardTitle}>{selectedUser.displayName}'s Devices</h2>
-                                <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginTop: '0.25rem' }}>{selectedUser.userPrincipalName}</p>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.25rem' }}>{selectedUser.userPrincipalName}</p>
                             </div>
                             <button
                                 onClick={() => { setSelectedUser(null); setUserDevices([]); }}
@@ -167,9 +167,9 @@ const IntuneUserDevices = () => {
                                     <tbody>
                                         {userDevices.map((device, i) => (
                                             <tr key={i} className={styles.tableRow}>
-                                                <td style={{ fontWeight: 500, color: 'white' }}>{device.deviceName}</td>
-                                                <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>{device.operatingSystem}</td>
-                                                <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{device.osVersion}</td>
+                                                <td style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{device.deviceName}</td>
+                                                <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{device.operatingSystem}</td>
+                                                <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>{device.osVersion}</td>
                                                 <td>
                                                     {device.complianceState === 'compliant' ? (
                                                         <span className={`${styles.badge} ${styles.badgeSuccess}`}>
@@ -183,7 +183,7 @@ const IntuneUserDevices = () => {
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>
+                                                <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
                                                     {device.lastSyncDateTime ? new Date(device.lastSyncDateTime).toLocaleString() : 'Never'}
                                                 </td>
                                             </tr>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '../contexts/ThemeContext';
 import { useMsal } from '@azure/msal-react';
 import {
-    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command, BookOpen
+    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command, BookOpen, Sun, Moon
 } from 'lucide-react';
 import SearchModal from './SearchModal';
 
@@ -11,6 +12,7 @@ const ServiceLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { instance, accounts } = useMsal();
+    const { theme, toggleTheme } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [unresolvedAlertsCount, setUnresolvedAlertsCount] = useState(0);
@@ -93,7 +95,7 @@ const ServiceLayout = () => {
                         <div style={{ backgroundColor: '#00a4ef', borderRadius: '1px' }}></div>
                         <div style={{ backgroundColor: '#ffb900', borderRadius: '1px' }}></div>
                     </div>
-                    {isSidebarOpen && <span className="font-bold" style={{ fontSize: '14px', marginLeft: '8px' }}>M365 Portal</span>}
+                    {isSidebarOpen && <span className="font-bold" style={{ fontSize: '14px', marginLeft: '8px' }}>AdminSphere</span>}
                 </div>
 
                 <nav className="sidebar-nav">
@@ -178,6 +180,14 @@ const ServiceLayout = () => {
                     </div>
 
                     <div className="flex-center flex-gap-4">
+                        <button
+                            onClick={toggleTheme}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        </button>
+
                         <button
                             onClick={() => navigate('/service/admin/alerts')}
                             style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', position: 'relative' }}
