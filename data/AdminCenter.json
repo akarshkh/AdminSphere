@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768363896831,
+  "timestamp": 1768387461058,
   "data": {
     "admincenter": {
       "mailboxes": {
@@ -47,7 +47,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-10-28T05:18:28Z",
           "lastActivityDate": "2025-12-30",
-          "itemCount": 2242,
+          "itemCount": 2243,
           "archivePolicy": true,
           "mailboxSize": "0.01 GB",
           "migrationStatus": "Cloud Native",
@@ -101,7 +101,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-12-03T05:52:13Z",
           "lastActivityDate": "N/A",
-          "itemCount": 258,
+          "itemCount": 247,
           "archivePolicy": true,
           "mailboxSize": "0.00 GB",
           "migrationStatus": "Cloud Native",
@@ -119,7 +119,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-09-16T05:08:37Z",
           "lastActivityDate": "2025-12-30",
-          "itemCount": 12387,
+          "itemCount": 12407,
           "archivePolicy": true,
           "mailboxSize": "3.59 GB",
           "migrationStatus": "Cloud Native",
@@ -137,7 +137,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-11-20T09:40:42Z",
           "lastActivityDate": "N/A",
-          "itemCount": 1926,
+          "itemCount": 1939,
           "archivePolicy": false,
           "mailboxSize": "0.01 GB",
           "migrationStatus": "Cloud Native",
@@ -155,7 +155,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2024-04-24T06:33:25Z",
           "lastActivityDate": "2025-11-25",
-          "itemCount": 2985,
+          "itemCount": 2976,
           "archivePolicy": true,
           "mailboxSize": "0.00 GB",
           "migrationStatus": "Cloud Native",
@@ -191,7 +191,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-10-01T06:47:25Z",
           "lastActivityDate": "2025-12-30",
-          "itemCount": 37511,
+          "itemCount": 37535,
           "archivePolicy": false,
           "mailboxSize": "16.49 GB",
           "migrationStatus": "Cloud Native",
@@ -209,7 +209,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-09-08T10:33:29Z",
           "lastActivityDate": "2025-12-13",
-          "itemCount": 4770,
+          "itemCount": 4777,
           "archivePolicy": false,
           "mailboxSize": "0.00 GB",
           "migrationStatus": "Cloud Native",
@@ -227,7 +227,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2026-01-09T12:05:35Z",
           "lastActivityDate": "N/A",
-          "itemCount": 1010,
+          "itemCount": 1044,
           "archivePolicy": false,
           "mailboxSize": "0.00 GB",
           "migrationStatus": "Cloud Native",
@@ -245,7 +245,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2023-10-02T14:54:35Z",
           "lastActivityDate": "2025-12-18",
-          "itemCount": 22854,
+          "itemCount": 22662,
           "archivePolicy": true,
           "mailboxSize": "0.51 GB",
           "migrationStatus": "Cloud Native",
@@ -1018,13 +1018,13 @@
             "basis": "AllTenants",
             "averageScore": 53.38,
             "appsScore": 40.22,
-            "appsScoreMax": 103.75,
+            "appsScoreMax": 103.72,
             "dataScore": 0.66,
             "dataScoreMax": 4.32,
             "deviceScore": 11.28,
             "deviceScoreMax": 20.88,
-            "identityScore": 37.19,
-            "identityScoreMax": 60.17,
+            "identityScore": 37.18,
+            "identityScoreMax": 60.16,
             "infrastructureScore": 0,
             "infrastructureScoreMax": 0
           },
@@ -1033,14 +1033,14 @@
             "averageScore": 46.68,
             "SeatSizeRangeLowerValue": "1",
             "SeatSizeRangeUpperValue": "100",
-            "appsScore": 46.72,
-            "appsScoreMax": 127.97,
+            "appsScore": 46.71,
+            "appsScoreMax": 127.94,
             "dataScore": 0.67,
             "dataScoreMax": 5.4,
             "deviceScore": 8.95,
             "deviceScoreMax": 16.61,
-            "identityScore": 35.65,
-            "identityScoreMax": 60.44,
+            "identityScore": 35.64,
+            "identityScoreMax": 60.43,
             "infrastructureScore": 0,
             "infrastructureScoreMax": 0
           }
@@ -1221,7 +1221,7 @@
             "controlName": "spo_idle_session_timeout",
             "description": "\r\n\t\t\tIdle session sign-out lets you specify a time at which users are warned and are later signed out of Microsoft 365 after a period of browser inactivity in SharePoint and OneDrive.\r\n            <br/>\r\n\t\t\tThis policy is one of several you can use with SharePoint and OneDrive to balance security and user productivity and help keep your data safe, regardless  of where users access the data from, what device they're working on, and how secure their network connection is.\r\n\t\t",
             "score": 0,
-            "lastSynced": "2026-01-13T16:45:12Z",
+            "lastSynced": "2026-01-14T05:40:20Z",
             "implementationStatus": "The setting is not compliant.",
             "on": "false",
             "scoreInPercentage": 0
@@ -1231,7 +1231,7 @@
             "controlName": "spo_legacy_auth",
             "description": "\r\n\t\t\tModern authentication in Microsoft 365 enables authentication features like multifactor authentication (MFA) using smart cards, certificate-based authentication (CBA), and third-party SAML identity providers.\r\n\t\t\t<br/>\r\n\t\t\tStrong authentication controls, such as the use of multifactor authentication, may be circumvented if basic authentication is used by SharePoint applications. Requiring modern authentication for SharePoint applications ensures strong authentication mechanisms are used when establishing sessions between these applications, SharePoint, and connecting users.\r\n\t\t\t<br/>\r\n\t\t\t<i>This information was taken from Center for Internet Security (CIS).</i>\r\n\t\t",
             "score": 0,
-            "lastSynced": "2026-01-13T16:45:12Z",
+            "lastSynced": "2026-01-14T05:40:20Z",
             "implementationStatus": "The setting is not compliant.",
             "on": "false",
             "scoreInPercentage": 0
@@ -1251,7 +1251,7 @@
             "controlName": "AATP_DefenderForIdentityIsNotInstalled",
             "description": "Installing Microsoft Defender for Identity sensors provides you with the ability to detect advanced threats in your entire identity infrastructure. Actionable security alerts are generated through the analysis of network traffic and security events.",
             "score": 0,
-            "lastSynced": "2026-01-13T14:26:31Z",
+            "lastSynced": "2026-01-14T09:19:37Z",
             "implementationStatus": "",
             "on": "false",
             "scoreInPercentage": 0
@@ -1929,89 +1929,16 @@
       ],
       "failedSignIns": [
         {
-          "id": "5350cd6e-6622-4abb-890e-4ff1b8509b00",
-          "createdDateTime": "2026-01-13T13:10:30Z",
-          "userDisplayName": "Demo User",
-          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
-          "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
-          "appDisplayName": "M365Portal-Purview-Service",
-          "ipAddress": "106.219.226.225",
-          "clientAppUsed": "Browser",
-          "correlationId": "019bb77a-b078-7c57-8864-b99340bea125",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Microsoft Graph",
-          "resourceId": "00000003-0000-0000-c000-000000000000",
-          "status": {
-            "errorCode": 50133,
-            "failureReason": "The session is not valid due to password expiration or recent password change.",
-            "additionalDetails": "Expected - auth codes, refresh tokens, and sessions expire over time or are revoked by the user or an admin. The app will request a new login from the user."
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Android",
-            "browser": "Chrome Mobile 143.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
-          },
-          "location": {
-            "city": "Janpath",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.6278,
-              "longitude": 77.219
-            }
-          },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlySuccess"
-            }
-          ]
-        },
-        {
-          "id": "d230d5f5-0a67-4504-9c3f-beb4a9601900",
-          "createdDateTime": "2026-01-13T12:23:31Z",
-          "userDisplayName": "Demo User",
-          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
-          "appId": "fab89c3f-93ac-4d4d-9ee5-844290170dd6",
-          "appDisplayName": "AdminSphere",
+          "id": "450c7784-c881-4dc4-9ddd-4fed6aa11900",
+          "createdDateTime": "2026-01-14T10:01:54Z",
+          "userDisplayName": "Vivek Kumar",
+          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
+          "appDisplayName": "Windows Sign In",
           "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "04e9956e-d8ea-4a19-8958-3522ae5fab69",
+          "clientAppUsed": "Mobile Apps and Desktop clients",
+          "correlationId": "b806056b-7c61-4b5d-9fea-8f21d7e4f36b",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2020,94 +1947,21 @@
           "riskState": "none",
           "riskEventTypes": [],
           "riskEventTypes_v2": [],
-          "resourceDisplayName": "Microsoft Graph",
-          "resourceId": "00000003-0000-0000-c000-000000000000",
+          "resourceDisplayName": "Windows Azure Active Directory",
+          "resourceId": "00000002-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 65001,
-            "failureReason": "The user or administrator has not consented to use the application with ID '{identifier}'{namePhrase}. Send an interactive authorization request for this user and resource.",
-            "additionalDetails": null
+            "errorCode": 50013,
+            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
+            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
           },
           "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Edge 143.0.0",
+            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
+            "displayName": "DESKTOP-R1VICQD",
+            "operatingSystem": "Windows",
+            "browser": "",
             "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
-          },
-          "location": {
-            "city": "New Delhi",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.6353,
-              "longitude": 77.225
-            }
-          },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlyNotApplied"
-            }
-          ]
-        },
-        {
-          "id": "d6bc5e9b-9b14-4d92-bfbc-c7629cc12700",
-          "createdDateTime": "2026-01-12T08:48:04Z",
-          "userDisplayName": "Demo User",
-          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
-          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-          "appDisplayName": "Azure Portal",
-          "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "0806789c-8119-4d5b-a38e-91a19f3429c4",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Azure Resource Manager",
-          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
-          "status": {
-            "errorCode": 50207,
-            "failureReason": "This web native bridge interrupt will be shown to the user during login when the application is requesting login through the native broker and needs eSTS to ensure the broker is properly configured.",
-            "additionalDetails": null
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Chrome 143.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
+            "isManaged": true,
+            "trustType": "Azure AD joined"
           },
           "location": {
             "city": "New Delhi",
@@ -2122,16 +1976,16 @@
           "appliedConditionalAccessPolicies": []
         },
         {
-          "id": "bdc760bf-1c53-477c-97a1-56a04d003000",
-          "createdDateTime": "2026-01-12T06:27:33Z",
-          "userDisplayName": "Vishal",
-          "userPrincipalName": "vishal@intunetraininglabs.onmicrosoft.com",
-          "userId": "99ff6360-9526-4142-81bc-f8abe5d3bf78",
-          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-          "appDisplayName": "Azure Portal",
+          "id": "730473ac-4744-4b9e-b28e-a04e7b451b00",
+          "createdDateTime": "2026-01-14T09:56:53Z",
+          "userDisplayName": "Vivek Kumar",
+          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
+          "appDisplayName": "Windows Sign In",
           "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "439b1cb2-267c-434c-aadc-fad41e138a29",
+          "clientAppUsed": "Mobile Apps and Desktop clients",
+          "correlationId": "f7a62eb9-a4b1-4f96-87c9-bcb4a600d037",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2140,21 +1994,21 @@
           "riskState": "none",
           "riskEventTypes": [],
           "riskEventTypes_v2": [],
-          "resourceDisplayName": "Azure Resource Manager",
-          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+          "resourceDisplayName": "Windows Azure Active Directory",
+          "resourceId": "00000002-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 50140,
-            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
-            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
+            "errorCode": 50013,
+            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
+            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
           },
           "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Edge 143.0.0",
+            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
+            "displayName": "DESKTOP-R1VICQD",
+            "operatingSystem": "Windows",
+            "browser": "",
             "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
+            "isManaged": true,
+            "trustType": "Azure AD joined"
           },
           "location": {
             "city": "New Delhi",
@@ -2166,45 +2020,19 @@
               "longitude": 77.225
             }
           },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlyNotApplied"
-            }
-          ]
+          "appliedConditionalAccessPolicies": []
         },
         {
-          "id": "bdc760bf-1c53-477c-97a1-56a036003000",
-          "createdDateTime": "2026-01-12T06:27:32Z",
-          "userDisplayName": "Vishal",
-          "userPrincipalName": "vishal@intunetraininglabs.onmicrosoft.com",
-          "userId": "99ff6360-9526-4142-81bc-f8abe5d3bf78",
-          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-          "appDisplayName": "Azure Portal",
+          "id": "6b453ee3-c4c2-4e8a-a4de-e0906a181500",
+          "createdDateTime": "2026-01-14T09:45:21Z",
+          "userDisplayName": "Vivek Kumar",
+          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
+          "appDisplayName": "Windows Sign In",
           "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "439b1cb2-267c-434c-aadc-fad41e138a29",
+          "clientAppUsed": "Mobile Apps and Desktop clients",
+          "correlationId": "1b5c2a57-dfc8-40dd-9bd2-e924b50877e2",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2213,21 +2041,115 @@
           "riskState": "none",
           "riskEventTypes": [],
           "riskEventTypes_v2": [],
-          "resourceDisplayName": "Azure Resource Manager",
-          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+          "resourceDisplayName": "Windows Azure Active Directory",
+          "resourceId": "00000002-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 50207,
-            "failureReason": "This web native bridge interrupt will be shown to the user during login when the application is requesting login through the native broker and needs eSTS to ensure the broker is properly configured.",
-            "additionalDetails": null
+            "errorCode": 50013,
+            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
+            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
           },
           "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Edge 143.0.0",
+            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
+            "displayName": "DESKTOP-R1VICQD",
+            "operatingSystem": "Windows",
+            "browser": "",
             "isCompliant": false,
             "isManaged": false,
-            "trustType": null
+            "trustType": "Azure AD joined"
+          },
+          "location": {
+            "city": "New Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": []
+        },
+        {
+          "id": "40eb69c3-48c8-4ba2-8f58-d28ea45f1500",
+          "createdDateTime": "2026-01-14T09:34:35Z",
+          "userDisplayName": "Vivek Kumar",
+          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
+          "appDisplayName": "Windows Sign In",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Mobile Apps and Desktop clients",
+          "correlationId": "572cbeff-eed0-4959-b683-b534305e4d88",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Windows Azure Active Directory",
+          "resourceId": "00000002-0000-0000-c000-000000000000",
+          "status": {
+            "errorCode": 50013,
+            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
+            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
+          },
+          "deviceDetail": {
+            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
+            "displayName": "DESKTOP-R1VICQD",
+            "operatingSystem": "Windows",
+            "browser": "",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": "Azure AD joined"
+          },
+          "location": {
+            "city": "New Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": []
+        },
+        {
+          "id": "355f105f-11e6-4809-bdb1-e3c0ae0f0200",
+          "createdDateTime": "2026-01-14T09:29:00Z",
+          "userDisplayName": "Vivek Kumar",
+          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+          "appId": "dd762716-544d-4aeb-a526-687b73838a22",
+          "appDisplayName": "Microsoft Device Registration Client",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Mobile Apps and Desktop clients",
+          "correlationId": "9b8805fd-56fc-4685-8aa5-3e0444ea4412",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Device Registration Service",
+          "resourceId": "01cb2876-7ebd-4aa4-9cc9-d28bd4d359a9",
+          "status": {
+            "errorCode": 50074,
+            "failureReason": "Strong Authentication is required.",
+            "additionalDetails": "User needs to perform multi-factor authentication. There could be multiple things requiring multi-factor, e.g. Conditional Access policies, per-user enforcement, requested by client, among others."
+          },
+          "deviceDetail": {
+            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
+            "displayName": "DESKTOP-R1VICQD",
+            "operatingSystem": "Windows10",
+            "browser": "Edge 18.26200",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": "Azure AD joined"
           },
           "location": {
             "city": "New Delhi",

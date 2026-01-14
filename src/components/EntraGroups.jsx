@@ -35,7 +35,7 @@ const EntraGroups = () => {
     const filteredGroups = groups.filter(group => {
         const matchesText = (group.displayName || '').toLowerCase().includes(filterText.toLowerCase());
         const isSecurity = group.securityEnabled;
-        const isDist = group.mailEnabled && !group.securityEnabled;
+        const isDist = group.mailEnabled && !group.securityEnabled && !group.groupTypes?.includes('Unified');
         let matchesType = true;
         if (filterType === 'security') matchesType = isSecurity;
         if (filterType === 'distribution') matchesType = isDist;

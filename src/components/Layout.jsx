@@ -76,7 +76,7 @@ const ServiceLayout = () => {
     const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
 
     return (
-        <div className="app-container">
+        <div className="app-container" style={{ '--current-sidebar-width': isSidebarOpen ? 'var(--sidebar-width)' : '80px' }}>
             {/* Sidebar */}
             <aside className="sidebar" style={{ width: isSidebarOpen ? 'var(--sidebar-width)' : '80px' }}>
                 <div className="sidebar-header" style={{ height: 'var(--header-height)', padding: '0 12px' }}>

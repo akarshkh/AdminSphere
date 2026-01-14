@@ -42,7 +42,7 @@ const OverviewDashboard = () => {
                         secure_score: overviewData.quickStats.secureScore
                     },
                     health_and_security: {
-                        service_issues: overviewData.charts.serviceHealth.find(d => d.name === 'Issues')?.value || 0,
+                        // Service Health removed
                         failed_signins: overviewData.charts.signIns[0]?.failed || 0,
                         compliance_rate: overviewData.charts.securityRadar.find(d => d.subject === 'Compliance')?.value || 0
                     }
@@ -267,68 +267,7 @@ const OverviewDashboard = () => {
                 gap: '16px'
             }}>
 
-                {/* Enhanced Service Health - Radial Chart */}
-                {data?.charts.serviceHealth?.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5 }}
-                        className="glass-card"
-                        style={{ padding: '14px' }}
-                    >
-                        <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                            <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-success), var(--accent-cyan))', borderRadius: '6px' }}>
-                                <Activity size={14} color="white" />
-                            </div>
-                            <div>
-                                <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Service Health</h3>
-                                <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Real-time Status</p>
-                            </div>
-                        </div>
-                        <ResponsiveContainer width="100%" height={240}>
-                            <PieChart>
-                                <defs>
-                                    <linearGradient id="gradSuccess" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#00f2fe" stopOpacity={1} />
-                                        <stop offset="100%" stopColor="#4facfe" stopOpacity={1} />
-                                    </linearGradient>
-                                    <linearGradient id="gradError" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#ff0844" stopOpacity={1} />
-                                        <stop offset="100%" stopColor="#ffb199" stopOpacity={1} />
-                                    </linearGradient>
-                                </defs>
-                                <Pie
-                                    data={data.charts.serviceHealth}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    label={renderCustomLabel}
-                                    outerRadius={85}
-                                    innerRadius={60}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                    animationBegin={0}
-                                    animationDuration={1200}
-                                    stroke="none"
-                                >
-                                    {data.charts.serviceHealth.map((entry, index) => (
-                                        <Cell
-                                            key={`cell-${index}`}
-                                            fill={entry.name === 'Operational' ? 'url(#gradSuccess)' : 'url(#gradError)'}
-                                            style={{ filter: 'drop-shadow(0px 0px 8px rgba(0,0,0,0.3))' }}
-                                        />
-                                    ))}
-                                </Pie>
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend
-                                    iconType="circle"
-                                    verticalAlign="bottom"
-                                    wrapperStyle={{ paddingTop: '24px', fontSize: '13px', fontWeight: 600 }}
-                                />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </motion.div>
-                )}
+                {/* Service Health Removed as per user request */}
 
                 {/* Enhanced User Distribution - Donut with Animation */}
                 {data?.charts.userDistribution?.length > 0 && (
