@@ -1,0 +1,32 @@
+name: Remote PowerShell Terminal
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'PowerShell command to execute'
+        required: true
+        type: string
+
+jobs:
+  execute:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run PowerShell Command
+        shell: pwsh
+        run: |
+          $command = "${{ github.event.inputs.command }}"
+          Write-Host "Executing: $command"
+          
+          $ErrorActionPreference = 'Continue'
+          try {
+              Invoke-Expression $command | Out-String -Width 160
+          } catch {
+              Write-Error $_
+              exit 1
+          } finally {
+              Write-Host "---END_OF_COMMAND---"
+          }

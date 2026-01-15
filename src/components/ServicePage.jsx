@@ -20,6 +20,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const [emailActivity, setEmailActivity] = useState({ sent: 0, received: 0, date: null });
     const [filterText, setFilterText] = useState('');
     const [loading, setLoading] = useState(true);
+    const [isAutomating, setIsAutomating] = useState(false);
     const [error, setError] = useState(null);
 
     // Entra Specific State
@@ -33,6 +34,14 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const [globalAdmins, setGlobalAdmins] = useState([]);
     const [deletedUsersCount, setDeletedUsersCount] = useState(0);
     const [licensingSummary, setLicensingSummary] = useState([]);
+
+    // Purview Specific State
+    const [purviewStats, setPurviewStats] = useState({
+        labels: 0,
+        dlpPolicies: 0,
+        retentionPolicies: 0,
+        dlpAlerts: 0
+    });
 
     const serviceNames = {
         admin: 'Admin Center',
@@ -124,6 +133,37 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 if (audits?.value) setAuditLogs(audits.value);
                 if (policies) setCaPolicies(policies);
                 if (admins) setGlobalAdmins(admins);
+            } else if (isPurview) {
+                // Fetch Purview data using Graph API (Fallback from PowerShell)
+                try {
+                    // Try to acquire token with Purview scopes specifically
+                    const purviewResponse = await instance.acquireTokenSilent({
+                        scopes: [
+                            "https://graph.microsoft.com/InformationProtectionPolicy.Read.All",
+                            "https://graph.microsoft.com/RecordsManagement.Read.All",
+                            "https://graph.microsoft.com/eDiscovery.Read.All"
+                        ],
+                        account: accounts[0]
+                    }).catch(async (err) => {
+                        console.warn("Silent token for Purview failed, attempting popup...", err);
+                        // If silent fails, we'll try to proceed with existing graphService or return null
+                        return null;
+                    });
+
+                    let stats;
+                    if (purviewResponse) {
+                        const purviewGraphService = new GraphService(purviewResponse.accessToken);
+                        stats = await purviewGraphService.getPurviewStats();
+                    } else {
+                        // Fallback to initial token (might fail with 403 if not consented)
+                        stats = await graphService.getPurviewStats();
+                    }
+
+                    setPurviewStats(stats);
+                } catch (err) {
+                    console.error("Purview stats fetch failed:", err);
+                    setError("Could not fetch Purview data. Additional permissions may be required.");
+                }
             }
         } catch (err) {
             console.error("Fetch error:", err);
@@ -134,7 +174,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     };
 
     const loadData = async () => {
-        const cacheName = isAdmin ? 'AdminCenter' : (isEntra ? 'EntraID' : null);
+        const cacheName = isAdmin ? 'AdminCenter' : (isEntra ? 'EntraID' : (isPurview ? 'Purview' : null));
         if (!cacheName) {
             fetchData(false);
             return;
@@ -181,10 +221,10 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         { label: 'Applications', value: appsCount, icon: LayoutGrid, color: 'var(--accent-cyan)', path: '/service/entra/apps' },
         { label: 'Global Admins', value: globalAdmins.length, icon: Shield, color: 'var(--accent-error)' }
     ] : isPurview ? [
-        { label: 'Sensitivity Labels', value: '--', icon: Lock, color: 'var(--accent-purple)' },
-        { label: 'Data Policy Matches', value: '--', icon: AlertTriangle, color: 'var(--accent-warning)' },
-        { label: 'Retention Policies', value: '--', icon: Activity, color: 'var(--accent-blue)' },
-        { label: 'DLP Alerts', value: '--', icon: Shield, color: 'var(--accent-error)' }
+        { label: 'Sensitivity Labels', value: purviewStats.labels, icon: Lock, color: 'var(--accent-purple)' },
+        { label: 'DLP Policies', value: purviewStats.dlpPolicies, icon: AlertTriangle, color: 'var(--accent-warning)' },
+        { label: 'Retention Policies', value: purviewStats.retentionPolicies, icon: Activity, color: 'var(--accent-blue)' },
+        { label: 'DLP Alerts', value: purviewStats.dlpAlerts, icon: Shield, color: 'var(--accent-error)' }
     ] : [];
 
     return (
@@ -238,7 +278,17 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 ))}
             </div>
 
-            {isPurview && (
+            {isPurview && isAutomating && (
+                <div className="glass-card flex-center border-accent-blue" style={{ marginTop: '32px', padding: '40px', gap: '15px' }}>
+                    <Loader2 size={24} className="animate-spin text-accent-blue" />
+                    <div>
+                        <h3 className="font-bold">Configuring Secure Session</h3>
+                        <p className="text-xs text-dim">Using your Microsoft credentials to unlock Purview data...</p>
+                    </div>
+                </div>
+            )}
+
+            {isPurview && !loading && !error && !isAutomating && (purviewStats.labels === 0 && purviewStats.dlpPolicies === 0) && (
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -262,19 +312,24 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: 'var(--text-dim)'
+                        color: 'var(--accent-warning)'
                     }}>
-                        <AlertCircle size={40} />
+                        <Lock size={40} />
                     </div>
                     <div>
-                        <h2 className="title-gradient" style={{ fontSize: '24px', marginBottom: '8px' }}>Telemetry Unavailable</h2>
+                        <h2 className="title-gradient" style={{ fontSize: '24px', marginBottom: '8px' }}>No Purview Data Found</h2>
                         <p style={{ color: 'var(--text-dim)', maxWidth: '400px', margin: '0 auto' }}>
-                            Couldn't retrieve Microsoft Purview data.
+                            We connected successfully, but didn't find any labels or policies. If you expect data, try refreshing below.
                         </p>
                     </div>
-                    <button className="btn btn-secondary" onClick={() => navigate('/service/admin')}>
-                        Return to Admin Center
-                    </button>
+                    <div className="flex-gap-2">
+                        <button className="btn btn-primary" onClick={() => navigate('/powershell')}>
+                            Open PowerShell Runner
+                        </button>
+                        <button className="btn btn-secondary" onClick={() => fetchData(true, true)}>
+                            {loading ? 'Retrying...' : 'Force Session Reset'}
+                        </button>
+                    </div>
                 </motion.div>
             )}
 
