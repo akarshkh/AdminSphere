@@ -7,6 +7,10 @@ on:
         description: 'PowerShell command to execute'
         required: true
         type: string
+      scc_token:
+        description: 'Access token for Security & Compliance Center'
+        required: false
+        type: string
 
 jobs:
   execute:
@@ -15,12 +19,32 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup PowerShell Modules
+        shell: pwsh
+        run: |
+          if (-not (Get-Module -ListAvailable ExchangeOnlineManagement)) {
+              Write-Host "Installing ExchangeOnlineManagement module..."
+              Install-Module -Name ExchangeOnlineManagement -Force -AllowClobber -Scope CurrentUser -Confirm:$false
+          }
+
       - name: Run PowerShell Command
         shell: pwsh
         run: |
           $command = "${{ github.event.inputs.command }}"
-          Write-Host "Executing: $command"
+          $sccToken = "${{ github.event.inputs.scc_token }}"
           
+          if ($sccToken) {
+              Write-Host "Authenticating to Purview (SCC) using provided token..."
+              try {
+                  Connect-IPPSSession -AccessToken $sccToken -ErrorAction Stop
+                  Write-Host "Connected to Security & Compliance Center."
+              } catch {
+                  Write-Error "Failed to connect to SCC: $($_.Exception.Message)"
+                  exit 1
+              }
+          }
+          
+          Write-Host "Executing command..."
           $ErrorActionPreference = 'Continue'
           try {
               Invoke-Expression $command | Out-String -Width 160
