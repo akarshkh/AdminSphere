@@ -195,7 +195,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
             if (!sccResponse || !sccResponse.accessToken) {
                 throw new Error("Could not acquire SCC access token. Check your Azure AD permissions.");
             }
-            console.log(`[Purview Sync] Token acquired (${exoResponse.accessToken.length} chars)`);
+            console.log(`[Purview Sync] Token acquired (${sccResponse.accessToken.length} chars)`);
 
             // 2. Define the Purview script that outputs JSON
             const script = `
