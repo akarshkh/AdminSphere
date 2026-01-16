@@ -29,9 +29,12 @@ jobs:
 
       - name: Run PowerShell Command
         shell: pwsh
+        env:
+          INPUT_COMMAND: ${{ github.event.inputs.command }}
+          INPUT_TOKEN: ${{ github.event.inputs.scc_token }}
         run: |
-          $command = "${{ github.event.inputs.command }}"
-          $sccToken = "${{ github.event.inputs.scc_token }}"
+          $command = $env:INPUT_COMMAND
+          $sccToken = $env:INPUT_TOKEN
           
           if ($sccToken) {
               Write-Host "Authenticating to Purview (SCC) using provided token..."

@@ -5,7 +5,7 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { DataPersistenceService } from '../services/dataPersistence';
 import { motion } from 'framer-motion';
-import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2, ArrowRight, Lock } from 'lucide-react';
+import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2, ArrowRight, Lock, Terminal } from 'lucide-react';
 
 const ServicePage = ({ serviceId: propServiceId }) => {
     const params = useParams();
@@ -134,40 +134,98 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 if (policies) setCaPolicies(policies);
                 if (admins) setGlobalAdmins(admins);
             } else if (isPurview) {
-                // Fetch Purview data using Graph API (Fallback from PowerShell)
-                try {
-                    // Try to acquire token with Purview scopes specifically
-                    const purviewResponse = await instance.acquireTokenSilent({
-                        scopes: [
-                            "https://graph.microsoft.com/InformationProtectionPolicy.Read.All",
-                            "https://graph.microsoft.com/RecordsManagement.Read.All",
-                            "https://graph.microsoft.com/eDiscovery.Read.All"
-                        ],
-                        account: accounts[0]
-                    }).catch(async (err) => {
-                        console.warn("Silent token for Purview failed, attempting popup...", err);
-                        // If silent fails, we'll try to proceed with existing graphService or return null
-                        return null;
-                    });
+                // Default to Graph API for speed, but provide manual terminal sync if needed
+                if (!purviewStats) {
+                    try {
+                        const purviewResponse = await instance.acquireTokenSilent({
+                            scopes: ["https://graph.microsoft.com/.default"],
+                            account: accounts[0]
+                        }).catch(() => null);
 
-                    let stats;
-                    if (purviewResponse) {
-                        const purviewGraphService = new GraphService(purviewResponse.accessToken);
-                        stats = await purviewGraphService.getPurviewStats();
-                    } else {
-                        // Fallback to initial token (might fail with 403 if not consented)
-                        stats = await graphService.getPurviewStats();
+                        const stats = await (purviewResponse
+                            ? new GraphService(purviewResponse.accessToken).getPurviewStats()
+                            : graphService.getPurviewStats());
+                        setPurviewStats(stats);
+                    } catch (err) {
+                        console.error("Purview initial fetch failed:", err);
                     }
-
-                    setPurviewStats(stats);
-                } catch (err) {
-                    console.error("Purview stats fetch failed:", err);
-                    setError("Could not fetch Purview data. Additional permissions may be required.");
                 }
             }
         } catch (err) {
             console.error("Fetch error:", err);
             setError("Connectivity issue with Microsoft Graph.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchPurviewViaTerminal = async () => {
+        setLoading(true);
+        setError('');
+        try {
+            // 1. Get SCC Token
+            const sccResponse = await instance.acquireTokenPopup({
+                scopes: ["https://ps.compliance.protection.outlook.com/.default"],
+                account: accounts[0]
+            });
+
+            if (!sccResponse) throw new Error("Could not acquire SCC token.");
+
+            // 2. Define the Purview script that outputs JSON
+            const script = `
+                $results = @{
+                    sensitivityLabels = @()
+                    eDiscoveryCases = @()
+                    dlpPolicies = 0
+                }
+                
+                try {
+                    $labels = Get-Label -ErrorAction SilentlyContinue
+                    if ($labels) { 
+                        $results.sensitivityLabels = $labels | Select-Object Name, Priority, UniqueId
+                    }
+                    
+                    $cases = Get-ComplianceCase -ErrorAction SilentlyContinue
+                    if ($cases) {
+                        $results.eDiscoveryCases = $cases | Select-Object Name, Status, CreatedDateTime
+                    }
+                } catch {
+                    Write-Warning "Partial data fetch error: $($_.Exception.Message)"
+                }
+                
+                $results | ConvertTo-Json -Depth 3 -Compress
+            `;
+
+            // 3. Connect to backend to run it on GitHub Actions
+            const response = await fetch('http://localhost:4000/api/script/run', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    command: script,
+                    token: sccResponse.accessToken,
+                    tokenType: 'scc'
+                }),
+            });
+
+            const result = await response.json();
+            if (result.success && result.data) {
+                // Map the PowerShell data to our dashboard structure
+                const data = result.data;
+                const stats = {
+                    sensitivityLabels: Array.isArray(data.sensitivityLabels) ? data.sensitivityLabels.length : (data.sensitivityLabels ? 1 : 0),
+                    retentionLabels: 0, // Simplified for now
+                    dlpPolicies: 0,
+                    dlpAlerts: Array.isArray(data.eDiscoveryCases) ? data.eDiscoveryCases.length : (data.eDiscoveryCases ? 1 : 0),
+                    rawLabels: data.sensitivityLabels,
+                    rawCases: data.eDiscoveryCases
+                };
+                setPurviewStats(stats);
+            } else {
+                throw new Error(result.error || result.stderr || "Terminal sync failed.");
+            }
+        } catch (err) {
+            console.error("Terminal sync error:", err);
+            setError("Terminal Sync Failed: " + err.message);
         } finally {
             setLoading(false);
         }
@@ -235,6 +293,27 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '10px' }}>Real-time operational telemetry and management</p>
                 </div>
                 <div className="flex-gap-2">
+                    {isPurview && (
+                        <button
+                            className="btn btn-secondary"
+                            onClick={fetchPurviewViaTerminal}
+                            disabled={loading}
+                            style={{
+                                padding: '8px 16px',
+                                fontSize: '11px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                background: 'hsla(210, 100%, 50%, 0.1)',
+                                borderColor: 'var(--accent-blue)',
+                                color: 'var(--accent-blue)',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            <Terminal size={14} />
+                            {loading ? 'Running Action...' : 'Sync via Terminal'}
+                        </button>
+                    )}
                     <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
                         <RefreshCw size={14} />
                     </button>
@@ -323,11 +402,12 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                         </p>
                     </div>
                     <div className="flex-gap-2">
-                        <button className="btn btn-primary" onClick={() => navigate('/powershell')}>
-                            Open PowerShell Runner
+                        <button className="btn btn-primary" style={{ background: 'var(--accent-blue)', borderColor: 'var(--accent-blue)' }} onClick={fetchPurviewViaTerminal}>
+                            <Terminal size={14} style={{ marginRight: '8px' }} />
+                            Sync Now via GitHub Terminal
                         </button>
                         <button className="btn btn-secondary" onClick={() => fetchData(true, true)}>
-                            {loading ? 'Retrying...' : 'Force Session Reset'}
+                            {loading ? 'Retrying...' : 'Reset Graph Session'}
                         </button>
                     </div>
                 </motion.div>
