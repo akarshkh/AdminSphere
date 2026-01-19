@@ -151,13 +151,6 @@ const ServiceLayout = () => {
                         onClick={() => navigate('/service/documentation')}
                     />
                 </nav>
-
-                <div style={{ padding: '12px', borderTop: '1px solid hsla(0,0%,100%,0.05)' }}>
-                    <button className="btn-secondary w-full" onClick={handleLogout} style={{ justifyContent: isSidebarOpen ? 'flex-start' : 'center', padding: '8px', fontSize: '11px' }}>
-                        <LogOut size={14} />
-                        {isSidebarOpen && <span style={{ marginLeft: '8px' }}>Sign Out</span>}
-                    </button>
-                </div>
             </aside>
 
             {/* Main Wrapper */}

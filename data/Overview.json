@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768804085796,
+  "timestamp": 1768814708663,
   "data": {
     "overview": {
       "statistics": {
@@ -9,7 +9,7 @@
         "secure_score": 181.5
       },
       "health_and_security": {
-        "failed_signins": 6,
+        "failed_signins": 7,
         "compliance_rate": 33
       }
     },
@@ -93,8 +93,8 @@
         "signIns": [
           {
             "name": "Last 24h",
-            "failed": 6,
-            "successful": 20
+            "failed": 7,
+            "successful": 25
           }
         ],
         "emailTrend": [
@@ -127,7 +127,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 77,
+            "value": 78,
             "fullMark": 100
           }
         ],
