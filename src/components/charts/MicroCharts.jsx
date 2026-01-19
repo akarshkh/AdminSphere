@@ -1,5 +1,5 @@
 import React from 'react';
-import { LineChart, Line, BarChart, Bar, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, BarChart, Bar, AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
 
 /**
@@ -16,34 +16,35 @@ export const MiniSparkline = ({ data, color = '#3b82f6', height = 35 }) => {
 
     return (
         <ResponsiveContainer width="100%" height={height}>
-            <LineChart data={data} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
+            <AreaChart data={data} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
                 <defs>
                     <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor={color} stopOpacity={0.4} />
                         <stop offset="95%" stopColor={color} stopOpacity={0.05} />
                     </linearGradient>
                     <filter id={`glow-${gradientId}`}>
-                        <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
+                        <feGaussianBlur stdDeviation="2" result="coloredBlur" />
                         <feMerge>
                             <feMergeNode in="coloredBlur" />
                             <feMergeNode in="SourceGraphic" />
                         </feMerge>
                     </filter>
                 </defs>
-                <Line
+                <Area
                     type="monotone"
                     dataKey="value"
                     stroke={color}
-                    strokeWidth={2.5}
+                    strokeWidth={3}
                     dot={false}
                     fill={`url(#${gradientId})`}
-                    animationDuration={1200}
+                    animationDuration={1500}
                     animationEasing="ease-in-out"
                     filter={`url(#glow-${gradientId})`}
                 />
-            </LineChart>
+            </AreaChart>
         </ResponsiveContainer>
     );
+
 };
 
 /**
@@ -305,6 +306,69 @@ export const MiniSeverityStrip = ({ severity = 'low', count = 0, height = 24 }) 
                 textShadow: `0 1px 2px ${config.color}30`
             }}>
                 {count > 0 || typeof count === 'string' ? count : config.label}
+            </span>
+        </motion.div>
+    );
+};
+
+/**
+ * Mini Status Generic - Generic status pill for any content
+ * @param {string} status - Text to display
+ * @param {string} color - Color hex or var
+ */
+export const MiniStatusGeneric = ({ status, color = 'var(--accent-blue)', height = 22 }) => {
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 5 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '4px 10px',
+                background: `linear-gradient(135deg, ${color}18, ${color}08)`,
+                border: `1.5px solid ${color}50`,
+                borderRadius: '8px',
+                height: `${height}px`,
+                minWidth: 'fit-content',
+                maxWidth: '100%',
+                boxShadow: `0 2px 8px ${color}20, inset 0 1px 0 rgba(255,255,255,0.1)`
+            }}
+        >
+            {/* Pulsing dot indicator */}
+            <motion.div
+                animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.8, 1, 0.8]
+                }}
+                transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                }}
+                style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: color,
+                    flexShrink: 0,
+                    boxShadow: `0 0 8px ${color}`,
+                    border: `1px solid ${color}`
+                }}
+            />
+            <span style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                color: color,
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                flex: 1
+            }}>
+                {status}
             </span>
         </motion.div>
     );

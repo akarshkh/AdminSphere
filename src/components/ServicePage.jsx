@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2, ArrowRight, Lock, Terminal } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
-import { MiniSparkline, MiniProgressBar, MiniSegmentedBar } from './charts/MicroCharts';
+import { MiniSparkline, MiniProgressBar, MiniSegmentedBar, MiniStatusGeneric } from './charts/MicroCharts';
 
 const ServicePage = ({ serviceId: propServiceId }) => {
     const params = useParams();
@@ -245,16 +245,22 @@ const ServicePage = ({ serviceId: propServiceId }) => {
 
                             if (exchangeData.length > 0) {
                                 const segments = [
-                                    { label: 'Active', value: activeMailboxes, color: 'var(--accent-success)' },
-                                    { label: 'Inactive', value: inactiveMailboxes, color: 'var(--accent-warning)' }
+                                    { label: 'Active', value: activeMailboxes, color: '#10b981' }, // Green
+                                    { label: 'Inactive', value: inactiveMailboxes, color: '#f59e0b' } // Amber
                                 ].filter(s => s.value > 0);
 
                                 microFigure = (
                                     <div style={{ marginTop: '12px' }}>
-                                        <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>
-                                            Active: {activeMailboxes} / Inactive: {inactiveMailboxes}
+                                        <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>User Status</div>
+                                        <MiniSegmentedBar segments={segments} height={8} />
+                                        <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                                            {segments.map((seg, idx) => (
+                                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: seg.color }}></div>
+                                                    <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>{seg.label}</span>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <MiniSegmentedBar segments={segments} height={6} />
                                     </div>
                                 );
                             }
@@ -265,15 +271,26 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                                 microFigure = (
                                     <div style={{ marginTop: '12px' }}>
                                         <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>Top License Types</div>
-                                        {topLicenses.map((lic, idx) => (
-                                            <div key={idx} style={{ marginBottom: idx < topLicenses.length - 1 ? '6px' : 0 }}>
-                                                <MiniProgressBar
-                                                    value={lic.consumedUnits || 0}
-                                                    max={(lic.prepaidUnits?.enabled || 0)}
-                                                    height={4}
-                                                />
-                                            </div>
-                                        ))}
+                                        {(() => {
+                                            const colors = ['#3b82f6', '#10b981', '#f59e0b']; // Blue, Green, Amber
+                                            const segments = topLicenses.map((lic, idx) => ({
+                                                label: lic.name || lic.skuPartNumber,
+                                                value: lic.consumedUnits || 0,
+                                                color: colors[idx % colors.length]
+                                            }));
+
+                                            return <MiniSegmentedBar segments={segments} height={10} />;
+                                        })()}
+                                        <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
+                                            {topLicenses.map((lic, idx) => (
+                                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: ['#3b82f6', '#10b981', '#f59e0b'][idx] }}></div>
+                                                    <span style={{ fontSize: '9px', color: 'var(--text-dim)', maxWidth: '60px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                        {lic.name || lic.skuPartNumber}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 );
                             }
@@ -296,6 +313,33 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                         }
                     }
 
+                    // Generic Fallback -> Upgrade to Rich Visuals if not already set
+                    if (!microFigure) {
+                        if (stat.label.includes('Health') || stat.label.includes('Status')) {
+                            microFigure = (
+                                <div style={{ marginTop: '12px' }}>
+                                    <MiniStatusGeneric status={stat.trend || 'Healthy'} color={stat.color} />
+                                </div>
+                            );
+                        } else if (stat.label.includes('Requests') || stat.label.includes('Groups')) {
+                            const sparkData = Array.from({ length: 10 }, (_, j) => ({
+                                value: 10 + Math.random() * 20
+                            }));
+                            microFigure = (
+                                <div style={{ marginTop: '12px' }}>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>Activity Trend</div>
+                                    <MiniSparkline data={sparkData} color={stat.color} height={30} />
+                                </div>
+                            );
+                        } else {
+                            microFigure = (
+                                <div style={{ marginTop: '12px' }}>
+                                    <MiniStatusGeneric status={stat.trend || 'Active'} color={stat.color} />
+                                </div>
+                            );
+                        }
+                    }
+
                     return (
                         <motion.div
                             key={i}
@@ -309,12 +353,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                                 <stat.icon size={14} style={{ color: stat.color }} />
                             </div>
                             <div className="stat-value">{stat.value}</div>
-                            {stat.trend && !microFigure && (
-                                <div className="flex-between mt-4" style={{ marginTop: '16px' }}>
-                                    <span className="badge badge-info">{stat.trend}</span>
-                                    <ArrowRight size={14} style={{ color: 'var(--text-dim)' }} />
-                                </div>
-                            )}
+
                             {microFigure}
                         </motion.div>
                     );

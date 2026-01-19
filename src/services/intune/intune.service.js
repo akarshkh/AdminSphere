@@ -11,7 +11,7 @@ export const IntuneService = {
                 configProfilesResponse,
                 mobileAppsResponse
             ] = await Promise.all([
-                client.api('/deviceManagement/managedDevices').select('id').top(999).get().catch((err) => { console.debug('Managed devices fetch failed:', err.statusCode); return { value: [] }; }),
+                client.api('/deviceManagement/managedDevices').select('id,operatingSystem').top(999).get().catch((err) => { console.debug('Managed devices fetch failed:', err.statusCode); return { value: [] }; }),
                 client.api('/deviceManagement/deviceCompliancePolicies').select('id').top(999).get().catch((err) => { console.debug('Compliance policies fetch failed:', err.statusCode); return { value: [] }; }),
                 client.api('/deviceManagement/deviceConfigurations').select('id').top(999).get().catch((err) => { console.debug('Device configurations fetch failed:', err.statusCode); return { value: [] }; }),
                 client.api('/deviceAppManagement/mobileApps').select('id').top(999).get().catch((err) => { console.debug('Mobile apps fetch failed:', err.statusCode); return { value: [] }; })
@@ -21,6 +21,15 @@ export const IntuneService = {
             const compliancePolicies = compliancePoliciesResponse.value ? compliancePoliciesResponse.value.length : 0;
             const configProfiles = configProfilesResponse.value ? configProfilesResponse.value.length : 0;
             const mobileApps = mobileAppsResponse.value ? mobileAppsResponse.value.length : 0;
+
+            // Compute OS Distribution
+            const osDistribution = {};
+            if (managedDevicesResponse.value) {
+                managedDevicesResponse.value.forEach(device => {
+                    const os = device.operatingSystem || 'Unknown';
+                    osDistribution[os] = (osDistribution[os] || 0) + 1;
+                });
+            }
 
             // Get non-compliant devices count - fetch actual devices to get accurate count
             const nonCompliantResponse = await client.api('/deviceManagement/managedDevices')
@@ -46,6 +55,7 @@ export const IntuneService = {
 
             return {
                 totalDevices: managedDevices,
+                osDistribution,
                 nonCompliantDevices,
                 inactiveDevices,
                 compliancePolicies,

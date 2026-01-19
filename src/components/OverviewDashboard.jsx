@@ -259,15 +259,21 @@ const OverviewDashboard = () => {
                         const compliantCount = data?.charts.deviceCompliance?.find(d => d.name === 'Compliant')?.value || 0;
                         const totalDevices = data?.quickStats.totalDevices || 0;
                         const complianceSegments = [
-                            { label: 'Compliant', value: compliantCount, color: 'var(--accent-success)' },
-                            { label: 'Issues', value: totalDevices - compliantCount, color: 'var(--accent-error)' }
+                            { label: 'Compliant', value: compliantCount, color: '#10b981' }, // Green
+                            { label: 'Issues', value: totalDevices - compliantCount, color: '#f43f5e' } // Rose
                         ].filter(s => s.value > 0);
                         microFigure = (
                             <div style={{ marginTop: '12px' }}>
-                                <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>
-                                    Compliance: {compliantCount}/{totalDevices}
+                                <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>Compliance Status</div>
+                                <MiniSegmentedBar segments={complianceSegments} height={8} />
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                                    {complianceSegments.map((seg, idx) => (
+                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: seg.color }}></div>
+                                            <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>{seg.label}</span>
+                                        </div>
+                                    ))}
                                 </div>
-                                <MiniSegmentedBar segments={complianceSegments} height={6} />
                             </div>
                         );
                     } else if (idx === 2) {
@@ -276,15 +282,26 @@ const OverviewDashboard = () => {
                         microFigure = (
                             <div style={{ marginTop: '12px' }}>
                                 <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>Top License Usage</div>
-                                {topLicenses.map((lic, i) => (
-                                    <div key={i} style={{ marginBottom: i < topLicenses.length - 1 ? '6px' : 0 }}>
-                                        <MiniProgressBar
-                                            value={lic.assigned}
-                                            max={lic.assigned + lic.available}
-                                            height={4}
-                                        />
-                                    </div>
-                                ))}
+                                {(() => {
+                                    const colors = ['#3b82f6', '#10b981', '#f59e0b']; // Blue, Green, Amber
+                                    const segments = topLicenses.map((lic, idx) => ({
+                                        label: lic.name,
+                                        value: lic.assigned,
+                                        color: colors[idx % colors.length]
+                                    }));
+
+                                    return <MiniSegmentedBar segments={segments} height={10} />;
+                                })()}
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
+                                    {topLicenses.map((lic, idx) => (
+                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: ['#3b82f6', '#10b981', '#f59e0b'][idx] }}></div>
+                                            <span style={{ fontSize: '9px', color: 'var(--text-dim)', maxWidth: '60px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                {lic.name}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         );
                     }

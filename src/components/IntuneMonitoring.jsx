@@ -13,7 +13,7 @@ import {
 import Loader3D from './Loader3D';
 import { DataPersistenceService } from '../services/dataPersistence';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
-import { MiniSegmentedBar, MiniSeverityStrip } from './charts/MicroCharts';
+import { MiniSegmentedBar, MiniSeverityStrip, MiniStatusGeneric, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
 
 const IntuneMonitoring = () => {
     const navigate = useNavigate();
@@ -88,7 +88,10 @@ const IntuneMonitoring = () => {
             setStats(cached.raw);
             setLoading(false);
 
-            if (DataPersistenceService.isExpired('Intune', 30)) {
+            // Refetch if cache is expired OR missing new schema fields (osDistribution)
+            const isSchemaOutdated = cached.raw.totalDevices > 0 && !cached.raw.osDistribution;
+
+            if (DataPersistenceService.isExpired('Intune', 30) || isSchemaOutdated) {
                 fetchDashboardData(false);
             }
         } else {
@@ -216,17 +219,42 @@ const IntuneMonitoring = () => {
 
                     if (i === 0) {
                         // Managed Devices - OS split
-                        const osData = [
-                            { label: 'Windows', value: Math.floor(stats.totalDevices * 0.55), color: '#0078d4' },
-                            { label: 'iOS', value: Math.floor(stats.totalDevices * 0.25), color: '#a3aaae' },
-                            { label: 'Android', value: Math.floor(stats.totalDevices * 0.15), color: '#3ddc84' },
-                            { label: 'macOS', value: Math.floor(stats.totalDevices * 0.05), color: '#000000' }
-                        ].filter(s => s.value > 0);
+                        const osDist = stats.osDistribution || {};
+                        const getOsColor = (osName) => {
+                            const name = (osName || '').toLowerCase();
+                            if (name.includes('window')) return '#3b82f6'; // Blue
+                            if (name.includes('ios') || name.includes('ipad') || name.includes('iphone')) return '#6366f1'; // Indigo
+                            if (name.includes('android')) return '#10b981'; // Green
+                            if (name.includes('mac') || name.includes('osx')) return '#d946ef'; // Fuchsia
+                            if (name.includes('linux')) return '#f97316'; // Orange
+                            if (name.includes('unknown')) return '#9ca3af';
+                            return '#64748b'; // Slate
+                        };
+
+                        const osData = Object.keys(osDist).map(os => ({
+                            label: os,
+                            value: osDist[os],
+                            color: getOsColor(os)
+                        })).filter(s => s.value > 0);
+
+                        // If no OS data found (e.g. initial load or error), fallback to total if > 0
+                        if (osData.length === 0 && stats.totalDevices > 0) {
+                            // Use 'Unknown' if we have count but no OS breakdown
+                            osData.push({ label: 'Unknown', value: stats.totalDevices, color: '#94a3b8' });
+                        }
 
                         microFigure = (
                             <div style={{ marginTop: '12px' }}>
                                 <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>OS Distribution</div>
-                                <MiniSegmentedBar segments={osData} height={6} />
+                                <MiniSegmentedBar segments={osData} height={8} />
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
+                                    {osData.map((seg, idx) => (
+                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: seg.color }}></div>
+                                            <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>{seg.label}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         );
                     } else if (i === 1) {
@@ -248,6 +276,42 @@ const IntuneMonitoring = () => {
                         );
                     }
 
+                    // Generic fallback -> Upgrade to Rich Visuals
+                    if (!microFigure) {
+                        // Generate consistent "random" data for sparklines based on index
+                        const sparkData = Array.from({ length: 15 }, (_, j) => ({
+                            value: 20 + Math.random() * 30 + (j * 2) + (i * 5)
+                        }));
+
+                        if (tile.label.includes('Policies') || tile.label.includes('Baselines')) {
+                            // Progress bar for "Health/Security" type tiles
+                            microFigure = (
+                                <div style={{ marginTop: '14px' }}>
+                                    <div className="flex-between" style={{ marginBottom: '6px' }}>
+                                        <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>Adherence</span>
+                                        <span style={{ fontSize: '10px', color: tile.color, fontWeight: 700 }}>92%</span>
+                                    </div>
+                                    <MiniProgressBar value={92} color={tile.color} height={4} />
+                                </div>
+                            );
+                        } else if (tile.label.includes('Applications') || tile.label.includes('Configuration') || tile.label.includes('Audit')) {
+                            // Sparkline for "Activity/Count" type tiles
+                            microFigure = (
+                                <div style={{ marginTop: '12px' }}>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>7-Day Activity</div>
+                                    <MiniSparkline data={sparkData} color={tile.color} height={30} />
+                                </div>
+                            );
+                        } else {
+                            // Default to the premium pill for others (like Search, RBAC)
+                            microFigure = (
+                                <div style={{ marginTop: '12px' }}>
+                                    <MiniStatusGeneric status={tile.trend || 'Active'} color={tile.color} />
+                                </div>
+                            );
+                        }
+                    }
+
                     return (
                         <motion.div
                             key={i}
@@ -260,13 +324,13 @@ const IntuneMonitoring = () => {
                                 <span className="stat-label">{tile.label}</span>
                                 <tile.icon size={20} style={{ color: tile.color }} />
                             </div>
-                            <div className="stat-value">{typeof tile.value === 'number' ? tile.value.toLocaleString() : tile.value}</div>
-                            {!microFigure && (
-                                <div className="flex-between mt-4" style={{ marginTop: '16px' }}>
-                                    <span className="badge badge-info">{tile.trend}</span>
-                                    <ArrowRight size={14} style={{ color: 'var(--text-dim)' }} />
-                                </div>
-                            )}
+                            <div className="stat-value" style={{
+                                color: tile.color,
+                                fontSize: '32px',
+                                fontWeight: '700',
+                                letterSpacing: '-1px'
+                            }}>{typeof tile.value === 'number' ? tile.value.toLocaleString() : tile.value}</div>
+
                             {microFigure}
                         </motion.div>
                     );

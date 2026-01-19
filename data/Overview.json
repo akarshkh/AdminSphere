@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768814708663,
+  "timestamp": 1768819913185,
   "data": {
     "overview": {
       "statistics": {
@@ -9,7 +9,7 @@
         "secure_score": 181.5
       },
       "health_and_security": {
-        "failed_signins": 7,
+        "failed_signins": 8,
         "compliance_rate": 33
       }
     },
@@ -55,12 +55,12 @@
         ],
         "deviceByPlatform": [
           {
-            "name": "macOS",
-            "value": 1
-          },
-          {
             "name": "Windows",
             "value": 2
+          },
+          {
+            "name": "macOS",
+            "value": 1
           }
         ],
         "licenseUsage": [
@@ -93,8 +93,8 @@
         "signIns": [
           {
             "name": "Last 24h",
-            "failed": 7,
-            "successful": 25
+            "failed": 8,
+            "successful": 30
           }
         ],
         "emailTrend": [
@@ -127,7 +127,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 78,
+            "value": 79,
             "fullMark": 100
           }
         ],

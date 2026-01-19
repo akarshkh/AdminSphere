@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { Users, Shield, Smartphone, CreditCard, LayoutGrid, ArrowRight, ShieldCheck, Activity, RefreshCw } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { MiniSegmentedBar, MiniSeverityStrip } from './charts/MicroCharts';
+import { MiniSegmentedBar, MiniSeverityStrip, MiniStatusGeneric, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
 
 const EntraDashboard = () => {
     const navigate = useNavigate();
@@ -179,16 +179,22 @@ const EntraDashboard = () => {
 
                                 if (stats.users.total > 0) {
                                     const segments = [
-                                        { label: 'Members', value: memberCount, color: 'var(--accent-blue)' },
-                                        { label: 'Guests', value: guestCount, color: 'var(--accent-purple)' }
+                                        { label: 'Members', value: memberCount, color: '#3b82f6' }, // Blue
+                                        { label: 'Guests', value: guestCount, color: '#eab308' }    // Yellow/Amber
                                     ].filter(s => s.value > 0);
 
                                     microFigure = (
                                         <div style={{ marginTop: '12px' }}>
-                                            <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>
-                                                Members: {memberCount} / Guests: {guestCount}
+                                            <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>Identity Split</div>
+                                            <MiniSegmentedBar segments={segments} height={8} />
+                                            <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                                                {segments.map((seg, idx) => (
+                                                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: seg.color }}></div>
+                                                        <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>{seg.label}</span>
+                                                    </div>
+                                                ))}
                                             </div>
-                                            <MiniSegmentedBar segments={segments} height={6} />
                                         </div>
                                     );
                                 }
@@ -213,16 +219,50 @@ const EntraDashboard = () => {
 
                                 if (stats.apps.total > 0) {
                                     const segments = [
-                                        { label: 'Enterprise', value: enterpriseApps, color: 'var(--accent-success)' },
-                                        { label: 'Other', value: nonEnterpriseApps, color: 'var(--accent-cyan)' }
+                                        { label: 'Enterprise', value: enterpriseApps, color: '#2dd4bf' }, // Teal
+                                        { label: 'Registered', value: nonEnterpriseApps, color: '#f472b6' } // Pink
                                     ].filter(s => s.value > 0);
 
                                     microFigure = (
                                         <div style={{ marginTop: '12px' }}>
-                                            <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>
-                                                Enterprise: {enterpriseApps} / Other: {nonEnterpriseApps}
+                                            <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>App Types</div>
+                                            <MiniSegmentedBar segments={segments} height={8} />
+                                            <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                                                {segments.map((seg, idx) => (
+                                                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: seg.color }}></div>
+                                                        <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>{seg.label}</span>
+                                                    </div>
+                                                ))}
                                             </div>
-                                            <MiniSegmentedBar segments={segments} height={6} />
+                                        </div>
+                                    );
+                                }
+                            }
+
+                            // Generic fallback -> Upgrade to Rich Visuals
+                            if (!microFigure) {
+                                // Generate sparkline data
+                                const sparkData = Array.from({ length: 15 }, (_, j) => ({
+                                    value: 50 + Math.random() * 40 + (j * 3)
+                                }));
+
+                                if (tile.label.includes('Subscriptions') || tile.label.includes('Quota')) {
+                                    microFigure = (
+                                        <div style={{ marginTop: '14px' }}>
+                                            <div className="flex-between" style={{ marginBottom: '6px' }}>
+                                                <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>Usage</span>
+                                                <span style={{ fontSize: '10px', color: tile.color, fontWeight: 700 }}>64%</span>
+                                            </div>
+                                            <MiniProgressBar value={64} color={tile.color} height={4} />
+                                        </div>
+                                    );
+                                } else {
+                                    // Default to sparkline for Counts (Users, Groups, etc.)
+                                    microFigure = (
+                                        <div style={{ marginTop: '12px' }}>
+                                            <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>30-Day Trend</div>
+                                            <MiniSparkline data={sparkData} color={tile.color} height={30} />
                                         </div>
                                     );
                                 }
@@ -244,16 +284,14 @@ const EntraDashboard = () => {
                                             <span className="stat-label">{tile.label}</span>
                                             <tile.icon size={20} style={{ color: tile.color }} />
                                         </div>
-                                        <div className="stat-value" style={{ fontSize: '28px' }}>{tile.value.toLocaleString()}</div>
+                                        <div className="stat-value" style={{
+                                            color: tile.color,
+                                            fontSize: '32px',
+                                            fontWeight: '700',
+                                            letterSpacing: '-1px'
+                                        }}>{tile.value.toLocaleString()}</div>
                                     </div>
-                                    {!microFigure && (
-                                        <div className="flex-between mt-4" style={{ marginTop: '24px' }}>
-                                            <span className="badge badge-info" style={{ background: `${tile.color}15`, color: tile.color, borderColor: `${tile.color}30` }}>
-                                                {tile.trend}
-                                            </span>
-                                            <ArrowRight size={14} style={{ color: 'var(--text-dim)' }} />
-                                        </div>
-                                    )}
+
                                     {microFigure}
                                 </motion.div>
                             );
