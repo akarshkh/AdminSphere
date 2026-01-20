@@ -266,11 +266,22 @@ const BirdsEyeView = () => {
                     value: `${stats.security.score}/${stats.security.max}`,
                     path: '/service/admin/secure-score',
                     custom: (
-                        <div className={styles.progressBarContainer}>
-                            <div
-                                className={styles.progressBarFill}
-                                style={{ width: `${(stats.security.score / stats.security.max) * 100 || 0}%`, background: 'var(--accent-warning)' }}
-                            />
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-20px' }}>
+                            <div className={styles.circularChartContainer}>
+                                <svg viewBox="0 0 36 36" className={styles.circularChart}>
+                                    <path className={styles.circularChartBg}
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                    <path className={styles.circularChartFill}
+                                        strokeDasharray={`${(stats.security.score / stats.security.max) * 100 || 0}, 100`}
+                                        stroke="#f59e0b"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                </svg>
+                                <div className={styles.circularChartText}>
+                                    {Math.round((stats.security.score / stats.security.max) * 100 || 0)}%
+                                </div>
+                            </div>
                         </div>
                     )
                 },
