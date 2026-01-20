@@ -133,7 +133,7 @@ const EntraDashboard = () => {
     const scorePercentage = Math.round((secureScore.current / secureScore.max) * 100);
     const scoreData = [
         { name: 'Achieved', value: secureScore.current, color: 'url(#scoreGrad)' },
-        { name: 'Remaining', value: secureScore.max - secureScore.current, color: 'rgba(255,255,255,0.05)' }
+        { name: 'Remaining', value: secureScore.max - secureScore.current, color: 'rgba(255,255,255,0.3)' }
     ];
 
     // Reusable Tooltip
@@ -300,12 +300,11 @@ const EntraDashboard = () => {
 
                     {/* Right Chart (1:1 Aspect Ratio) */}
                     <motion.div
-                        initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         className="glass-card"
-                        style={{ padding: '32px', position: 'sticky', top: '24px', aspectRatio: '1/1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+                        style={{ padding: '24px', position: 'sticky', top: '24px', minHeight: '480px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                     >
-                        <div className="flex-center flex-gap-4 spacing-v-8" style={{ width: '100%', marginBottom: '32px' }}>
+                        <div className="flex-center flex-gap-4 spacing-v-8" style={{ width: '100%', marginBottom: '16px', flexShrink: 0 }}>
                             <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-indigo))', borderRadius: '12px', boxShadow: '0 8px 16px rgba(59, 130, 246, 0.2)' }}>
                                 <ShieldCheck size={24} color="white" />
                             </div>
@@ -315,7 +314,7 @@ const EntraDashboard = () => {
                             <Activity size={18} color="var(--accent-success)" />
                         </div>
 
-                        <div style={{ width: '240px', height: '240px', position: 'relative' }}>
+                        <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: 0 }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <defs>
@@ -328,13 +327,14 @@ const EntraDashboard = () => {
                                         data={scoreData}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={80}
-                                        outerRadius={110}
+                                        innerRadius="65%"
+                                        outerRadius="85%"
                                         paddingAngle={0}
                                         dataKey="value"
-                                        startAngle={225}
-                                        endAngle={-45}
+                                        startAngle={240}
+                                        endAngle={-60}
                                         stroke="none"
+                                        cornerRadius={10}
                                     >
                                         {scoreData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
@@ -348,16 +348,17 @@ const EntraDashboard = () => {
                                 top: '50%',
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)',
-                                textAlign: 'center'
+                                textAlign: 'center',
+                                pointerEvents: 'none'
                             }}>
-                                <span className="compliance-score-text" style={{ fontSize: '42px', fontWeight: 800, display: 'block', lineHeight: 1 }}>
+                                <span className="compliance-score-text" style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, display: 'block', lineHeight: 1 }}>
                                     {scorePercentage}%
                                 </span>
-                                <span style={{ fontSize: '11px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Secure</span>
+                                <span style={{ fontSize: '10px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Secure</span>
                             </div>
                         </div>
 
-                        <div style={{ width: '100%', marginTop: '32px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div style={{ width: '100%', marginTop: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flexShrink: 0 }}>
                             <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                 <p style={{ fontSize: '10px', color: 'var(--text-dim)', marginBottom: '4px' }}>CURRENT</p>
                                 <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>{secureScore.current}</p>

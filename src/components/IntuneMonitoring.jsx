@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import {
     Smartphone, AlertTriangle, Clock, Shield, Settings,
     Package, Rocket, Lock, Users, UserCog, FileText,
-    TrendingUp, ArrowRight, RefreshCw
+    TrendingUp, ArrowRight, RefreshCw, Search
 } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { DataPersistenceService } from '../services/dataPersistence';
@@ -162,7 +162,7 @@ const IntuneMonitoring = () => {
         },
         {
             label: 'User → Devices View',
-            value: 'Search',
+            value: 'Lookup',
             trend: 'Enabled',
             color: 'var(--accent-cyan)',
             path: '/service/intune/user-devices',
@@ -186,7 +186,7 @@ const IntuneMonitoring = () => {
         },
         {
             label: 'Reports & Insights',
-            value: 'Analytics',
+            value: 'Exports',
             trend: 'Trends',
             color: 'var(--accent-success)',
             path: '/service/intune/reports',
@@ -303,12 +303,30 @@ const IntuneMonitoring = () => {
                                 </div>
                             );
                         } else {
-                            // Default to the premium pill for others (like Search, RBAC)
-                            microFigure = (
-                                <div style={{ marginTop: '12px' }}>
-                                    <MiniStatusGeneric status={tile.trend || 'Active'} color={tile.color} />
-                                </div>
-                            );
+                            // Default to the premium pill for others (like RBAC)
+                            if (tile.label.includes('User')) {
+                                microFigure = (
+                                    <div style={{ marginTop: '14px', background: 'var(--glass-bg)', borderRadius: '8px', padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid var(--glass-border)' }}>
+                                        <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>Find user or device...</span>
+                                        <Search size={12} color="var(--text-dim)" />
+                                    </div>
+                                );
+                            } else if (tile.label.includes('Reports')) {
+                                microFigure = (
+                                    <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{ padding: '4px 8px', background: 'var(--accent-success)', borderRadius: '6px', fontSize: '10px', color: '#fff', fontWeight: 600, display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                            <span>Excel</span>
+                                        </div>
+                                        <div style={{ padding: '4px 8px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '6px', fontSize: '10px', color: 'var(--text-secondary)' }}>CSV</div>
+                                    </div>
+                                );
+                            } else {
+                                microFigure = (
+                                    <div style={{ marginTop: '12px' }}>
+                                        <MiniStatusGeneric status={tile.trend || 'Active'} color={tile.color} />
+                                    </div>
+                                );
+                            }
                         }
                     }
 
