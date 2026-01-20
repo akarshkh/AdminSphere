@@ -345,14 +345,14 @@ const EntraDashboard = () => {
                                     startAngle={90}
                                     endAngle={-270}
                                     stroke="none"
-                                    cornerRadius={10}
+                                    cornerRadius={0}
                                     isAnimationActive={true}
                                 >
                                     {scoreData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />
                                     ))}
                                 </Pie>
-                                <Tooltip content={<CustomTooltip />} />
+                                <Tooltip content={<CustomTooltip />} cursor={false} />
                             </PieChart>
                             <div style={{
                                 position: 'absolute',

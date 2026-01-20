@@ -228,7 +228,7 @@
 .circularChartFill {
     fill: none;
     stroke-width: 3;
-    stroke-linecap: round;
+    stroke-linecap: butt;
     transition: stroke-dasharray 0.8s ease-out;
 }
 
