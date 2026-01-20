@@ -13,7 +13,7 @@ import {
 import {
     Users, Smartphone, CreditCard, Shield, Activity,
     TrendingUp, AlertTriangle, Mail, Download,
-    ShieldCheck, Lock, LayoutGrid, RefreshCw
+    ShieldCheck, Lock, LayoutGrid, RefreshCw, ChevronDown, Laptop
 } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { DataPersistenceService } from '../services/dataPersistence';
@@ -26,6 +26,9 @@ const OverviewDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [bevStats, setBevStats] = useState(null);
+    const [bevLoading, setBevLoading] = useState(false);
 
     const fetchOverviewData = async (isManual = false) => {
         if (accounts.length === 0) return;
@@ -90,8 +93,129 @@ const OverviewDashboard = () => {
         }
     };
 
+    const loadBEVData = async () => {
+        const bevCached = await DataPersistenceService.load('BirdsEyeView');
+        if (bevCached) {
+            setBevStats(bevCached);
+        }
+    };
+
+    const fetchBEVData = async () => {
+        if (accounts.length === 0) return;
+        setBevLoading(true);
+
+        try {
+            const request = {
+                scopes: ["User.Read.All", "Directory.Read.All", "DeviceManagementManagedDevices.Read.All", "Reports.Read.All", "Policy.Read.All", "ServiceHealth.Read.All"],
+                account: accounts[0],
+            };
+            const response = await instance.acquireTokenSilent(request);
+            const graphService = new GraphService(response.accessToken);
+
+            // Parallel Fetching
+            const [
+                users,
+                groups,
+                devices,
+                secureScore,
+                skus,
+                directoryRoles,
+                apps,
+                domains,
+                deletedUsers,
+                caPolicies,
+                serviceIssues,
+                entraDevicesCount
+            ] = await Promise.all([
+                graphService.client.api('/users').select('id,accountEnabled,userType,assignedLicenses').top(999).get().catch(e => ({ value: [] })),
+                graphService.client.api('/groups').select('id,groupTypes,mailEnabled,securityEnabled,resourceProvisioningOptions,visibility').top(999).get().catch(e => ({ value: [] })),
+                graphService.getDeviceComplianceStats(),
+                graphService.getSecureScore(),
+                graphService.client.api('/subscribedSkus').get().catch(e => ({ value: [] })),
+                graphService.getDirectoryRoles(),
+                graphService.getApplications(),
+                graphService.getDomains(),
+                graphService.getDeletedUsers(),
+                graphService.getConditionalAccessPolicies(),
+                graphService.getServiceIssues(),
+                graphService.getTotalDevicesCount()
+            ]);
+
+            // Process Data
+            const userList = users.value || [];
+            const groupList = groups.value || [];
+            const skuList = skus.value || [];
+            const roleList = directoryRoles || [];
+
+            const importantRoles = ['Global Administrator', 'Security Administrator', 'Exchange Administrator', 'SharePoint Administrator', 'User Administrator', 'Intune Administrator'];
+            const adminStats = roleList
+                .filter(r => importantRoles.includes(r.displayName))
+                .map(r => ({ name: r.displayName.replace(' Administrator', ''), count: r.members?.length || 0 }))
+                .filter(r => r.count > 0)
+                .sort((a, b) => b.count - a.count);
+
+            const userStats = {
+                users: userList.length,
+                signin: userList.filter(u => u.accountEnabled).length,
+                licensed: userList.filter(u => u.assignedLicenses?.length > 0).length,
+                guest: userList.filter(u => u.userType === 'Guest').length,
+                groups: groupList.length,
+                securityGroups: groupList.filter(g => g.securityEnabled && !g.mailEnabled).length,
+                distGroups: groupList.filter(g => g.mailEnabled && !g.groupTypes?.includes('Unified')).length,
+                unifiedGroups: groupList.filter(g => g.groupTypes?.includes('Unified')).length,
+                admins: adminStats,
+                apps: apps.length,
+                domains: domains.length,
+                deletedUsers: deletedUsers.length
+            };
+
+            const topSkus = skuList
+                .sort((a, b) => (b.consumedUnits || 0) - (a.consumedUnits || 0))
+                .slice(0, 3)
+                .map(s => ({ name: s.skuPartNumber, count: s.consumedUnits || 0 }));
+
+            const licenseStats = {
+                purchased: skuList.reduce((acc, sku) => acc + (sku.prepaidUnits?.enabled || 0), 0),
+                assigned: skuList.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0),
+                total: skuList.length,
+                topSkus: topSkus
+            };
+
+            const teamsGroups = groupList.filter(g => g.resourceProvisioningOptions?.includes('Team'));
+            const teamsCount = teamsGroups.length;
+            const privateTeams = teamsGroups.filter(g => g.visibility === 'Private').length;
+            const publicTeams = teamsGroups.filter(g => g.visibility === 'Public').length;
+
+            const activeIssues = serviceIssues.length;
+            const enabledCaPolicies = (caPolicies || []).filter(p => p.state === 'enabled').length;
+
+            const newStats = {
+                entra: userStats,
+                licenses: licenseStats,
+                devices: { ...devices, entraTotal: entraDevicesCount },
+                security: {
+                    score: secureScore?.currentScore || 0,
+                    max: secureScore?.maxScore || 0,
+                    caPolicies: enabledCaPolicies,
+                    healthIssues: activeIssues
+                },
+                exchange: { mailboxes: userStats.licensed },
+                teams: { total: teamsCount, private: privateTeams, public: publicTeams },
+                sharepoint: { sites: 0 }
+            };
+
+            setBevStats(newStats);
+            await DataPersistenceService.save('BirdsEyeView', newStats);
+        } catch (error) {
+            console.error("Failed to fetch Bird's Eye data", error);
+        } finally {
+            setBevLoading(false);
+        }
+    };
+
     useEffect(() => {
         loadData();
+        loadBEVData();
     }, [accounts, instance]);
 
     if (loading) {
@@ -332,6 +456,197 @@ const OverviewDashboard = () => {
                     );
                 })}
             </div>
+
+            {/* Birds Eye View - Collapsible Section */}
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="glass-card"
+                style={{ marginTop: '32px', marginBottom: '32px', overflow: 'hidden' }}
+            >
+                {/* Header */}
+                <div
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    style={{
+                        padding: '16px 20px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        background: 'var(--glass-bg)',
+                        borderBottom: isExpanded ? '1px solid var(--glass-border)' : 'none'
+                    }}
+                    className="hover:bg-opacity-80"
+                >
+                    <div>
+                        <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <ShieldCheck size={20} style={{ color: 'var(--accent-blue)' }} />
+                            Microsoft 365 - Bird's Eye View
+                        </h2>
+                        <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
+                            Deep-dive overview of your organization's Microsoft 365 environment.
+                        </p>
+                    </div>
+                    <motion.div
+                        animate={{ rotate: isExpanded ? 180 : 0 }}
+                        transition={{ duration: 0.3 }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
+                    >
+                        <RefreshCw
+                            size={16}
+                            style={{ color: 'var(--text-dim)', cursor: 'pointer' }}
+                            className={bevLoading ? 'spinning' : ''}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                fetchBEVData();
+                            }}
+                        />
+                        <ChevronDown size={20} style={{ color: 'var(--text-secondary)' }} />
+                    </motion.div>
+                </div>
+
+                {/* Collapsible Content */}
+                <motion.div
+                    initial={false}
+                    animate={{
+                        height: isExpanded ? 'auto' : 0,
+                        opacity: isExpanded ? 1 : 0
+                    }}
+                    transition={{ duration: 0.4, ease: 'easeInOut' }}
+                    style={{ overflow: 'hidden' }}
+                >
+                    <div style={{ padding: '20px' }}>
+                        {bevStats ? (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                {/* Entra ID Section */}
+                                <div style={{ backgroundColor: 'var(--glass-bg)', borderRadius: '12px', border: '1px solid var(--glass-border)', borderTop: '6px solid #0078D4' }}>
+                                    <div style={{ padding: '16px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-secondary)' }}>Entra ID</h3>
+                                            <ShieldCheck size={22} style={{ color: '#0078D4' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                            <div onClick={() => navigate('/service/entra/users')} style={{ cursor: 'pointer' }}>
+                                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '4px' }}>Users</div>
+                                                <div style={{ fontSize: '24px', fontWeight: 300, color: 'var(--text-primary)' }}>{bevStats.entra?.users || 0}</div>
+                                            </div>
+                                            <div style={{ fontSize: '11px', color: 'var(--text-dim)', textAlign: 'right' }}>
+                                                <div>Sign-in Enabled: <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{bevStats.entra?.signin || 0}</span></div>
+                                                <div>Licensed: <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{bevStats.entra?.licensed || 0}</span></div>
+                                                <div>Guests: <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{bevStats.entra?.guest || 0}</span></div>
+                                            </div>
+                                            <div onClick={() => navigate('/service/entra/groups')} style={{ cursor: 'pointer' }}>
+                                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '4px' }}>Groups</div>
+                                                <div style={{ fontSize: '24px', fontWeight: 300, color: 'var(--text-primary)' }}>{bevStats.entra?.groups || 0}</div>
+                                                <div style={{ fontSize: '11px', color: 'var(--text-dim)', textAlign: 'right', marginTop: '4px' }}>
+                                                    <div>M365: <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{bevStats.entra?.unifiedGroups || 0}</span></div>
+                                                    <div>Security: <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{bevStats.entra?.securityGroups || 0}</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Device Management Section */}
+                                <div style={{ backgroundColor: 'var(--glass-bg)', borderRadius: '12px', border: '1px solid var(--glass-border)', borderTop: '6px solid #9332BF' }}>
+                                    <div style={{ padding: '16px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-secondary)' }}>Device Management</h3>
+                                            <Laptop size={22} style={{ color: '#9332BF' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                            <div onClick={() => navigate('/service/intune/devices')} style={{ cursor: 'pointer' }}>
+                                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '4px' }}>Total Devices</div>
+                                                <div style={{ fontSize: '24px', fontWeight: 300, color: 'var(--text-primary)' }}>{bevStats.devices?.entraTotal || 0}</div>
+                                            </div>
+                                            <div>
+                                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '8px' }}>Intune Status</div>
+                                                <div style={{ fontSize: '18px', fontWeight: 300, color: 'var(--text-primary)' }}>
+                                                    {bevStats.devices?.compliant || 0}/{bevStats.devices?.total || 0}
+                                                </div>
+                                                <div style={{ fontSize: '11px', color: 'var(--text-dim)', textAlign: 'right', marginTop: '4px' }}>
+                                                    <div>Managed: <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{bevStats.devices?.total || 0}</span></div>
+                                                    <div>Compliant: <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{bevStats.devices?.compliant || 0}</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Teams & Groups Section */}
+                                <div style={{ backgroundColor: 'var(--glass-bg)', borderRadius: '12px', border: '1px solid var(--glass-border)', borderTop: '6px solid #5059C9' }}>
+                                    <div style={{ padding: '16px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-secondary)' }}>Teams & Groups</h3>
+                                            <div style={{ backgroundColor: '#5059C9', color: 'white', padding: '4px 8px', borderRadius: '6px' }}>
+                                                <span style={{ fontWeight: 'bold', fontSize: '12px' }}>T</span>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                            <div onClick={() => navigate('/service/entra/groups')} style={{ cursor: 'pointer' }}>
+                                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '4px' }}>Total Teams</div>
+                                                <div style={{ fontSize: '24px', fontWeight: 300, color: 'var(--text-primary)' }}>{bevStats.teams?.total || 0}</div>
+                                            </div>
+                                            <div>
+                                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '8px' }}>Visibility</div>
+                                                <div style={{ fontSize: '11px', color: 'var(--text-dim)' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                                        <span>Private</span>
+                                                        <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{bevStats.teams?.private || 0}</span>
+                                                    </div>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <span>Public</span>
+                                                        <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{bevStats.teams?.public || 0}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Security & Health Section */}
+                                <div style={{ backgroundColor: 'var(--glass-bg)', borderRadius: '12px', border: '1px solid var(--glass-border)', borderTop: '6px solid #D83B01' }}>
+                                    <div style={{ padding: '16px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-secondary)' }}>Security & Health</h3>
+                                            <Shield size={22} style={{ color: '#D83B01' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                            <div onClick={() => navigate('/service/admin/secure-score')} style={{ cursor: 'pointer' }}>
+                                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '4px' }}>Secure Score</div>
+                                                <div style={{ fontSize: '24px', fontWeight: 300, color: 'var(--text-primary)' }}>
+                                                    {bevStats.security?.score || 0}/{bevStats.security?.max || 100}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '8px' }}>Health Status</div>
+                                                <div style={{ fontSize: '12px', color: 'var(--text-dim)', textAlign: 'right' }}>
+                                                    {bevStats.security?.healthIssues > 0 ? (
+                                                        <span style={{ fontWeight: 600, color: '#ef4444' }}>{bevStats.security.healthIssues} Active Issues</span>
+                                                    ) : (
+                                                        <span style={{ fontWeight: 600, color: '#10b981' }}>All Systems Operational</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div onClick={() => navigate('/service/entra')} style={{ cursor: 'pointer' }}>
+                                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Active CA Policies</div>
+                                                <div style={{ fontSize: '18px', fontWeight: 300, color: 'var(--text-primary)', marginTop: '4px' }}>{bevStats.security?.caPolicies || 0}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-dim)' }}>
+                                <p>No Birds Eye View data available. Visit the Birds Eye View page to view detailed statistics.</p>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+            </motion.div>
+
 
             {/* Charts Grid with Responsive Alignment */}
             <div style={{
