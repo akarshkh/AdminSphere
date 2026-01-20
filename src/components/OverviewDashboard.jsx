@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { AggregationService } from '../services/aggregation.service';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     PieChart, Pie, BarChart, Bar, LineChart, Line, AreaChart, Area, RadialBarChart, RadialBar,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Treemap, ComposedChart,
@@ -506,6 +506,106 @@ const OverviewDashboard = () => {
                         <ChevronDown size={20} style={{ color: 'var(--text-secondary)' }} />
                     </motion.div>
                 </div>
+
+                {/* Condensed Preview (visible when collapsed) */}
+                <AnimatePresence>
+                    {!isExpanded && bevStats && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            style={{ overflow: 'hidden', borderTop: '1px solid var(--glass-border)' }}
+                        >
+                            <div style={{
+                                padding: '16px 20px',
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                                gap: '12px'
+                            }}>
+                                {/* Entra ID Preview */}
+                                <div style={{
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    background: 'linear-gradient(135deg, rgba(0, 120, 212, 0.1), rgba(0, 120, 212, 0.05))',
+                                    border: '1px solid rgba(0, 120, 212, 0.2)',
+                                    cursor: 'pointer'
+                                }} onClick={() => navigate('/service/entra/users')}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                        <Users size={14} style={{ color: '#0078D4' }} />
+                                        <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Users</span>
+                                    </div>
+                                    <div style={{ fontSize: '20px', fontWeight: 300, color: 'var(--text-primary)' }}>
+                                        {bevStats.entra?.users || 0}
+                                    </div>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginTop: '2px' }}>
+                                        {bevStats.entra?.licensed || 0} licensed
+                                    </div>
+                                </div>
+
+                                {/* Devices Preview */}
+                                <div style={{
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    background: 'linear-gradient(135deg, rgba(147, 50, 191, 0.1), rgba(147, 50, 191, 0.05))',
+                                    border: '1px solid rgba(147, 50, 191, 0.2)',
+                                    cursor: 'pointer'
+                                }} onClick={() => navigate('/service/intune/devices')}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                        <Laptop size={14} style={{ color: '#9332BF' }} />
+                                        <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Devices</span>
+                                    </div>
+                                    <div style={{ fontSize: '20px', fontWeight: 300, color: 'var(--text-primary)' }}>
+                                        {bevStats.devices?.entraTotal || 0}
+                                    </div>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginTop: '2px' }}>
+                                        {bevStats.devices?.compliant || 0} compliant
+                                    </div>
+                                </div>
+
+                                {/* Teams Preview */}
+                                <div style={{
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    background: 'linear-gradient(135deg, rgba(80, 89, 201, 0.1), rgba(80, 89, 201, 0.05))',
+                                    border: '1px solid rgba(80, 89, 201, 0.2)',
+                                    cursor: 'pointer'
+                                }} onClick={() => navigate('/service/entra/groups')}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                        <Users size={14} style={{ color: '#5059C9' }} />
+                                        <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Teams</span>
+                                    </div>
+                                    <div style={{ fontSize: '20px', fontWeight: 300, color: 'var(--text-primary)' }}>
+                                        {bevStats.teams?.total || 0}
+                                    </div>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginTop: '2px' }}>
+                                        {bevStats.teams?.private || 0} private
+                                    </div>
+                                </div>
+
+                                {/* Secure Score Preview */}
+                                <div style={{
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    background: 'linear-gradient(135deg, rgba(216, 59, 1, 0.1), rgba(216, 59, 1, 0.05))',
+                                    border: '1px solid rgba(216, 59, 1, 0.2)',
+                                    cursor: 'pointer'
+                                }} onClick={() => navigate('/service/admin/secure-score')}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                        <Shield size={14} style={{ color: '#D83B01' }} />
+                                        <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Secure Score</span>
+                                    </div>
+                                    <div style={{ fontSize: '20px', fontWeight: 300, color: 'var(--text-primary)' }}>
+                                        {bevStats.security?.score || 0}
+                                    </div>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginTop: '2px' }}>
+                                        of {bevStats.security?.max || 0}
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 {/* Collapsible Content */}
                 <motion.div
