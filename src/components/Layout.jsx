@@ -109,13 +109,6 @@ const ServiceLayout = () => {
                         onClick={() => navigate('/service/overview')}
                     />
                     <NavItem
-                        icon={Eye}
-                        label="Bird's Eye View"
-                        active={isActive('/service/birdseye')}
-                        isOpen={isSidebarOpen}
-                        onClick={() => navigate('/service/birdseye')}
-                    />
-                    <NavItem
                         icon={LayoutDashboard}
                         label="Admin Center"
                         active={isActive('/service/admin')}

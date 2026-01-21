@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768824685583,
+  "timestamp": 1768981599473,
   "data": {
     "entra_id": {
       "identities": {
@@ -27,8 +27,8 @@
         "trend": "Managed"
       },
       "compliance": {
-        "score_percentage": "64%",
-        "score_points": 181.5,
+        "score_percentage": "65%",
+        "score_points": 183.92,
         "max_points": 283,
         "status": "Identity Guard"
       }
@@ -61,7 +61,7 @@
         }
       },
       "secureScore": {
-        "current": 181.5,
+        "current": 183.92,
         "max": 283
       }
     }

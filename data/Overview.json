@@ -1,15 +1,15 @@
 {
-  "timestamp": 1768882659097,
+  "timestamp": 1768981760731,
   "data": {
     "overview": {
       "statistics": {
         "total_users": 12,
         "total_devices": 3,
         "total_licenses": 13,
-        "secure_score": 181.5
+        "secure_score": 183.92
       },
       "health_and_security": {
-        "failed_signins": 33,
+        "failed_signins": 4,
         "compliance_rate": 33
       }
     },
@@ -18,7 +18,7 @@
         "totalUsers": 12,
         "totalDevices": 3,
         "totalLicenses": 13,
-        "secureScore": 181.5,
+        "secureScore": 183.92,
         "maxSecureScore": 283
       },
       "charts": {
@@ -55,12 +55,12 @@
         ],
         "deviceByPlatform": [
           {
-            "name": "Windows",
-            "value": 2
-          },
-          {
             "name": "macOS",
             "value": 1
+          },
+          {
+            "name": "Windows",
+            "value": 2
           }
         ],
         "licenseUsage": [
@@ -93,8 +93,8 @@
         "signIns": [
           {
             "name": "Last 24h",
-            "failed": 33,
-            "successful": 44
+            "failed": 4,
+            "successful": 19
           }
         ],
         "emailTrend": [
@@ -107,7 +107,7 @@
         "securityRadar": [
           {
             "subject": "Secure Score",
-            "value": 64,
+            "value": 65,
             "fullMark": 100
           },
           {
@@ -127,7 +127,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 57,
+            "value": 83,
             "fullMark": 100
           }
         ],

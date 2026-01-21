@@ -6,6 +6,12 @@
     font-family: 'Inter', sans-serif;
 }
 
+.embeddedContainer {
+    padding: 0;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+}
+
 .header {
     margin-bottom: 24px;
     display: flex;
@@ -56,8 +62,8 @@
 
 .cardGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
     align-items: start;
 }
 
@@ -78,14 +84,14 @@
 }
 
 .cardContent {
-    padding: 20px;
+    padding: 16px;
 }
 
 .cardHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .cardTitle {
@@ -100,7 +106,7 @@
 .statSection {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
 }
 
 .statBlock {
@@ -122,12 +128,12 @@
     color: var(--text-dim);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .statValue {
-    font-size: 24px;
-    font-weight: 300;
+    font-size: 20px;
+    font-weight: 400;
     color: var(--text-primary);
     line-height: 1;
 }
@@ -135,7 +141,7 @@
 .subValueGroup {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     align-items: flex-end;
 }
 

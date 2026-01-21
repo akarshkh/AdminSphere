@@ -14,7 +14,7 @@ import Loader3D from './Loader3D';
 
 import styles from './BirdsEyeView.module.css';
 
-const BirdsEyeView = () => {
+const BirdsEyeView = ({ embedded = false }) => {
     const { instance, accounts } = useMsal();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -300,19 +300,21 @@ const BirdsEyeView = () => {
     ];
 
     return (
-        <div className={styles.container}>
+        <div className={embedded ? styles.embeddedContainer : styles.container}>
             {loading && <Loader3D showOverlay={true} />}
 
-            <header className={styles.header}>
-                <div>
-                    <h1 className={styles.title}>M365 Bird's Eye</h1>
-                    <p className={styles.subtitle}>Real-time environment telemetry and resource mapping.</p>
-                </div>
-                <button onClick={() => fetchData(true)} className={styles.refreshBtn}>
-                    <RefreshCw size={14} className={loading ? styles.spinning : ""} />
-                    <span>Refresh</span>
-                </button>
-            </header>
+            {!embedded && (
+                <header className={styles.header}>
+                    <div>
+                        <h1 className={styles.title}>M365 Bird's Eye</h1>
+                        <p className={styles.subtitle}>Real-time environment telemetry and resource mapping.</p>
+                    </div>
+                    <button onClick={() => fetchData(true)} className={styles.refreshBtn}>
+                        <RefreshCw size={14} className={loading ? styles.spinning : ""} />
+                        <span>Refresh</span>
+                    </button>
+                </header>
+            )}
 
             <div className={styles.cardGrid}>
                 {sections.map((section, idx) => (
