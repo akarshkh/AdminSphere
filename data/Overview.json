@@ -1,15 +1,15 @@
 {
-  "timestamp": 1768997195654,
+  "timestamp": 1769079762279,
   "data": {
     "overview": {
       "statistics": {
         "total_users": 12,
         "total_devices": 3,
-        "total_licenses": 13,
+        "total_licenses": 14,
         "secure_score": 183.92
       },
       "health_and_security": {
-        "failed_signins": 10,
+        "failed_signins": 0,
         "compliance_rate": 33
       }
     },
@@ -17,7 +17,7 @@
       "quickStats": {
         "totalUsers": 12,
         "totalDevices": 3,
-        "totalLicenses": 13,
+        "totalLicenses": 14,
         "secureScore": 183.92,
         "maxSecureScore": 283
       },
@@ -55,12 +55,12 @@
         ],
         "deviceByPlatform": [
           {
-            "name": "macOS",
-            "value": 1
-          },
-          {
             "name": "Windows",
             "value": 2
+          },
+          {
+            "name": "macOS",
+            "value": 1
           }
         ],
         "licenseUsage": [
@@ -86,15 +86,15 @@
           },
           {
             "name": "POWERAPPS DEV",
-            "assigned": 0,
-            "available": 10000
+            "assigned": 1,
+            "available": 9999
           }
         ],
         "signIns": [
           {
             "name": "Last 24h",
-            "failed": 10,
-            "successful": 22
+            "failed": 0,
+            "successful": 25
           }
         ],
         "emailTrend": [
@@ -127,7 +127,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 69,
+            "value": 100,
             "fullMark": 100
           }
         ],
@@ -154,7 +154,7 @@
           },
           {
             "name": "POWERAPPS DEV",
-            "size": 61,
+            "size": 1,
             "fill": "#f59e0b"
           }
         ],
@@ -210,26 +210,26 @@
         "licenseTrendComposed": [
           {
             "month": "3 Mon Ago",
-            "assigned": 10,
-            "available": 33614,
+            "assigned": 11,
+            "available": 33613,
             "utilization": 68
           },
           {
             "month": "2 Mon Ago",
-            "assigned": 11,
-            "available": 31813,
+            "assigned": 12,
+            "available": 31812,
             "utilization": 74
           },
           {
             "month": "Last Month",
-            "assigned": 12,
-            "available": 30613,
+            "assigned": 13,
+            "available": 30612,
             "utilization": 79
           },
           {
             "month": "This Month",
-            "assigned": 13,
-            "available": 30013,
+            "assigned": 14,
+            "available": 30012,
             "utilization": 0
           }
         ]

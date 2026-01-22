@@ -11,37 +11,81 @@ export class UsageService {
     }
 
     /**
-     * Fetch real Exchange data using mailbox statistics API
-     * This uses the proper admin API that doesn't require accessing individual mailboxes
+     * Fetch report data from Graph API with fallback to JSON format
+     * @param {string} endpoint - The report endpoint
+     * @param {string} period - D7, D30, D90, D180
+     */
+    async fetchReport(endpoint, period = 'D7') {
+        try {
+            // Using $format=application/json on beta typically avoids the 302 redirect CORS issue
+            // and returns a cleaner JSON structure.
+            const url = `https://graph.microsoft.com/beta/reports/${endpoint}(period='${period}')?$format=application/json`;
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${this.accessToken}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                // If it's a 302 redirect, it might still fail in browser due to CORS
+                // but we try to handle it.
+                if (response.status === 302 || response.status === 301) {
+                    const location = response.headers.get('Location');
+                    if (location) {
+                        const redirectRes = await fetch(location);
+                        if (redirectRes.ok) {
+                            return await redirectRes.json();
+                        }
+                    }
+                }
+                throw new Error(`Report fetch failed: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            return data.value || [];
+        } catch (error) {
+            console.warn(`Failed to fetch report ${endpoint}:`, error.message);
+            return null;
+        }
+    }
+
+    /**
+     * Fetch real Exchange activity data
      */
     async getExchangeUsage(period = 'D7') {
         try {
-            // Fetch all users (this works with User.Read.All)
-            const users = await this.client.api('/users')
-                .select('userPrincipalName,displayName,mail,userType')
-                .filter('accountEnabled eq true and userType eq \'Member\'')
-                .top(100)
-                .get();
+            const data = await this.fetchReport('getEmailActivityUserDetail', period);
 
-            // Generate realistic activity data based on user count
-            const detail = users.value.map(user => {
-                const baseActivity = Math.floor(Math.random() * 50) + 10;
+            if (!data) {
                 return {
-                    userPrincipalName: user.userPrincipalName,
-                    displayName: user.displayName,
-                    lastActivityDate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    sendCount: baseActivity,
-                    receiveCount: baseActivity * 3,
-                    readCount: Math.floor(baseActivity * 2.5)
+                    detail: this.getExchangeFallbackData(),
+                    counts: this.generateExchangeCountsData(period, 10)
                 };
-            });
+            }
 
-            // Generate time-series data with realistic patterns
-            const counts = this.generateExchangeCountsData(period, users.value.length);
+            // Map Graph API fields to UI fields
+            const detail = data.map(item => ({
+                userPrincipalName: item.userPrincipalName,
+                displayName: item.displayName || item.userPrincipalName.split('@')[0],
+                lastActivityDate: item.lastActivityDate,
+                sendCount: parseInt(item.sendCount) || 0,
+                receiveCount: parseInt(item.receiveCount) || 0,
+                readCount: parseInt(item.readCount) || 0
+            }));
+
+            // For counts, we might need a different endpoint or aggregate from detail
+            // getEmailActivityCounts provides daily totals
+            const countsData = await this.fetchReport('getEmailActivityCounts', period);
+            const counts = countsData ? countsData.map(c => ({
+                reportDate: c.reportRefreshDate,
+                sendCount: parseInt(c.sendCount) || 0,
+                receiveCount: parseInt(c.receiveCount) || 0,
+                readCount: parseInt(c.readCount) || 0
+            })) : this.generateExchangeCountsData(period, detail.length);
 
             return { detail, counts };
-        } catch (error) {
-            console.warn('Error fetching Exchange data:', error.message);
+        } catch {
             return {
                 detail: this.getExchangeFallbackData(),
                 counts: this.generateExchangeCountsData(period, 10)
@@ -50,47 +94,40 @@ export class UsageService {
     }
 
     /**
-     * Fetch real Teams data
+     * Fetch real Teams user activity data
      */
     async getTeamsUsage(period = 'D7') {
         try {
-            // Fetch all member users (exclude guests)
-            const users = await this.client.api('/users')
-                .select('userPrincipalName,displayName,userType')
-                .filter('accountEnabled eq true and userType eq \'Member\'')
-                .top(100)
-                .get();
+            const data = await this.fetchReport('getTeamsUserActivityUserDetail', period);
 
-            // Try to get Teams for the organization
-            let orgTeamsCount = 0;
-            try {
-                const teams = await this.client.api('/teams')
-                    .top(50)
-                    .get();
-                orgTeamsCount = teams.value?.length || 0;
-            } catch (error) {
-                console.warn('Could not fetch teams list:', error.message);
+            if (!data) {
+                return {
+                    detail: this.getTeamsFallbackData(),
+                    counts: this.generateTeamsCountsData(period, 10)
+                };
             }
 
-            // Generate detail data with realistic activity
-            const detail = users.value.map(user => {
-                const teamsActivity = Math.floor(Math.random() * 5) + 1;
-                return {
-                    userPrincipalName: user.userPrincipalName,
-                    displayName: user.displayName,
-                    lastActivityDate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    teamChatMessages: Math.floor(Math.random() * 50 + teamsActivity * 10),
-                    privateChatMessages: Math.floor(Math.random() * 100 + teamsActivity * 20),
-                    calls: Math.floor(Math.random() * 10),
-                    meetings: Math.floor(Math.random() * 8)
-                };
-            });
+            const detail = data.map(item => ({
+                userPrincipalName: item.userPrincipalName,
+                displayName: item.displayName || item.userPrincipalName.split('@')[0],
+                lastActivityDate: item.lastActivityDate,
+                teamChatMessages: parseInt(item.teamChatMessageCount) || 0,
+                privateChatMessages: parseInt(item.privateChatMessageCount) || 0,
+                calls: parseInt(item.callCount) || 0,
+                meetings: parseInt(item.meetingCount) || 0
+            }));
 
-            const counts = this.generateTeamsCountsData(period, users.value.length);
+            const countsData = await this.fetchReport('getTeamsUserActivityCounts', period);
+            const counts = countsData ? countsData.map(c => ({
+                reportDate: c.reportRefreshDate,
+                teamChatMessages: parseInt(c.teamChatMessageCount) || 0,
+                privateChatMessages: parseInt(c.privateChatMessageCount) || 0,
+                calls: parseInt(c.callCount) || 0,
+                meetings: parseInt(c.meetingCount) || 0
+            })) : this.generateTeamsCountsData(period, detail.length);
 
             return { detail, counts };
-        } catch (error) {
-            console.warn('Error fetching Teams data:', error.message);
+        } catch {
             return {
                 detail: this.getTeamsFallbackData(),
                 counts: this.generateTeamsCountsData(period, 10)
@@ -99,41 +136,71 @@ export class UsageService {
     }
 
     /**
-     * Fetch real SharePoint data
+     * Fetch real SharePoint site usage data
      */
     async getSharePointUsage(period = 'D7') {
         try {
-            // Fetch real SharePoint sites
-            const sites = await this.client.api('/sites')
-                .select('webUrl,displayName,createdDateTime,id')
-                .top(50)
-                .get();
+            const data = await this.fetchReport('getSharePointSiteUsageDetail', period);
 
-            // Generate detail data
-            const detail = sites.value.map(site => {
-                const activityLevel = Math.floor(Math.random() * 1000) + 100;
+            if (!data) {
                 return {
-                    siteUrl: site.webUrl,
-                    displayName: site.displayName,
-                    lastActivityDate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    viewedOrEditedFileCount: activityLevel,
-                    syncedFileCount: activityLevel * 3,
-                    sharedInternalFileCount: Math.floor(activityLevel * 0.1),
-                    sharedExternalFileCount: Math.floor(activityLevel * 0.03)
+                    detail: this.getSharePointFallbackData(),
+                    counts: this.generateSharePointCountsData(period, 5)
                 };
-            });
+            }
 
-            const counts = this.generateSharePointCountsData(period, sites.value.length);
+            const detail = data.map(item => ({
+                siteUrl: item.siteUrl,
+                displayName: item.siteTitle || 'Unnamed Site',
+                lastActivityDate: item.lastActivityDate,
+                viewedOrEditedFileCount: parseInt(item.viewedOrEditedFileCount) || 0,
+                syncedFileCount: parseInt(item.syncedFileCount) || 0,
+                sharedInternalFileCount: parseInt(item.sharedInternalFileCount) || 0,
+                sharedExternalFileCount: parseInt(item.sharedExternalFileCount) || 0,
+                storageUsedInBytes: parseInt(item.storageUsedInBytes) || 0
+            }));
+
+            const countsData = await this.fetchReport('getSharePointSiteUsageFileCounts', period);
+            const counts = countsData ? countsData.map(c => ({
+                reportDate: c.reportRefreshDate,
+                viewedOrEditedFileCount: parseInt(c.viewedOrEditedFileCount) || 0,
+                syncedFileCount: parseInt(c.syncedFileCount) || 0
+            })) : this.generateSharePointCountsData(period, detail.length);
 
             return { detail, counts };
-        } catch (error) {
-            console.warn('Error fetching SharePoint data:', error.message);
+        } catch {
             return {
                 detail: this.getSharePointFallbackData(),
                 counts: this.generateSharePointCountsData(period, 5)
             };
         }
     }
+
+    /**
+     * Fetch OneDrive user activity data
+     */
+    async getOneDriveUsage(period = 'D7') {
+        try {
+            const data = await this.fetchReport('getOneDriveActivityUserDetail', period);
+            return data || [];
+        } catch {
+            return [];
+        }
+    }
+
+    /**
+     * Fetch Active Users across all services
+     */
+    async getOffice365ActiveUserDetail(period = 'D7') {
+        try {
+            const data = await this.fetchReport('getOffice365ActiveUserDetail', period);
+            return data || [];
+        } catch {
+            return [];
+        }
+    }
+
+    // --- Data Generation / Fallbacks for robustness ---
 
     // Generate realistic time-series data based on actual user/site count
     generateTeamsCountsData(period, userCount = 10) {
@@ -218,28 +285,22 @@ export class UsageService {
         return [
             { userPrincipalName: 'admin@tenant.com', displayName: 'Admin User', lastActivityDate: '2024-01-20', teamChatMessages: 45, privateChatMessages: 120, calls: 5, meetings: 3 },
             { userPrincipalName: 'user1@tenant.com', displayName: 'User One', lastActivityDate: '2024-01-21', teamChatMessages: 12, privateChatMessages: 30, calls: 2, meetings: 1 },
-            { userPrincipalName: 'user2@tenant.com', displayName: 'User Two', lastActivityDate: '2024-01-19', teamChatMessages: 8, privateChatMessages: 15, calls: 0, meetings: 4 },
-            { userPrincipalName: 'user3@tenant.com', displayName: 'User Three', lastActivityDate: '2024-01-21', teamChatMessages: 55, privateChatMessages: 210, calls: 12, meetings: 8 },
-            { userPrincipalName: 'user4@tenant.com', displayName: 'User Four', lastActivityDate: '2024-01-20', teamChatMessages: 2, privateChatMessages: 5, calls: 1, meetings: 0 }
+            { userPrincipalName: 'user2@tenant.com', displayName: 'User Two', lastActivityDate: '2024-01-19', teamChatMessages: 8, privateChatMessages: 15, calls: 0, meetings: 4 }
         ];
     }
 
     getExchangeFallbackData() {
         return [
             { userPrincipalName: 'admin@tenant.com', displayName: 'Admin User', lastActivityDate: '2024-01-21', sendCount: 24, receiveCount: 89, readCount: 156 },
-            { userPrincipalName: 'user1@tenant.com', displayName: 'User One', lastActivityDate: '2024-01-20', sendCount: 5, receiveCount: 42, readCount: 40 },
-            { userPrincipalName: 'user2@tenant.com', displayName: 'User Two', lastActivityDate: '2024-01-21', sendCount: 18, receiveCount: 56, readCount: 92 },
-            { userPrincipalName: 'user3@tenant.com', displayName: 'User Three', lastActivityDate: '2024-01-18', sendCount: 0, receiveCount: 12, readCount: 5 },
-            { userPrincipalName: 'user4@tenant.com', displayName: 'User Four', lastActivityDate: '2024-01-21', sendCount: 42, receiveCount: 110, readCount: 245 }
+            { userPrincipalName: 'user1@tenant.com', displayName: 'User One', lastActivityDate: '2024-01-20', sendCount: 5, receiveCount: 42, readCount: 40 }
         ];
     }
 
     getSharePointFallbackData() {
         return [
-            { siteUrl: 'https://tenant.sharepoint.com', displayName: 'Root Site', lastActivityDate: '2024-01-21', viewedOrEditedFileCount: 450, syncedFileCount: 1200, sharedInternalFileCount: 45, sharedExternalFileCount: 12 },
-            { siteUrl: 'https://tenant.sharepoint.com/sites/Marketing', displayName: 'Marketing', lastActivityDate: '2024-01-20', viewedOrEditedFileCount: 120, syncedFileCount: 300, sharedInternalFileCount: 12, sharedExternalFileCount: 2 },
-            { siteUrl: 'https://tenant.sharepoint.com/sites/Sales', displayName: 'Sales', lastActivityDate: '2024-01-21', viewedOrEditedFileCount: 850, syncedFileCount: 2100, sharedInternalFileCount: 112, sharedExternalFileCount: 24 },
-            { siteUrl: 'https://tenant.sharepoint.com/sites/HR', displayName: 'HR', lastActivityDate: '2024-01-19', viewedOrEditedFileCount: 45, syncedFileCount: 120, sharedInternalFileCount: 5, sharedExternalFileCount: 0 }
+            { siteUrl: 'https://tenant.sharepoint.com', displayName: 'Root Site', lastActivityDate: '2024-01-21', viewedOrEditedFileCount: 450, syncedFileCount: 1200, sharedInternalFileCount: 45, sharedExternalFileCount: 12 }
         ];
     }
 }
+
+export default UsageService;

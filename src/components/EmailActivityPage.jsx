@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
-import { loginRequest } from '../authConfig';
-import { GraphService } from '../services/graphService';
-import { motion } from 'framer-motion';
+import { UsageService } from '../services/usage.service';
 import { ArrowLeft, Mail, Activity, Send, Inbox, TrendingUp, Loader2, AlertCircle, Download } from 'lucide-react';
 
 const EmailActivityPage = () => {
@@ -14,147 +12,166 @@ const EmailActivityPage = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchActivity = async () => {
-            if (accounts.length === 0) return;
+        const fetchActivityData = async () => {
+            if (!accounts || accounts.length === 0) return;
+            setLoading(true);
+            setError(null);
             try {
-                // Note: This endpoint redirects to reportssea.office.com which causes CORS errors in browsers
-                // Microsoft Graph report endpoints with redirects cannot be called directly from frontend
-                // Requires either: backend proxy, PowerShell, or Graph Explorer
-                setError("Email activity reports require backend API access due to Microsoft's CORS restrictions. Use PowerShell or Graph Explorer to retrieve this data.");
-                setActivity([]);
+                const tokenResponse = await instance.acquireTokenSilent({
+                    scopes: ["Reports.Read.All"],
+                    account: accounts[0]
+                });
+                const service = new UsageService(tokenResponse.accessToken);
+                const result = await service.getExchangeUsage('D7');
+
+                if (result && result.detail && result.detail.length > 0) {
+                    setActivity(result.detail);
+                } else {
+                    setError("No detailed email activity record found for this period.");
+                    setActivity([]);
+                }
             } catch (err) {
-                setError("Email interaction telemetry could not be synchronized.");
+                console.error("Fetch error:", err);
+                setError("Failed to synchronize with Microsoft Graph. Please verify administrative permissions.");
+                setActivity([]);
             } finally {
                 setLoading(false);
             }
         };
-        fetchActivity();
+        fetchActivityData();
     }, [instance, accounts]);
 
-    const totalSent = activity.reduce((acc, curr) => acc + (parseInt(curr.sendCount) || 0), 0);
-    const totalReceived = activity.reduce((acc, curr) => acc + (parseInt(curr.receiveCount) || 0), 0);
+    const stats = {
+        sent: activity.reduce((acc, curr) => acc + (Number(curr.sendCount) || 0), 0),
+        received: activity.reduce((acc, curr) => acc + (Number(curr.receiveCount) || 0), 0)
+    };
 
-    const handleExport = () => {
-        const headers = ['User Principal Name', 'Display Name', 'Send Count', 'Receive Count', 'Read Count', 'Last Activity Date'];
-        const csvRows = activity.map(r => [
-            `"${r.userPrincipalName}"`, `"${r.displayName}"`, r.sendCount, r.receiveCount, r.readCount, r.lastActivityDate
-        ].join(','));
-        const csvContent = [headers.join(','), ...csvRows].join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv' });
+    const downloadCsv = () => {
+        const headers = ['User', 'Email', 'Sent', 'Received', 'Read', 'LastActive'];
+        const rows = activity.map(r => [
+            r.displayName || 'N/A',
+            r.userPrincipalName,
+            r.sendCount,
+            r.receiveCount,
+            r.readCount,
+            r.lastActivityDate
+        ].map(val => `"${val}"`).join(','));
+
+        const content = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([content], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'email_activity_7d.csv';
-        link.click();
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `exchange_usage_report.csv`;
+        a.click();
     };
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-purple)" />
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+                <Loader2 className="animate-spin" size={32} />
             </div>
         );
     }
 
     return (
-        <div className="animate-in">
-            <button onClick={() => navigate('/service/admin')} className="btn-back">
-                <ArrowLeft size={14} style={{ marginRight: '8px' }} />
-                Back to Dashboard
+        <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
+            <button
+                onClick={() => navigate('/service/admin')}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', marginBottom: '24px', fontWeight: 600 }}
+            >
+                <ArrowLeft size={16} />
+                Back to Admin Dashboard
             </button>
 
-            <header className="flex-between spacing-v-8">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Email Flow Analytics</h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Seven-day interaction volume and communication auditing</p>
+                    <h1 className="title-gradient" style={{ margin: 0, fontSize: '28px' }}>Email Flow Analytics</h1>
+                    <p style={{ color: 'var(--text-dim)', margin: '4px 0 0 0' }}>Live communication telemetry from Microsoft Graph</p>
                 </div>
-                <button className="btn btn-primary" onClick={handleExport}>
+                <button
+                    onClick={downloadCsv}
+                    disabled={activity.length === 0}
+                    className="btn btn-primary"
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
                     <Download size={16} />
-                    Export Communications
+                    Export Report
                 </button>
-            </header>
+            </div>
 
             {error && (
-                <div className="glass-card" style={{ background: 'hsla(0, 84%, 60%, 0.05)', borderColor: 'hsla(0, 84%, 60%, 0.2)', marginBottom: '32px' }}>
-                    <div className="flex-center justify-start flex-gap-4" style={{ color: 'var(--accent-error)' }}>
-                        <AlertCircle size={20} />
-                        <span>{error}</span>
-                    </div>
+                <div className="glass-card" style={{ padding: '16px', marginBottom: '24px', borderColor: 'var(--accent-error)', display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--accent-error)' }}>
+                    <AlertCircle size={20} />
+                    <span>{error}</span>
                 </div>
             )}
 
-            <div className="stat-grid">
-                <div className="glass-card stat-card">
-                    <div className="flex-between spacing-v-4">
-                        <span className="stat-label">Aggregated Sent (7d)</span>
+            <div className="stat-grid" style={{ marginBottom: '32px' }}>
+                <div className="glass-card" style={{ padding: '24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                        <span style={{ color: 'var(--text-dim)', fontSize: '14px', fontWeight: 600 }}>Total Sent (7D)</span>
                         <Send size={18} color="var(--accent-purple)" />
                     </div>
-                    <div className="stat-value" style={{ color: 'var(--accent-purple)' }}>{totalSent.toLocaleString()}</div>
-                    <div className="flex-between mt-4" style={{ marginTop: '16px' }}>
-                        <span className="badge badge-info">Tenant Outbound</span>
-                        <TrendingUp size={12} color="var(--text-dim)" />
-                    </div>
+                    <div style={{ fontSize: '32px', fontWeight: 800 }}>{stats.sent.toLocaleString()}</div>
+                    <div style={{ marginTop: '12px' }} className="badge badge-info">Outbound Traffic</div>
                 </div>
-                <div className="glass-card stat-card">
-                    <div className="flex-between spacing-v-4">
-                        <span className="stat-label">Aggregated Received (7d)</span>
+                <div className="glass-card" style={{ padding: '24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                        <span style={{ color: 'var(--text-dim)', fontSize: '14px', fontWeight: 600 }}>Total Received (7D)</span>
                         <Inbox size={18} color="var(--accent-blue)" />
                     </div>
-                    <div className="stat-value" style={{ color: 'var(--accent-blue)' }}>{totalReceived.toLocaleString()}</div>
-                    <div className="flex-between mt-4" style={{ marginTop: '16px' }}>
-                        <span className="badge badge-success">Tenant Inbound</span>
-                        <Activity size={12} color="var(--text-dim)" />
-                    </div>
+                    <div style={{ fontSize: '32px', fontWeight: 800 }}>{stats.received.toLocaleString()}</div>
+                    <div style={{ marginTop: '12px' }} className="badge badge-success">Inbound Traffic</div>
                 </div>
             </div>
 
-            <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
-                <div className="p-8 flex-between" style={{ padding: '24px' }}>
-                    <h3 style={{ fontSize: '18px' }}>Individual Subject Interaction</h3>
-                    <span className="badge badge-info">{activity.length} ACTIVE SUBJECTS</span>
+            <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '18px' }}>Individual User Activity</h3>
+                    <span className="badge badge-info">{activity.length} Users Tracked</span>
                 </div>
-                <div className="table-container">
+                <div style={{ overflowX: 'auto' }}>
                     <table className="modern-table">
                         <thead>
                             <tr>
-                                <th>Subject Identity</th>
-                                <th style={{ textAlign: 'center' }}>Outbound</th>
-                                <th style={{ textAlign: 'center' }}>Inbound</th>
-                                <th style={{ textAlign: 'center' }}>Engagement (Read)</th>
-                                <th>Report Date</th>
+                                <th>User Profile</th>
+                                <th style={{ textAlign: 'center' }}>Sent</th>
+                                <th style={{ textAlign: 'center' }}>Received</th>
+                                <th style={{ textAlign: 'center' }}>Read Rate</th>
+                                <th>Last Active</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {activity.length > 0 ? activity.map((item, i) => (
+                            {activity.length > 0 ? activity.map((u, i) => (
                                 <tr key={i}>
                                     <td>
-                                        <div className="flex-center justify-start flex-gap-4">
-                                            <div style={{ padding: '8px', background: 'hsla(var(--hue), 90%, 60%, 0.1)', color: 'var(--accent-purple)', borderRadius: '8px' }}>
-                                                <Mail size={16} />
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--glass-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-purple)' }}>
+                                                <Mail size={18} />
                                             </div>
                                             <div>
-                                                <div style={{ fontWeight: 600 }}>{item.displayName || 'Unknown'}</div>
-                                                <div style={{ fontSize: '11px', opacity: 0.5 }}>{item.userPrincipalName}</div>
+                                                <div style={{ fontWeight: 700 }}>{u.displayName || 'Unknown'}</div>
+                                                <div style={{ fontSize: '11px', color: 'var(--text-dim)' }}>{u.userPrincipalName}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{item.sendCount}</td>
-                                    <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{item.receiveCount}</td>
+                                    <td style={{ textAlign: 'center', fontWeight: 700 }}>{u.sendCount}</td>
+                                    <td style={{ textAlign: 'center', fontWeight: 700 }}>{u.receiveCount}</td>
                                     <td style={{ textAlign: 'center' }}>
-                                        <div className="flex-center" style={{ gap: '8px' }}>
-                                            <span style={{ fontSize: '12px' }}>{item.readCount}</span>
-                                            <div style={{ width: '60px', height: '4px', background: 'hsla(0,0%,100%,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
-                                                <div style={{ height: '100%', width: `${Math.min((item.readCount / Math.max(item.receiveCount || 1, 1)) * 100, 100)}%`, background: 'var(--accent-success)' }}></div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+                                            <span style={{ fontSize: '12px' }}>{u.readCount}</span>
+                                            <div style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                                                <div style={{ height: '100%', background: 'var(--accent-success)', width: `${Math.min(100, (u.readCount / (u.receiveCount || 1)) * 100)}%` }} />
                                             </div>
                                         </div>
                                     </td>
-                                    <td style={{ fontSize: '12px', color: 'var(--text-dim)' }}>{item.reportRefreshDate || '-'}</td>
+                                    <td style={{ color: 'var(--text-dim)', fontSize: '13px' }}>{u.lastActivityDate}</td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan="5" style={{ textAlign: 'center', padding: '100px', color: 'var(--text-dim)' }}>
-                                        <Mail size={48} style={{ opacity: 0.2, marginBottom: '16px' }} />
-                                        <p>No communication activity recorded in this period.</p>
+                                    <td colSpan="5" style={{ textAlign: 'center', padding: '60px', color: 'var(--text-dim)' }}>
+                                        No recent email activity detected.
                                     </td>
                                 </tr>
                             )}

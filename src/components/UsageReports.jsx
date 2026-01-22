@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMsal } from "@azure/msal-react";
 import { UsageService } from '../services/usage.service';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
     LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -24,7 +24,8 @@ const UsageReports = () => {
     const [data, setData] = useState({
         teams: { detail: [], counts: [] },
         exchange: { detail: [], counts: [] },
-        sharepoint: { detail: [], counts: [] }
+        sharepoint: { detail: [], counts: [] },
+        onedrive: { detail: [], counts: [] }
     });
 
     const fetchData = async () => {
@@ -36,7 +37,8 @@ const UsageReports = () => {
                 tokenResponse = await instance.acquireTokenSilent({
                     scopes: [
                         "User.Read.All",
-                        "Sites.Read.All"
+                        "Sites.Read.All",
+                        "Reports.Read.All"
                     ],
                     account: accounts[0]
                 });
@@ -49,7 +51,8 @@ const UsageReports = () => {
                     await instance.acquireTokenRedirect({
                         scopes: [
                             "User.Read.All",
-                            "Sites.Read.All"
+                            "Sites.Read.All",
+                            "Reports.Read.All"
                         ],
                         account: accounts[0]
                     });
@@ -62,20 +65,27 @@ const UsageReports = () => {
 
             const usageService = new UsageService(tokenResponse.accessToken);
 
-            const [teams, exchange, sharepoint] = await Promise.all([
+            const [teams, exchange, sharepoint, onedrive] = await Promise.all([
                 usageService.getTeamsUsage(period),
                 usageService.getExchangeUsage(period),
-                usageService.getSharePointUsage(period)
+                usageService.getSharePointUsage(period),
+                usageService.getOneDriveUsage(period)
             ]);
 
-            setData({ teams, exchange, sharepoint });
+            // For OneDrive, we need to adapt the raw data if it doesn't match our component's expected format
+            const formattedOneDrive = {
+                detail: onedrive || [],
+                counts: [] // OneDrive counts and detailed trends could be added here
+            };
+
+            setData({ teams, exchange, sharepoint, onedrive: formattedOneDrive });
         } catch (error) {
             console.error("Error fetching usage data:", error);
-            // Use complete fallback data if everything fails
             setData({
                 teams: { detail: [], counts: [] },
                 exchange: { detail: [], counts: [] },
-                sharepoint: { detail: [], counts: [] }
+                sharepoint: { detail: [], counts: [] },
+                onedrive: { detail: [], counts: [] }
             });
         } finally {
             setLoading(false);
@@ -214,15 +224,7 @@ const UsageReports = () => {
     const renderExchangeDashboard = () => {
         const { detail, counts } = data.exchange;
         const latestDetail = detail || [];
-        const dailyCounts = counts && counts.length > 0 ? counts : [
-            { reportDate: '2024-01-15', sendCount: 150, receiveCount: 450, readCount: 380 },
-            { reportDate: '2024-01-16', sendCount: 180, receiveCount: 520, readCount: 460 },
-            { reportDate: '2024-01-17', sendCount: 140, receiveCount: 410, readCount: 390 },
-            { reportDate: '2024-01-18', sendCount: 210, receiveCount: 630, readCount: 580 },
-            { reportDate: '2024-01-19', sendCount: 245, receiveCount: 710, readCount: 650 },
-            { reportDate: '2024-01-20', sendCount: 80, receiveCount: 220, readCount: 180 },
-            { reportDate: '2024-01-21', sendCount: 65, receiveCount: 190, readCount: 150 }
-        ];
+        const dailyCounts = counts && counts.length > 0 ? counts : [];
 
         const exchangeStats = {
             totalSent: latestDetail.reduce((acc, curr) => acc + (curr.sendCount || 0), 0),
@@ -258,25 +260,29 @@ const UsageReports = () => {
 
                 <div className="glass-card" style={{ padding: '24px', marginBottom: '24px' }}>
                     <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '24px' }}>Email Traffic Analytics</h3>
-                    <ResponsiveContainer width="100%" height={350}>
-                        <LineChart data={dailyCounts}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                            <XAxis
-                                dataKey="reportDate"
-                                stroke="var(--text-dim)"
-                                fontSize={10}
-                                tickLine={false}
-                                axisLine={false}
-                                tickFormatter={(val) => new Date(val).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                            />
-                            <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Legend iconType="circle" />
-                            <Line type="monotone" dataKey="sendCount" name="Sent" stroke="#3b82f6" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                            <Line type="monotone" dataKey="receiveCount" name="Received" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                            <Line type="monotone" dataKey="readCount" name="Read" stroke="#f59e0b" strokeWidth={3} strokeDasharray="5 5" dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    {dailyCounts.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={350}>
+                            <LineChart data={dailyCounts}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis
+                                    dataKey="reportDate"
+                                    stroke="var(--text-dim)"
+                                    fontSize={10}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(val) => new Date(val).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                                />
+                                <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend iconType="circle" />
+                                <Line type="monotone" dataKey="sendCount" name="Sent" stroke="#3b82f6" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
+                                <Line type="monotone" dataKey="receiveCount" name="Received" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
+                                <Line type="monotone" dataKey="readCount" name="Read" stroke="#f59e0b" strokeWidth={3} strokeDasharray="5 5" dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="flex-center" style={{ height: '350px', color: 'var(--text-dim)' }}>No trend data available.</div>
+                    )}
                 </div>
             </div>
         );
@@ -285,15 +291,7 @@ const UsageReports = () => {
     const renderSharePointDashboard = () => {
         const { detail, counts } = data.sharepoint;
         const latestDetail = detail || [];
-        const dailyCounts = counts && counts.length > 0 ? counts : [
-            { reportDate: '2024-01-15', viewedOrEditedFileCount: 1200, syncedFileCount: 4500 },
-            { reportDate: '2024-01-16', viewedOrEditedFileCount: 1400, syncedFileCount: 4800 },
-            { reportDate: '2024-01-17', viewedOrEditedFileCount: 1100, syncedFileCount: 4200 },
-            { reportDate: '2024-01-18', viewedOrEditedFileCount: 1800, syncedFileCount: 5600 },
-            { reportDate: '2024-01-19', viewedOrEditedFileCount: 2200, syncedFileCount: 6400 },
-            { reportDate: '2024-01-20', viewedOrEditedFileCount: 600, syncedFileCount: 1800 },
-            { reportDate: '2024-01-21', viewedOrEditedFileCount: 500, syncedFileCount: 1500 }
-        ];
+        const dailyCounts = counts && counts.length > 0 ? counts : [];
 
         const spStats = {
             totalFiles: latestDetail.reduce((acc, curr) => acc + (curr.viewedOrEditedFileCount || 0), 0),
@@ -329,24 +327,97 @@ const UsageReports = () => {
 
                 <div className="glass-card" style={{ padding: '24px' }}>
                     <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '24px' }}>Content & Sync Dynamics</h3>
-                    <ResponsiveContainer width="100%" height={400}>
-                        <LineChart data={dailyCounts}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                            <XAxis
-                                dataKey="reportDate"
-                                stroke="var(--text-dim)"
-                                fontSize={10}
-                                tickLine={false}
-                                axisLine={false}
-                                tickFormatter={(val) => new Date(val).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                            />
-                            <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Legend iconType="circle" />
-                            <Line type="stepAfter" dataKey="viewedOrEditedFileCount" name="Viewed/Edited" stroke="#0ea5e9" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                            <Line type="monotone" dataKey="syncedFileCount" name="Synced" stroke="#14b8a6" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    {dailyCounts.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={400}>
+                            <LineChart data={dailyCounts}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis
+                                    dataKey="reportDate"
+                                    stroke="var(--text-dim)"
+                                    fontSize={10}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(val) => new Date(val).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                                />
+                                <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend iconType="circle" />
+                                <Line type="stepAfter" dataKey="viewedOrEditedFileCount" name="Viewed/Edited" stroke="#0ea5e9" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
+                                <Line type="monotone" dataKey="syncedFileCount" name="Synced" stroke="#14b8a6" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="flex-center" style={{ height: '400px', color: 'var(--text-dim)' }}>No trend data available.</div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    const renderOneDriveDashboard = () => {
+        const { detail } = data.onedrive;
+        const latestDetail = detail || [];
+
+        const onedriveStats = {
+            activeFiles: latestDetail.reduce((acc, curr) => acc + (parseInt(curr.activeFileCount) || 0), 0),
+            storageUsedByte: latestDetail.reduce((acc, curr) => acc + (parseInt(curr.storageUsedInBytes) || 0), 0),
+            sharedFiles: latestDetail.reduce((acc, curr) => acc + (parseInt(curr.sharedInternalFileCount) || 0) + (parseInt(curr.sharedExternalFileCount) || 0), 0),
+        };
+
+        const formatGB = (bytes) => (bytes / (1024 * 1024 * 1024)).toFixed(2);
+
+        return (
+            <div className="animate-in">
+                <div className="stat-grid" style={{ marginBottom: '24px' }}>
+                    <div className="glass-card" style={{ padding: '20px', borderLeft: '4px solid #0078d4' }}>
+                        <div className="flex-between">
+                            <span className="stat-label">Active Files</span>
+                            <FileText size={16} color="#0078d4" />
+                        </div>
+                        <div className="stat-value">{onedriveStats.activeFiles.toLocaleString()}</div>
+                    </div>
+                    <div className="glass-card" style={{ padding: '20px', borderLeft: '4px solid #28a745' }}>
+                        <div className="flex-between">
+                            <span className="stat-label">Storage Used</span>
+                            <Activity size={16} color="#28a745" />
+                        </div>
+                        <div className="stat-value">{formatGB(onedriveStats.storageUsedByte)} GB</div>
+                    </div>
+                    <div className="glass-card" style={{ padding: '20px', borderLeft: '4px solid #ffc107' }}>
+                        <div className="flex-between">
+                            <span className="stat-label">Shared Files</span>
+                            <Share2 size={16} color="#ffc107" />
+                        </div>
+                        <div className="stat-value">{onedriveStats.sharedFiles.toLocaleString()}</div>
+                    </div>
+                </div>
+
+                <div className="glass-card" style={{ padding: '24px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '24px' }}>OneDrive User Activity</h3>
+                    <div className="table-container">
+                        <table className="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Active Files</th>
+                                    <th>Storage Used</th>
+                                    <th>Shared (Int/Ext)</th>
+                                    <th>Last Activity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {latestDetail.slice(0, 10).map((u, i) => (
+                                    <tr key={i}>
+                                        <td style={{ fontWeight: 600 }}>{u.displayName || u.userPrincipalName}</td>
+                                        <td>{u.activeFileCount}</td>
+                                        <td>{formatGB(u.storageUsedInBytes)} GB</td>
+                                        <td>{u.sharedInternalFileCount} / {u.sharedExternalFileCount}</td>
+                                        <td>{u.lastActivityDate}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         );
@@ -357,7 +428,7 @@ const UsageReports = () => {
             <header className="flex-between spacing-v-12">
                 <div>
                     <h1 className="title-gradient" style={{ fontSize: '28px' }}>M365 Usage Analytics</h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '13px' }}>Monitor resource consumption across Teams, Exchange, and SharePoint.</p>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '13px' }}>Monitor resource consumption across Microsoft 365 services.</p>
                 </div>
                 <div className="flex-gap-3">
                     <div style={{ position: 'relative' }}>
@@ -499,9 +570,29 @@ const UsageReports = () => {
                 >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Globe size={18} />
-                        SharePoint Site
+                        SharePoint
                     </div>
                     {activeTab === 'sharepoint' && <motion.div layoutId="activeTab" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2.5px', background: 'var(--accent-blue)', borderRadius: '2px 2px 0 0' }} />}
+                </button>
+                <button
+                    onClick={() => setActiveTab('onedrive')}
+                    className={`tab-item ${activeTab === 'onedrive' ? 'active' : ''}`}
+                    style={{
+                        padding: '12px 24px',
+                        background: 'none',
+                        border: 'none',
+                        color: activeTab === 'onedrive' ? 'var(--accent-blue)' : 'var(--text-dim)',
+                        fontWeight: 700,
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        position: 'relative'
+                    }}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <RefreshCw size={18} />
+                        OneDrive
+                    </div>
+                    {activeTab === 'onedrive' && <motion.div layoutId="activeTab" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2.5px', background: 'var(--accent-blue)', borderRadius: '2px 2px 0 0' }} />}
                 </button>
             </div>
 
@@ -522,6 +613,7 @@ const UsageReports = () => {
                             {activeTab === 'teams' && renderTeamsDashboard()}
                             {activeTab === 'exchange' && renderExchangeDashboard()}
                             {activeTab === 'sharepoint' && renderSharePointDashboard()}
+                            {activeTab === 'onedrive' && renderOneDriveDashboard()}
                         </motion.div>
                     </AnimatePresence>
                 )}

@@ -1,10 +1,10 @@
 {
-  "timestamp": 1768997199423,
+  "timestamp": 1769079764422,
   "data": {
     "entra": {
       "users": 12,
       "signin": 12,
-      "licensed": 11,
+      "licensed": 12,
       "guest": 2,
       "groups": 58,
       "securityGroups": 40,
@@ -26,7 +26,7 @@
     },
     "licenses": {
       "purchased": 30026,
-      "assigned": 13,
+      "assigned": 14,
       "total": 5,
       "topSkus": [
         {
@@ -70,10 +70,10 @@
       "score": 183.92,
       "max": 283,
       "caPolicies": 1,
-      "healthIssues": 7
+      "healthIssues": 8
     },
     "exchange": {
-      "mailboxes": 11
+      "mailboxes": 12
     },
     "teams": {
       "total": 5,
