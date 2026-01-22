@@ -1,7 +1,7 @@
 import { Client } from '@microsoft/microsoft-graph-client';
 
 export class AggregationService {
-    static async getOverviewData(client) {
+    static async getOverviewData(client, accessToken = null) {
         try {
             // Fetch data from multiple endpoints in parallel
             const [
@@ -110,32 +110,43 @@ export class AggregationService {
             // Email Activity Trend - Fetching real data using JSON format to avoid CORS issues
             let emailTrendData = [];
             try {
-                const emailResponse = await fetch(`https://graph.microsoft.com/beta/reports/getEmailActivityCounts(period='D7')?$format=application/json`, {
-                    headers: { 'Authorization': `Bearer ${client.authProvider.accessToken || client.config.authProvider.accessToken}` } // This might be tricky depending on how client is initialized
-                });
+                const token = accessToken || client.authProvider?.accessToken || client.config?.authProvider?.accessToken;
 
-                // Since AggregationService gets a ready-to-use client, we might need a better way to get the token.
-                // However, the client passed should have the authProvider already. 
-                // Let's try to use the client directly if possible, but Graph SDK get() defaults to CSV.
+                if (token) {
+                    const emailResponse = await fetch(`https://graph.microsoft.com/beta/reports/getEmailActivityCounts(period='D7')?$format=application/json`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }).catch(() => null);
 
-                // Fallback approach if direct fetch is tricky: use the client.api() but it might still fail due to redirect.
-                // Best to use the same logic as UsageService.
+                    if (emailResponse && emailResponse.ok) {
+                        const data = await emailResponse.json();
+                        if (data && data.value) {
+                            emailTrendData = data.value.map(item => ({
+                                name: item.reportRefreshDate,
+                                sent: parseInt(item.sendCount) || 0,
+                                received: parseInt(item.receiveCount) || 0
+                            }));
+                        }
+                    }
+                }
 
-                const reportData = await client.api("/reports/getEmailActivityCounts(period='D7')")
-                    .version("beta")
-                    .header("Accept", "application/json")
-                    .get()
-                    .catch(() => null);
+                // Fallback approach if direct fetch failed: use the client.api()
+                if (emailTrendData.length === 0) {
+                    const reportData = await client.api("/reports/getEmailActivityCounts(period='D7')")
+                        .version("beta")
+                        .query({ "$format": "application/json" })
+                        .get()
+                        .catch(() => null);
 
-                if (reportData && reportData.value) {
-                    emailTrendData = reportData.value.map(item => ({
-                        name: item.reportRefreshDate,
-                        sent: parseInt(item.sendCount) || 0,
-                        received: parseInt(item.receiveCount) || 0
-                    }));
+                    if (reportData && reportData.value) {
+                        emailTrendData = reportData.value.map(item => ({
+                            name: item.reportRefreshDate,
+                            sent: parseInt(item.sendCount) || 0,
+                            received: parseInt(item.receiveCount) || 0
+                        }));
+                    }
                 }
             } catch (e) {
-                console.warn("Could not fetch real email trend, using fallback.");
+                console.warn("Could not fetch real email trend, using fallback:", e.message);
             }
 
             if (emailTrendData.length === 0) {

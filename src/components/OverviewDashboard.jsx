@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { AggregationService } from '../services/aggregation.service';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import {
     PieChart, Pie, BarChart, Bar, LineChart, Line, AreaChart, Area, RadialBarChart, RadialBar,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Treemap, ComposedChart,
@@ -40,7 +40,7 @@ const OverviewDashboard = () => {
         try {
             const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
             const client = new GraphService(response.accessToken).client;
-            const overviewData = await AggregationService.getOverviewData(client);
+            const overviewData = await AggregationService.getOverviewData(client, response.accessToken);
 
             // Map to our persistence schema
             const persistenceData = {

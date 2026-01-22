@@ -1,5 +1,5 @@
 {
-  "timestamp": 1769079764422,
+  "timestamp": 1769084751846,
   "data": {
     "entra": {
       "users": 12,
@@ -70,7 +70,7 @@
       "score": 183.92,
       "max": 283,
       "caPolicies": 1,
-      "healthIssues": 8
+      "healthIssues": 9
     },
     "exchange": {
       "mailboxes": 12

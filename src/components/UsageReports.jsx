@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMsal } from "@azure/msal-react";
 import { UsageService } from '../services/usage.service';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import {
     LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -446,7 +446,16 @@ const UsageReports = () => {
                                 alignItems: 'center'
                             }}
                         >
-                            {period === 'D7' ? 'Last 7 days' : period === 'D30' ? 'Last 30 days' : 'Last 90 days'}
+                            {period === 'D7'
+                                ? 'Last 7 days'
+                                : period === 'D30'
+                                    ? 'Last 30 days'
+                                    : period === 'D90'
+                                        ? 'Last 90 days'
+                                        : period === 'D180'
+                                            ? 'Last 180 days'
+                                            : 'Last 90 days'}
+
                             {isPeriodDropdownOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                         </button>
 
@@ -471,7 +480,8 @@ const UsageReports = () => {
                                     {[
                                         { label: 'Last 7 days', value: 'D7' },
                                         { label: 'Last 30 days', value: 'D30' },
-                                        { label: 'Last 90 days', value: 'D90' }
+                                        { label: 'Last 90 days', value: 'D90' },
+                                        { label: 'Last 180 days', value: 'D180' }
                                     ].map(opt => (
                                         <div
                                             key={opt.value}
