@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import SearchModal from './SearchModal';
 import Logo from './Logo';
+import Chatbot from './Chatbot/Chatbot';
 
 const ServiceLayout = () => {
     const navigate = useNavigate();
@@ -303,6 +304,9 @@ const ServiceLayout = () => {
 
             {/* Search Modal */}
             <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
+            {/* AI Chatbot */}
+            <Chatbot />
         </div>
     );
 };

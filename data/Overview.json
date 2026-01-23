@@ -1,5 +1,5 @@
 {
-  "timestamp": 1769084748926,
+  "timestamp": 1769157706954,
   "data": {
     "overview": {
       "statistics": {
@@ -9,7 +9,7 @@
         "secure_score": 183.92
       },
       "health_and_security": {
-        "failed_signins": 0,
+        "failed_signins": 1,
         "compliance_rate": 33
       }
     },
@@ -93,15 +93,45 @@
         "signIns": [
           {
             "name": "Last 24h",
-            "failed": 0,
-            "successful": 27
+            "failed": 1,
+            "successful": 21
           }
         ],
         "emailTrend": [
           {
-            "name": "Last 7 Days",
-            "sent": 1250,
-            "received": 2870
+            "name": "2026-01-21",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-21",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-21",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-21",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-21",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-21",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-21",
+            "sent": 0,
+            "received": 0
           }
         ],
         "securityRadar": [
@@ -127,7 +157,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 100,
+            "value": 95,
             "fullMark": 100
           }
         ],

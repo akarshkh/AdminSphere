@@ -1,5 +1,5 @@
 {
-  "timestamp": 1769085596873,
+  "timestamp": 1769157732280,
   "data": {
     "intune": {
       "devices": {
@@ -22,8 +22,8 @@
     "raw": {
       "totalDevices": 3,
       "osDistribution": {
-        "macOS": 1,
-        "Windows": 2
+        "Windows": 2,
+        "macOS": 1
       },
       "nonCompliantDevices": 2,
       "inactiveDevices": 2,
