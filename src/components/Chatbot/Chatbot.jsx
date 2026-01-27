@@ -184,44 +184,7 @@ const Chatbot = () => {
         }
     };
 
-    const handleNavigation = (message) => {
-        const lower = message.toLowerCase();
 
-        const routes = {
-            'teams tab': '/service/usage?tab=teams',
-            'exchange online tab': '/service/usage?tab=exchange',
-            'exchange tab': '/service/usage?tab=exchange',
-            'sharepoint tab': '/service/usage?tab=sharepoint',
-            'onedrive tab': '/service/usage?tab=onedrive',
-            'mailbox report': '/service/admin/report',
-            'usage': '/service/usage',
-            'overview': '/service/overview',
-            'dashboard': '/service/overview',
-            'mailbox': '/service/admin/report',
-            'exchange': '/service/admin/report',
-            'license': '/service/admin/licenses',
-            'entra': '/service/entra',
-            'users': '/service/entra/users',
-            'groups': '/service/entra/groups',
-            'intune': '/service/intune',
-            'devices': '/service/intune/devices',
-            'health': '/service/admin/service-health',
-            'secure score': '/service/admin/secure-score',
-            'sign-ins': '/service/admin/sign-ins',
-            'alerts': '/service/admin/alerts',
-            'documentation': '/service/documentation'
-        };
-
-        for (const [key, path] of Object.entries(routes)) {
-            if (lower.includes(key)) {
-                navigate(path);
-                const displayKey = key.includes('tab') ? key.replace(' tab', '').toUpperCase() : key.charAt(0).toUpperCase() + key.slice(1);
-                return `Navigating you to the **${displayKey}** section...`;
-            }
-        }
-
-        return "I'm sorry, I couldn't find that specific page. Try asking to open 'usage', 'mailbox report', or 'entra users'.";
-    };
 
     const handleSend = async (e) => {
         e?.preventDefault();
@@ -235,43 +198,51 @@ const Chatbot = () => {
 
         try {
             const lowerMessage = currentMessage.toLowerCase();
-            const isReportRequest = lowerMessage.includes("report") || lowerMessage.includes("stats") || lowerMessage.includes("summary") || lowerMessage.includes("analytics") || lowerMessage.includes("usage");
-            const isNavigationRequest = lowerMessage.includes("open") || lowerMessage.includes("go to") || lowerMessage.includes("show me") || lowerMessage.includes("navigate") || lowerMessage.includes("page");
+            let aiResponse = "";
 
-            // Priority 1: Navigation (if explicitly asked to open/go to a page or tab)
-            if (isNavigationRequest && (lowerMessage.includes("page") || lowerMessage.includes("section") || lowerMessage.includes("portal") || lowerMessage.includes("tab"))) {
-                const response = handleNavigation(currentMessage);
-                setChatHistory(prev => [...prev, { role: 'assistant', content: response }]);
-            }
-            // Priority 2: Specific Stats/Reports
-            else if (lowerMessage.includes("mailbox")) {
-                const response = await handleMailboxStats(currentMessage);
-                setChatHistory(prev => [...prev, { role: 'assistant', content: response }]);
+            // Special data-enriched prompts for certain keywords
+            if (lowerMessage.includes("mailbox")) {
+                aiResponse = await handleMailboxStats(currentMessage);
             } else if (lowerMessage.includes("license")) {
-                const response = await handleLicenseStats(currentMessage);
-                setChatHistory(prev => [...prev, { role: 'assistant', content: response }]);
+                aiResponse = await handleLicenseStats(currentMessage);
             } else if (lowerMessage.includes("sharepoint")) {
-                const response = await handleSharePointStats();
-                setChatHistory(prev => [...prev, { role: 'assistant', content: response }]);
+                aiResponse = await handleSharePointStats();
             } else if (lowerMessage.includes("active user")) {
-                const response = await handleActiveUsers();
-                setChatHistory(prev => [...prev, { role: 'assistant', content: response }]);
+                aiResponse = await handleActiveUsers();
             } else if (lowerMessage.includes("total user") || lowerMessage.includes("how many users")) {
-                const response = await handleTotalUsers();
-                setChatHistory(prev => [...prev, { role: 'assistant', content: response }]);
+                aiResponse = await handleTotalUsers();
+            } else {
+                // Default AI Chat
+                aiResponse = await GeminiService.chat(currentMessage, chatHistory);
             }
-            // Priority 3: General Navigation (fallback for "open ...")
-            else if (isNavigationRequest) {
-                const response = handleNavigation(currentMessage);
-                setChatHistory(prev => [...prev, { role: 'assistant', content: response }]);
+
+            // --- NAVIGATION LOGIC ---
+            // Check if AI response contains a navigation command: [ACTION:NAVIGATE, PATH:/some/path]
+            const navRegex = /\[ACTION:NAVIGATE,\s*PATH:([^\]]+)\]/i;
+            const match = aiResponse.match(navRegex);
+
+            if (match && match[1]) {
+                const targetPath = match[1].trim();
+                console.log("Chatbot triggering navigation to:", targetPath);
+
+                // Navigate after a slight delay for better UX
+                setTimeout(() => {
+                    navigate(targetPath);
+                }, 1000);
+
+                // Strip the command from the AI response before showing it to the user
+                aiResponse = aiResponse.replace(navRegex, '').trim();
+
+                if (!aiResponse) {
+                    aiResponse = `Taking you to ${targetPath}...`;
+                }
             }
-            // Priority 4: AI Chat
-            else {
-                const response = await GeminiService.chat(currentMessage, chatHistory);
-                setChatHistory(prev => [...prev, { role: 'assistant', content: response }]);
-            }
+
+            setChatHistory(prev => [...prev, { role: 'assistant', content: aiResponse }]);
+
         } catch (error) {
-            setChatHistory(prev => [...prev, { role: 'assistant', content: error.message }]);
+            console.error("Chatbot Send Error:", error);
+            setChatHistory(prev => [...prev, { role: 'assistant', content: "I encountered an error: " + error.message }]);
         } finally {
             setIsTyping(false);
         }
