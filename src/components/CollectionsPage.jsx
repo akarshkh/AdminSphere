@@ -38,14 +38,14 @@ const CollectionsPage = () => {
 
     return (
         <div className="animate-in">
-            <header className="flex-between spacing-v-8">
+            <header className="flex-between spacing-v-4">
                 <div className="flex-center flex-gap-3">
                     <button onClick={() => navigate('/service/purview')} className="back-btn">
                         <ArrowLeft size={16} />
                     </button>
                     <div>
-                        <h1 className="title-gradient" style={{ fontSize: '32px' }}>Collections & Access Control</h1>
-                        <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>RBAC and collection hierarchy management</p>
+                        <h1 className="title-gradient" style={{ fontSize: '22px' }}>Collections & Access Control</h1>
+                        <p style={{ color: 'var(--text-dim)', fontSize: '11px' }}>RBAC and collection hierarchy management</p>
                     </div>
                 </div>
             </header>

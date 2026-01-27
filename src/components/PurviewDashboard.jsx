@@ -206,10 +206,10 @@ const PurviewDashboard = () => {
 
     return (
         <div className="animate-in">
-            <header className="flex-between spacing-v-8">
+            <header className="flex-between spacing-v-4">
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Purview Governance</h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Unified data governance and compliance platform</p>
+                    <h1 className="title-gradient" style={{ fontSize: '22px' }}>Purview Governance</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '11px' }}>Unified data governance and compliance platform</p>
                 </div>
                 <div className="flex-gap-2">
                     <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchDashboardData(true)} title="Sync & Refresh">
@@ -339,53 +339,57 @@ const PurviewDashboard = () => {
 
                         <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: '340px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                             {assetDistribution.length > 0 ? (
-                                <PieChart width={320} height={320}>
-                                    <defs>
-                                        {COLORS.map((color, idx) => (
-                                            <linearGradient key={idx} id={`assetGrad${idx}`} x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor={color} stopOpacity={0.9} />
-                                                <stop offset="100%" stopColor={color} stopOpacity={0.6} />
-                                            </linearGradient>
-                                        ))}
-                                    </defs>
-                                    <Pie
-                                        data={assetDistribution}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={80}
-                                        outerRadius={120}
-                                        paddingAngle={2}
-                                        dataKey="value"
-                                        stroke="none"
-                                        isAnimationActive={true}
-                                    >
-                                        {assetDistribution.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={`url(#assetGrad${index % COLORS.length})`} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip />} cursor={false} />
-                                </PieChart>
+                                <>
+                                    <PieChart width={320} height={320}>
+                                        <defs>
+                                            {COLORS.map((color, idx) => (
+                                                <linearGradient key={idx} id={`assetGrad${idx}`} x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stopColor={color} stopOpacity={0.9} />
+                                                    <stop offset="100%" stopColor={color} stopOpacity={0.6} />
+                                                </linearGradient>
+                                            ))}
+                                        </defs>
+                                        <Pie
+                                            data={assetDistribution}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={80}
+                                            outerRadius={120}
+                                            paddingAngle={2}
+                                            dataKey="value"
+                                            stroke="none"
+                                            isAnimationActive={true}
+                                        >
+                                            {assetDistribution.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={`url(#assetGrad${index % COLORS.length})`} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} cursor={false} />
+                                    </PieChart>
+
+                                    {/* Center Label - Only show when there's data */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '50.5%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        textAlign: 'center',
+                                        pointerEvents: 'none',
+                                        zIndex: 10
+                                    }}>
+                                        <span style={{ fontSize: '48px', fontWeight: 800, display: 'block', lineHeight: 1, color: 'var(--text-primary)', letterSpacing: '-1.5px' }}>
+                                            {stats.totalAssets}
+                                        </span>
+                                        <span style={{ fontSize: '11px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '2.5px', fontWeight: 700, marginTop: '8px', display: 'block', opacity: 0.8 }}>Assets</span>
+                                    </div>
+                                </>
                             ) : (
                                 <div style={{ textAlign: 'center', color: 'var(--text-dim)' }}>
                                     <Database size={48} style={{ opacity: 0.3, marginBottom: '16px' }} />
-                                    <p>No asset data available</p>
+                                    <p style={{ fontSize: '13px', margin: 0 }}>No asset data available</p>
+                                    <p style={{ fontSize: '11px', opacity: 0.6, marginTop: '8px' }}>Configure Purview to see distribution</p>
                                 </div>
                             )}
-
-                            <div style={{
-                                position: 'absolute',
-                                top: '50.5%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                textAlign: 'center',
-                                pointerEvents: 'none',
-                                zIndex: 10
-                            }}>
-                                <span style={{ fontSize: '48px', fontWeight: 800, display: 'block', lineHeight: 1, color: 'var(--text-primary)', letterSpacing: '-1.5px' }}>
-                                    {stats.totalAssets}
-                                </span>
-                                <span style={{ fontSize: '11px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '2.5px', fontWeight: 700, marginTop: '8px', display: 'block', opacity: 0.8 }}>Assets</span>
-                            </div>
                         </div>
 
                         {/* Legend */}

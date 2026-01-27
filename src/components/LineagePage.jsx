@@ -80,14 +80,14 @@ const LineagePage = () => {
 
     return (
         <div className="animate-in">
-            <header className="flex-between spacing-v-8">
+            <header className="flex-between spacing-v-4">
                 <div className="flex-center flex-gap-3">
                     <button onClick={() => navigate('/service/purview')} className="back-btn">
                         <ArrowLeft size={16} />
                     </button>
                     <div>
-                        <h1 className="title-gradient" style={{ fontSize: '32px' }}>Data Lineage</h1>
-                        <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>End-to-end data flow visualization</p>
+                        <h1 className="title-gradient" style={{ fontSize: '22px' }}>Data Lineage</h1>
+                        <p style={{ color: 'var(--text-dim)', fontSize: '11px' }}>End-to-end data flow visualization</p>
                     </div>
                 </div>
                 <div className="flex-gap-2">
