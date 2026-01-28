@@ -23,6 +23,7 @@ const Chatbot = () => {
     const { instance, accounts } = useMsal();
     const navigate = useNavigate();
     const messagesEndRef = useRef(null);
+    const containerRef = useRef(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -262,7 +263,13 @@ const Chatbot = () => {
     };
 
     return (
-        <div className={`chatbot-container ${isOpen ? 'active' : ''}`}>
+        <motion.div
+            className={`chatbot-container ${isOpen ? 'active' : ''}`}
+            drag
+            dragMomentum={false}
+            dragConstraints={{ left: -window.innerWidth + 100, right: 0, top: -window.innerHeight + 100, bottom: 0 }}
+            whileDrag={{ scale: 1.05, cursor: 'grabbing' }}
+        >
             {/* Floating Action Button */}
             <motion.button
                 className="chatbot-fab"
@@ -396,7 +403,7 @@ const Chatbot = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </motion.div>
     );
 };
 
