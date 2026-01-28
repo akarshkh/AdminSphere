@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     MessageSquare, X, Send, Bot, User,
     ChevronDown, Maximize2, Minimize2, Sparkles,
-    RefreshCw, Terminal, Navigation
+    RefreshCw, Terminal, Navigation, Check
 } from 'lucide-react';
 import { GeminiService } from '../../services/gemini.service';
 import { GraphService } from '../../services/graphService';
@@ -23,7 +23,6 @@ const Chatbot = () => {
     const { instance, accounts } = useMsal();
     const navigate = useNavigate();
     const messagesEndRef = useRef(null);
-    const containerRef = useRef(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -185,6 +184,33 @@ const Chatbot = () => {
         }
     };
 
+    const handleConfirmNavigation = (path, index) => {
+        navigate(path);
+        setChatHistory(prev => {
+            const newHistory = [...prev];
+            newHistory[index] = {
+                ...newHistory[index],
+                content: `Navigating to ${path}...`,
+                type: 'text_disabled',
+                actionsDisabled: true
+            };
+            return newHistory;
+        });
+    };
+
+    const handleCancelNavigation = (index) => {
+        setChatHistory(prev => {
+            const newHistory = [...prev];
+            newHistory[index] = {
+                ...newHistory[index],
+                content: "Navigation cancelled.",
+                type: 'text_disabled',
+                actionsDisabled: true
+            };
+            return newHistory;
+        });
+    };
+
 
 
     const handleSend = async (e) => {
@@ -224,22 +250,25 @@ const Chatbot = () => {
 
             if (match && match[1]) {
                 const targetPath = match[1].trim();
-                console.log("Chatbot triggering navigation to:", targetPath);
 
-                // Navigate after a slight delay for better UX
-                setTimeout(() => {
-                    navigate(targetPath);
-                }, 1000);
+                // Strip the command from the AI response
+                const cleanResponse = aiResponse.replace(navRegex, '').trim();
 
-                // Strip the command from the AI response before showing it to the user
-                aiResponse = aiResponse.replace(navRegex, '').trim();
-
-                if (!aiResponse) {
-                    aiResponse = `Taking you to ${targetPath}...`;
+                if (cleanResponse) {
+                    setChatHistory(prev => [...prev, { role: 'assistant', content: cleanResponse }]);
                 }
-            }
 
-            setChatHistory(prev => [...prev, { role: 'assistant', content: aiResponse }]);
+                // Add confirmation request
+                setChatHistory(prev => [...prev, {
+                    role: 'assistant',
+                    content: `I can take you to the ${targetPath} page. Should I proceed?`,
+                    type: 'navigation_confirm',
+                    targetPath: targetPath
+                }]);
+
+            } else {
+                setChatHistory(prev => [...prev, { role: 'assistant', content: aiResponse }]);
+            }
 
         } catch (error) {
             console.error("Chatbot Send Error:", error);
@@ -263,13 +292,7 @@ const Chatbot = () => {
     };
 
     return (
-        <motion.div
-            className={`chatbot-container ${isOpen ? 'active' : ''}`}
-            drag
-            dragMomentum={false}
-            dragConstraints={{ left: -window.innerWidth + 100, right: 0, top: -window.innerHeight + 100, bottom: 0 }}
-            whileDrag={{ scale: 1.05, cursor: 'grabbing' }}
-        >
+        <div className={`chatbot-container ${isOpen ? 'active' : ''}`}>
             {/* Floating Action Button */}
             <motion.button
                 className="chatbot-fab"
@@ -351,6 +374,23 @@ const Chatbot = () => {
                                                 {msg.content.split('\n').map((line, i) => (
                                                     <p key={i}>{line}</p>
                                                 ))}
+
+                                                {msg.type === 'navigation_confirm' && !msg.actionsDisabled && (
+                                                    <div className="navigation-actions">
+                                                        <button
+                                                            className="nav-confirm-btn"
+                                                            onClick={() => handleConfirmNavigation(msg.targetPath, idx)}
+                                                        >
+                                                            <Check size={14} /> Yes, Go
+                                                        </button>
+                                                        <button
+                                                            className="nav-cancel-btn"
+                                                            onClick={() => handleCancelNavigation(idx)}
+                                                        >
+                                                            <X size={14} /> No, Stay
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </motion.div>
                                     ))}
@@ -403,7 +443,7 @@ const Chatbot = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.div>
+        </div>
     );
 };
 
