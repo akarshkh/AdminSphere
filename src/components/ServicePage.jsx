@@ -25,30 +25,19 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Entra Specific State
+
+    // Admin Center Specific State
     const [secureScore, setSecureScore] = useState(null);
     const [serviceHealth, setServiceHealth] = useState([]);
     const [failedSignIns, setFailedSignIns] = useState([]);
-    const [deviceSummary, setDeviceSummary] = useState({ total: 0, compliant: 0 });
-    const [appsCount, setAppsCount] = useState(0);
-    const [auditLogs, setAuditLogs] = useState([]);
-    const [caPolicies, setCaPolicies] = useState([]);
-    const [globalAdmins, setGlobalAdmins] = useState([]);
     const [deletedUsersCount, setDeletedUsersCount] = useState(0);
     const [licensingSummary, setLicensingSummary] = useState([]);
 
     const serviceNames = {
-        admin: 'Admin Center',
-        entra: 'Microsoft Entra ID',
-        intune: 'Microsoft Intune',
-        purview: 'Microsoft Purview',
-        licensing: 'Licensing & Billing'
+        admin: 'Admin Center'
     };
 
     const isAdmin = serviceId === 'admin';
-    const isEntra = serviceId === 'entra';
-    const isLicensing = serviceId === 'licensing';
-    const isPurview = serviceId === 'purview';
 
     const fetchData = async (isManual = false) => {
         if (accounts.length === 0) return;
@@ -110,26 +99,6 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 if (score) setSecureScore(score);
                 if (health) setServiceHealth(health);
                 if (signIns) setFailedSignIns(signIns);
-
-            } else if (isEntra) {
-                const [apps, groups, usersData, domains, audits, policies, admins] = await Promise.all([
-                    graphService.getApplications(),
-                    graphService.getGroups(),
-                    graphService.getExchangeMailboxReport(),
-                    graphService.getDomains(),
-                    graphService.getDirectoryAudits(),
-                    graphService.getConditionalAccessPolicies(),
-                    graphService.getGlobalAdmins()
-                ]);
-
-                // Persistence Logic for Entra could go here if needed, but usually handled in EntraDashboard
-                setAppsCount(apps?.length || 0);
-                setGroupsCount(groups?.length || 0);
-                setExchangeData(usersData.reports || []);
-                setDomainsCount(domains?.length || 0);
-                if (audits?.value) setAuditLogs(audits.value);
-                if (policies) setCaPolicies(policies);
-                if (admins) setGlobalAdmins(admins);
             }
         } catch (err) {
             console.error("Fetch error:", err);
@@ -148,28 +117,25 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     };
 
     const loadData = async () => {
-        const cacheName = isAdmin ? 'AdminCenter' : (isEntra ? 'EntraID' : null);
-        if (!cacheName) {
+        if (!isAdmin) {
+            // ServicePage only handles Admin Center now
             fetchData(false);
             return;
         }
 
-        const cached = await DataPersistenceService.load(cacheName);
+        const cached = await DataPersistenceService.load('AdminCenter');
         if (cached && cached.raw) {
-            if (isAdmin) {
-                setExchangeData(cached.raw.exchangeData);
-                setLicensingSummary(cached.raw.licensingSummary);
-                setDomainsCount(cached.raw.domainsCount);
-                setGroupsCount(cached.raw.groupsCount);
-                setDeletedUsersCount(cached.raw.deletedUsersCount);
-                setSecureScore(cached.raw.secureScore);
-                setServiceHealth(cached.raw.serviceHealth);
-                setFailedSignIns(cached.raw.failedSignIns);
-            }
-            // Add Entra hydrations here if needed
+            setExchangeData(cached.raw.exchangeData);
+            setLicensingSummary(cached.raw.licensingSummary);
+            setDomainsCount(cached.raw.domainsCount);
+            setGroupsCount(cached.raw.groupsCount);
+            setDeletedUsersCount(cached.raw.deletedUsersCount);
+            setSecureScore(cached.raw.secureScore);
+            setServiceHealth(cached.raw.serviceHealth);
+            setFailedSignIns(cached.raw.failedSignIns);
             setLoading(false);
 
-            if (DataPersistenceService.isExpired(cacheName, 30)) {
+            if (DataPersistenceService.isExpired('AdminCenter', 30)) {
                 fetchData(false);
             }
         } else {
@@ -181,7 +147,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         loadData();
     }, [serviceId]);
 
-    const stats = isAdmin ? [
+    const stats = [
         { label: 'Total Mailboxes', value: exchangeData.length, icon: Mail, color: 'var(--accent-blue)', path: '/service/admin/report', trend: 'Live' },
         { label: 'Licenses Used', value: licensingSummary.reduce((acc, curr) => acc + (curr.consumedUnits || 0), 0), icon: CreditCard, color: 'var(--accent-cyan)', path: '/service/admin/licenses', trend: 'Active' },
         { label: 'Groups', value: groupsCount, icon: Users, color: 'var(--accent-indigo)', path: '/service/admin/groups', trend: 'Manage' },
@@ -189,17 +155,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         { label: 'Deleted Users', value: deletedUsersCount, icon: Trash2, color: 'var(--accent-error)', path: '/service/admin/deleted-users', trend: 'Restore' },
         { label: 'Secure Score', value: secureScore ? `${Math.round((secureScore.currentScore / secureScore.maxScore) * 100)}%` : '--', icon: Shield, color: 'var(--accent-blue)', path: '/service/admin/secure-score', trend: `${secureScore?.currentScore || 0} Pts` },
         { label: 'Failed Logins (24h)', value: failedSignIns.length, icon: AlertTriangle, color: 'var(--accent-error)', path: '/service/admin/sign-ins', trend: 'Review' }
-    ] : isEntra ? [
-        { label: 'Users', value: exchangeData.length, icon: Users, color: 'var(--accent-blue)', path: '/service/entra/users' },
-        { label: 'Groups', value: groupsCount, icon: Users, color: 'var(--accent-purple)', path: '/service/entra/groups' },
-        { label: 'Applications', value: appsCount, icon: LayoutGrid, color: 'var(--accent-cyan)', path: '/service/entra/apps' },
-        { label: 'Global Admins', value: globalAdmins.length, icon: Shield, color: 'var(--accent-error)' }
-    ] : isPurview ? [
-        { label: 'Sensitivity Labels', value: '--', icon: Lock, color: 'var(--accent-purple)' },
-        { label: 'Data Policy Matches', value: '--', icon: AlertTriangle, color: 'var(--accent-warning)' },
-        { label: 'Retention Policies', value: '--', icon: Activity, color: 'var(--accent-blue)' },
-        { label: 'DLP Alerts', value: '--', icon: Shield, color: 'var(--accent-error)' }
-    ] : [];
+    ];
 
     return (
         <div className="animate-in">
@@ -233,76 +189,74 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                     // Prepare micro figures for Admin Center cards
                     let microFigure = null;
 
-                    if (isAdmin) {
-                        if (i === 0) {
-                            // Mailboxes - Active vs Inactive
-                            const activeMailboxes = exchangeData.filter(mb => {
-                                const lastActivity = new Date(mb.lastActivityDate);
-                                const daysSinceActivity = (Date.now() - lastActivity.getTime()) / (1000 * 60 * 60 * 24);
-                                return daysSinceActivity <= 30;
-                            }).length;
-                            const inactiveMailboxes = exchangeData.length - activeMailboxes;
+                    if (i === 0) {
+                        // Mailboxes - Active vs Inactive
+                        const activeMailboxes = exchangeData.filter(mb => {
+                            const lastActivity = new Date(mb.lastActivityDate);
+                            const daysSinceActivity = (Date.now() - lastActivity.getTime()) / (1000 * 60 * 60 * 24);
+                            return daysSinceActivity <= 30;
+                        }).length;
+                        const inactiveMailboxes = exchangeData.length - activeMailboxes;
 
-                            if (exchangeData.length > 0) {
-                                const segments = [
-                                    { label: 'Active', value: activeMailboxes, color: '#10b981' }, // Green
-                                    { label: 'Inactive', value: inactiveMailboxes, color: '#f59e0b' } // Amber
-                                ].filter(s => s.value > 0);
+                        if (exchangeData.length > 0) {
+                            const segments = [
+                                { label: 'Active', value: activeMailboxes, color: '#10b981' }, // Green
+                                { label: 'Inactive', value: inactiveMailboxes, color: '#f59e0b' } // Amber
+                            ].filter(s => s.value > 0);
 
-                                microFigure = (
-                                    <div style={{ marginTop: '12px' }}>
-                                        <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>User Status</div>
-                                        <MiniSegmentedBar segments={segments} height={8} />
-                                        <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
-                                            {segments.map((seg, idx) => (
-                                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: seg.color }}></div>
-                                                    <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>{seg.label}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                );
-                            }
-                        } else if (i === 1) {
-                            // Licenses - Utilization Progress for top 3
-                            const topLicenses = licensingSummary.slice(0, 3);
-                            if (topLicenses.length > 0) {
-                                microFigure = (
-                                    <div style={{ marginTop: '12px' }}>
-                                        <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>Top License Types</div>
-                                        {(() => {
-                                            const colors = ['#3b82f6', '#10b981', '#f59e0b']; // Blue, Green, Amber
-                                            const segments = topLicenses.map((lic, idx) => ({
-                                                label: lic.name || lic.skuPartNumber,
-                                                value: lic.consumedUnits || 0,
-                                                color: colors[idx % colors.length]
-                                            }));
-
-                                            return <MiniSegmentedBar segments={segments} height={10} />;
-                                        })()}
-                                        <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
-                                            {topLicenses.map((lic, idx) => (
-                                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: ['#3b82f6', '#10b981', '#f59e0b'][idx] }}></div>
-                                                    <span style={{ fontSize: '9px', color: 'var(--text-dim)', maxWidth: '60px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                        {lic.name || lic.skuPartNumber}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                );
-                            }
-                        } else if (i === 6) {
-                            // Removed fake trend data generation for Failed Logins
                             microFigure = (
                                 <div style={{ marginTop: '12px' }}>
-                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>Last 24h</div>
-                                    <div style={{ fontSize: '16px', fontWeight: 600 }}>{failedSignIns.length}</div>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>User Status</div>
+                                    <MiniSegmentedBar segments={segments} height={8} />
+                                    <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                                        {segments.map((seg, idx) => (
+                                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: seg.color }}></div>
+                                                <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>{seg.label}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             );
                         }
+                    } else if (i === 1) {
+                        // Licenses - Utilization Progress for top 3
+                        const topLicenses = licensingSummary.slice(0, 3);
+                        if (topLicenses.length > 0) {
+                            microFigure = (
+                                <div style={{ marginTop: '12px' }}>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>Top License Types</div>
+                                    {(() => {
+                                        const colors = ['#3b82f6', '#10b981', '#f59e0b']; // Blue, Green, Amber
+                                        const segments = topLicenses.map((lic, idx) => ({
+                                            label: lic.name || lic.skuPartNumber,
+                                            value: lic.consumedUnits || 0,
+                                            color: colors[idx % colors.length]
+                                        }));
+
+                                        return <MiniSegmentedBar segments={segments} height={10} />;
+                                    })()}
+                                    <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
+                                        {topLicenses.map((lic, idx) => (
+                                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: ['#3b82f6', '#10b981', '#f59e0b'][idx] }}></div>
+                                                <span style={{ fontSize: '9px', color: 'var(--text-dim)', maxWidth: '60px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    {lic.name || lic.skuPartNumber}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        }
+                    } else if (i === 6) {
+                        // Removed fake trend data generation for Failed Logins
+                        microFigure = (
+                            <div style={{ marginTop: '12px' }}>
+                                <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>Last 24h</div>
+                                <div style={{ fontSize: '16px', fontWeight: 600 }}>{failedSignIns.length}</div>
+                            </div>
+                        );
                     }
 
                     // Generic Fallback -> Upgrade to Rich Visuals if not already set
@@ -345,116 +299,8 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 })}
             </div>
 
-            {isPurview && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="glass-card"
-                    style={{
-                        marginTop: '32px',
-                        padding: '60px',
-                        textAlign: 'center',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '20px',
-                        background: 'hsla(0, 0%, 100%, 0.02)'
-                    }}
-                >
-                    <div style={{
-                        width: '80px',
-                        height: '80px',
-                        borderRadius: '50%',
-                        background: 'hsla(0, 0%, 100%, 0.05)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'var(--text-dim)'
-                    }}>
-                        <AlertCircle size={40} />
-                    </div>
-                    <div>
-                        <h2 className="title-gradient" style={{ fontSize: '24px', marginBottom: '8px' }}>Telemetry Unavailable</h2>
-                        <p style={{ color: 'var(--text-dim)', maxWidth: '400px', margin: '0 auto' }}>
-                            Couldn't retrieve Microsoft Purview data.
-                        </p>
-                    </div>
-                    <button className="btn btn-secondary" onClick={() => navigate('/service/admin')}>
-                        Return to Admin Center
-                    </button>
-                </motion.div>
-            )}
-
-            {isEntra && (
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-                    gap: '24px'
-                }}>
-                    <div className="glass-card" style={{ padding: '14px' }}>
-                        <h3 className="spacing-v-4 flex-center justify-start flex-gap-2" style={{ fontSize: '12px' }}>
-                            <Activity size={14} color="var(--accent-purple)" />
-                            Directory Audits
-                        </h3>
-                        <div className="table-container">
-                            <table className="modern-table">
-                                <thead>
-                                    <tr>
-                                        <th>Activity</th>
-                                        <th>Initiated By</th>
-                                        <th>Result</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {auditLogs.slice(0, 5).map((log, i) => (
-                                        <tr key={i}>
-                                            <td style={{ fontWeight: 600 }}>{log.activityDisplayName}</td>
-                                            <td style={{ fontSize: '12px' }}>{log.initiatedBy?.user?.userPrincipalName || 'System'}</td>
-                                            <td>
-                                                <span className={`badge ${log.result === 'success' ? 'badge-success' : 'badge-error'}`}>
-                                                    {log.result}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div className="glass-card" style={{ padding: '14px' }}>
-                        <h3 className="spacing-v-4 flex-center justify-start flex-gap-2" style={{ fontSize: '12px' }}>
-                            <Shield size={14} color="var(--accent-blue)" />
-                            CA Policies
-                        </h3>
-                        <div className="table-container">
-                            <table className="modern-table">
-                                <thead>
-                                    <tr>
-                                        <th>Policy Name</th>
-                                        <th>State</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {caPolicies.slice(0, 5).map((policy, i) => (
-                                        <tr key={i}>
-                                            <td>{policy.displayName}</td>
-                                            <td>
-                                                <span className={`badge ${policy.state === 'enabled' ? 'badge-success' : 'badge-error'}`}>
-                                                    {policy.state}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* NEW: Main Analytics for Admin Center */}
-            {isAdmin && !loading && exchangeData.length > 0 && (
+            {/* Main Analytics for Admin Center */}
+            {!loading && exchangeData.length > 0 && (
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fit, minmin(400px, 1fr))',
@@ -491,7 +337,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 </div>
             )}
 
-            {isAdmin && exchangeData.length > 0 && (
+            {exchangeData.length > 0 && (
                 <div className="glass-card" style={{ marginTop: '16px', padding: '14px' }}>
                     <div className="flex-between spacing-v-4">
                         <h3 className="flex-center flex-gap-2" style={{ fontSize: '12px' }}>

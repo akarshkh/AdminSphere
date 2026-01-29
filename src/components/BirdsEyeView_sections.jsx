@@ -16,7 +16,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "Mailbox Operations",
                 value: stats.admin.mailboxes,
-                path: '/service/admin/emails',
+                path: '/service/admin/report',
                 subValues: [
                     { label: "Total", value: stats.admin.mailboxes },
                     { label: "Active (7D)", value: stats.admin.activeMail }
@@ -30,16 +30,6 @@ export const generateSections = (stats, styles) => [
                     <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
                         Registered Domains
                     </div>
-                )
-            },
-            {
-                label: "Service Health",
-                value: stats.admin.healthIssues > 0 ? "Alert" : "Healthy",
-                path: '/service/admin/service-health',
-                custom: (
-                    <span className={styles.statusText} style={{ color: stats.admin.healthIssues > 0 ? '#ef4444' : '#10b981' }}>
-                        {stats.admin.healthIssues > 0 ? `${stats.admin.healthIssues} Active Issues` : "All Systems Operational"}
-                    </span>
                 )
             }
         ]
@@ -96,7 +86,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "Conditional Access",
                 value: stats.entra.caPolicies,
-                path: '/service/entra/conditional-access',
+                path: '/service/governance/conditional-access',
                 custom: (
                     <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
                         Active Policies
@@ -106,7 +96,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "Identity Protection",
                 value: stats.entra.riskyUsers,
-                path: '/service/entra/risky-users',
+                path: '/service/security/risky-users',
                 custom: (
                     <span className={styles.statusText} style={{ color: stats.entra.riskyUsers > 0 ? '#ef4444' : '#10b981' }}>
                         {stats.entra.riskyUsers > 0 ? `${stats.entra.riskyUsers} At Risk` : "No Risks Detected"}
@@ -229,7 +219,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "Exchange Workloads",
                 value: stats.collaboration.mailboxes,
-                path: '/service/admin/emails',
+                path: '/service/admin/report',
                 subValues: [
                     { label: "Active (7D)", value: stats.collaboration.activeEmail },
                     { label: "Mailboxes", value: stats.collaboration.mailboxes }

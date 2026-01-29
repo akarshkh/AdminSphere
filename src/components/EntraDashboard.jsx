@@ -154,8 +154,17 @@ const EntraDashboard = () => {
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="glass-card" style={{ padding: '10px', border: '1px solid var(--accent-blue-glow)' }}>
-                    <p style={{ fontSize: '12px', fontWeight: 600 }}>{payload[0].name}: {payload[0].value}</p>
+                <div style={{
+                    padding: '12px 16px',
+                    background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(31, 41, 55, 0.98))',
+                    backdropFilter: 'blur(20px)',
+                    border: '1.5px solid rgba(59, 130, 246, 0.5)',
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.2)'
+                }}>
+                    <p style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', margin: 0 }}>
+                        {payload[0].name}: <span style={{ color: '#60a5fa' }}>{payload[0].value}</span>
+                    </p>
                 </div>
             );
         }
@@ -316,6 +325,8 @@ const EntraDashboard = () => {
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
+                        whileHover={{ y: -5, scale: 1.02 }}
+                        onClick={() => navigate('/service/admin/secure-score')}
                         className="glass-card"
                         style={{
                             padding: '24px',
@@ -324,7 +335,8 @@ const EntraDashboard = () => {
                             minHeight: '520px',
                             display: 'flex',
                             flexDirection: 'column',
-                            overflow: 'hidden'
+                            overflow: 'hidden',
+                            cursor: 'pointer'
                         }}
                     >
                         <div className="flex-center flex-gap-4 spacing-v-8" style={{ width: '100%', marginBottom: '16px', flexShrink: 0 }}>
@@ -337,7 +349,7 @@ const EntraDashboard = () => {
                             <Activity size={18} color="var(--accent-success)" />
                         </div>
 
-                        <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: '340px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: '340px', display: 'flex', justifyContent: 'center', alignItems: 'center', pointerEvents: 'none' }}>
                             <PieChart width={320} height={320}>
                                 <defs>
                                     <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">

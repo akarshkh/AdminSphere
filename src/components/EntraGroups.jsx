@@ -102,7 +102,7 @@ const EntraGroups = () => {
                         />
                         <Search size={18} className="search-icon" />
                     </div>
-                    <select className="input" value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+                    <select className="input" value={filterType} onChange={(e) => setFilterType(e.target.value)} style={{ color: 'var(--text-primary)', cursor: 'pointer' }}>
                         <option value="all">All Group Types</option>
                         <option value="security">Security Enabled</option>
                         <option value="distribution">Distribution Lists</option>
