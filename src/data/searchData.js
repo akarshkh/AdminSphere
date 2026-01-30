@@ -87,15 +87,6 @@ export const searchableItems = [
         tags: ['secure', 'score', 'security', 'posture', 'recommendations', 'compliance']
     },
     {
-        id: 'service-health',
-        title: 'Service Health',
-        description: 'Microsoft 365 service health status',
-        path: '/service/admin/service-health',
-        category: 'Admin Center',
-        icon: Activity,
-        tags: ['service', 'health', 'status', 'incidents', 'outages', 'advisories', 'uptime']
-    },
-    {
         id: 'sign-ins',
         title: 'Sign-in Logs',
         description: 'User sign-in activity and failures',
@@ -177,6 +168,15 @@ export const searchableItems = [
         category: 'Entra ID',
         icon: LayoutGrid,
         tags: ['apps', 'applications', 'registrations', 'enterprise', 'oauth', 'api']
+    },
+    {
+        id: 'entra-sign-in-logs',
+        title: 'Sign-In Logs',
+        description: 'User authentication activity and sign-in events',
+        path: '/service/entra/sign-in-logs',
+        category: 'Entra ID',
+        icon: Activity,
+        tags: ['sign-in', 'signin', 'login', 'authentication', 'logs', 'audit', 'activity', 'security', 'failed', 'success']
     },
 
     // Intune

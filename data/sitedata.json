@@ -15,9 +15,9 @@
       "compliancePolicies": 2,
       "configProfiles": 8,
       "mobileApps": 7,
-      "securityBaselines": 0,
-      "adminRoles": 0
+      "securityBaselines": 4,
+      "adminRoles": 9
     },
-    "timestamp": 1769763885751
+    "timestamp": 1769764020011
   }
 }

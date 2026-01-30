@@ -164,7 +164,7 @@ const EntraDashboard = () => {
                     minWidth: '140px'
                 }}>
                     <p style={{ margin: 0, fontWeight: 700, color: 'var(--tooltip-text)', fontSize: '12px' }}>
-                        {payload[0].name}: {payload[0].value}
+                        {payload[0].name}: <span style={{ color: 'var(--accent-blue)' }}>{payload[0].value}</span>
                     </p>
                 </div>
             );
@@ -326,6 +326,8 @@ const EntraDashboard = () => {
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
+                        whileHover={{ y: -5, scale: 1.02 }}
+                        onClick={() => navigate('/service/admin/secure-score')}
                         className="glass-card"
                         style={{
                             padding: '24px',
@@ -334,7 +336,8 @@ const EntraDashboard = () => {
                             minHeight: '520px',
                             display: 'flex',
                             flexDirection: 'column',
-                            overflow: 'hidden'
+                            overflow: 'hidden',
+                            cursor: 'pointer'
                         }}
                     >
                         <div className="flex-center flex-gap-4 spacing-v-8" style={{ width: '100%', marginBottom: '16px', flexShrink: 0 }}>
@@ -347,7 +350,7 @@ const EntraDashboard = () => {
                             <Activity size={18} color="var(--accent-success)" />
                         </div>
 
-                        <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: '340px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: '340px', display: 'flex', justifyContent: 'center', alignItems: 'center', pointerEvents: 'none' }}>
                             <PieChart width={320} height={320}>
                                 <defs>
                                     <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
@@ -458,10 +461,11 @@ const EntraDashboard = () => {
 
                     {/* Line Chart: Sign-in Trends */}
                     {signInTrends.length > 0 && (
-                        <div className="glass-card" style={{ padding: '14px' }}>
+                        <div className="glass-card" style={{ padding: '14px', cursor: 'pointer' }} onClick={() => navigate('/service/entra/sign-in-logs')}>
                             <h3 style={{ fontSize: '12px', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <Activity size={14} color="var(--accent-blue)" />
                                 Sign-in Activity (14 Days)
+                                <ArrowRight size={12} style={{ marginLeft: 'auto', color: 'var(--text-dim)' }} />
                             </h3>
                             <ResponsiveContainer width="100%" height={250}>
                                 <AreaChart data={signInTrends} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>

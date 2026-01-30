@@ -42,7 +42,6 @@ ROUTE DIRECTORY:
    - Groups Management (Admin): /service/admin/groups
    - Restore Deleted Users: /service/admin/deleted-users
    - Microsoft Secure Score: /service/admin/secure-score
-   - M365 Service Health: /service/admin/service-health
    - Failed Sign-ins / Logs: /service/admin/sign-ins
    - Email Activity / Trends: /service/admin/emails
    - System Alerts: /service/admin/alerts

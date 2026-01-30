@@ -15,8 +15,8 @@ import EntraDevices from './components/EntraDevices';
 import EntraAdmins from './components/EntraAdmins';
 import EntraSubscriptions from './components/EntraSubscriptions';
 import EntraApps from './components/EntraApps';
+import EntraSignInLogs from './components/EntraSignInLogs';
 import SecureScorePage from './components/SecureScorePage';
-import ServiceHealthPage from './components/ServiceHealthPage';
 import SignInsPage from './components/SignInsPage';
 import IntuneMonitoring from './components/IntuneMonitoring';
 import IntuneManagedDevices from './components/IntuneManagedDevices';
@@ -99,7 +99,6 @@ function App() {
                 <Route path="admin/groups" element={<GroupsPage />} />
                 <Route path="admin/deleted-users" element={<DeletedUsersPage />} />
                 <Route path="admin/secure-score" element={<SecureScorePage />} />
-                <Route path="admin/service-health" element={<ServiceHealthPage />} />
                 <Route path="admin/sign-ins" element={<SignInsPage />} />
                 <Route path="admin/emails" element={<EmailActivityPage />} />
                 <Route path="admin/alerts" element={<AlertsPage />} />
@@ -113,6 +112,7 @@ function App() {
                 <Route path="entra/subscriptions" element={<EntraSubscriptions />} />
                 <Route path="entra/admins" element={<EntraAdmins />} />
                 <Route path="entra/apps" element={<EntraApps />} />
+                <Route path="entra/sign-in-logs" element={<EntraSignInLogs />} />
 
                 {/* Intune Routes */}
                 <Route path="intune" element={<IntuneMonitoring />} />
