@@ -163,7 +163,8 @@ const EntraDashboard = () => {
         { label: 'Total Identities', value: stats.users.total, trend: stats.users.growth, color: 'var(--accent-blue)', path: '/service/entra/users', icon: Users },
         { label: 'Sign-In Events', value: totalSignIns, trend: 'Last 14 Days', color: '#f59e0b', path: '/service/entra/sign-in-logs', icon: Activity },
         { label: 'Cloud Groups', value: stats.groups.total, trend: stats.groups.growth, color: 'var(--accent-purple)', path: '/service/entra/groups', icon: LayoutGrid },
-        { label: 'App Registrations', value: stats.apps.total, trend: stats.apps.growth, color: 'var(--accent-indigo)', path: '/service/entra/apps', icon: LayoutGrid },
+        { label: 'App Registrations', value: stats.apps.total, trend: stats.apps.growth, color: 'var(--accent-indigo)', path: '/service/entra/apps', icon: Box },
+        { label: 'Enterprise Apps', value: stats.enterpriseApps?.total || 0, trend: stats.enterpriseApps?.growth || 'Principals', color: 'var(--accent-cyan)', path: '/service/entra/enterprise-apps', icon: Globe },
         { label: 'Global Admins', value: stats.admins.total, trend: stats.admins.growth, color: 'var(--accent-error)', path: '/service/entra/admins', icon: Shield },
         { label: 'Subscriptions', value: stats.subs.total, trend: stats.subs.growth, color: 'var(--accent-cyan)', path: '/service/entra/subscriptions', icon: CreditCard },
         { label: 'All Azure Devices', value: stats.devices.total || 0, trend: 'Directory', color: 'var(--accent-pink)', path: '/service/entra/devices', icon: Monitor }
