@@ -28,7 +28,8 @@ export const DevicesService = {
     getAllDevices: async (client, top = 50) => {
         try {
             const response = await client.api('/devices')
-                .select('id,displayName,operatingSystem,accountEnabled,isManaged,approximateLastSignInDateTime,complianceState')
+                .select('id,displayName,operatingSystem,operatingSystemVersion,accountEnabled,isManaged,approximateLastSignInDateTime,complianceState,trustType,mdmAppId,profileType')
+                .expand('registeredOwners($select=id,displayName,userPrincipalName)')
                 .top(top)
                 .get();
             return response.value || [];

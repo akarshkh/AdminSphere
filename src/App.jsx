@@ -14,6 +14,7 @@ import EntraDevices from './components/EntraDevices';
 import EntraAdmins from './components/EntraAdmins';
 import EntraSubscriptions from './components/EntraSubscriptions';
 import EntraApps from './components/EntraApps';
+import EntraEnterpriseApps from './components/EntraEnterpriseApps';
 import EntraSignInLogs from './components/EntraSignInLogs';
 import SecureScorePage from './components/SecureScorePage';
 import SignInsPage from './components/SignInsPage';
@@ -110,6 +111,7 @@ function App() {
                 <Route path="entra/subscriptions" element={<EntraSubscriptions />} />
                 <Route path="entra/admins" element={<EntraAdmins />} />
                 <Route path="entra/apps" element={<EntraApps />} />
+                <Route path="entra/enterprise-apps" element={<EntraEnterpriseApps />} />
                 <Route path="entra/sign-in-logs" element={<EntraSignInLogs />} />
 
                 {/* Intune Routes */}

@@ -139,6 +139,15 @@ export class GraphService {
             .get().then(r => r.value || []).catch(() => []);
     }
 
+    async getServicePrincipals() {
+        return this.client.api("/servicePrincipals")
+            .select("id,appId,displayName,createdDateTime,homepage,keyCredentials,passwordCredentials,tags")
+            .top(100)
+            .get()
+            .then(r => r.value || [])
+            .catch(() => []);
+    }
+
     async getDirectoryAudits() {
         return this.client.api("/auditLogs/directoryAudits").top(5).orderby("activityDateTime desc").get().catch(() => null);
     }

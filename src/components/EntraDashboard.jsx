@@ -6,7 +6,7 @@ import { GraphService } from '../services/graphService';
 import { UsersService, GroupsService, DevicesService, SubscriptionsService, RolesService } from '../services/entra';
 import { DataPersistenceService } from '../services/dataPersistence';
 import { motion } from 'framer-motion';
-import { Users, Shield, Smartphone, CreditCard, LayoutGrid, ArrowRight, ShieldCheck, Activity, RefreshCw } from 'lucide-react';
+import { Users, Shield, Smartphone, CreditCard, LayoutGrid, ArrowRight, ShieldCheck, Activity, RefreshCw, Monitor, Box, Globe, AlertTriangle } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniStatusGeneric, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
@@ -21,12 +21,14 @@ const EntraDashboard = () => {
         devices: { total: 0, growth: 'Managed' },
         subs: { total: 0, growth: 'Verified' },
         admins: { total: 0, growth: 'Privileged' },
-        apps: { total: 0, growth: 'Enterprise' }
+        apps: { total: 0, growth: 'Registrations' },
+        enterpriseApps: { total: 0, growth: 'Service Principals' }
     });
     const [secureScore, setSecureScore] = useState({ current: 0, max: 100 });
     const [mfaStats, setMfaStats] = useState(null);
     const [signInTrends, setSignInTrends] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const fetchDashboardData = async (isManual = false) => {
         if (accounts.length === 0) return;
@@ -40,28 +42,31 @@ const EntraDashboard = () => {
             const client = graphService.client;
 
             // Parallel Fetch
-            const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse, scoreResponse, mfaData, signInsData] = await Promise.all([
+            const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse, spResponse, scoreResponse, mfaData, signInsData] = await Promise.all([
                 UsersService.getUserCounts(client),
                 GroupsService.getGroupCounts(client),
                 DevicesService.getDeviceCounts(client),
                 SubscriptionsService.getSubscriptionCounts(client),
                 RolesService.getAdminCounts(client),
                 client.api("/applications").select('id').top(999).get().catch(() => ({ value: [] })),
+                client.api("/servicePrincipals").select('id').top(999).get().catch(() => ({ value: [] })),
                 client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] })),
                 graphService.getMFAStatus(),
                 graphService.getSignInTrends(14)
             ]);
 
             const appsCount = appsResponse.value ? appsResponse.value.length : 0;
+            const spCount = spResponse.value ? spResponse.value.length : 0;
             const scoreData = scoreResponse.value?.[0] || { currentScore: 78, maxScore: 100 };
 
             const dashboardStats = {
                 users: { total: userCounts.total, growth: 'Directory' },
                 groups: { total: groupCounts.total, growth: 'Teams' },
-                devices: { total: deviceCounts.total, growth: 'Managed' },
+                devices: { total: deviceCounts.total, managed: deviceCounts.managed, growth: 'By Intune' },
                 subs: { total: subCounts.active, growth: 'Verified' },
                 admins: { total: adminCounts.globalAdmins, growth: 'Privileged' },
-                apps: { total: appsCount, growth: 'Enterprise' }
+                apps: { total: appsCount, growth: 'Registrations' },
+                enterpriseApps: { total: spCount, growth: 'Principals' }
             };
 
             const scoreInfo = {
@@ -74,7 +79,8 @@ const EntraDashboard = () => {
                 entra_id: {
                     identities: { total: userCounts.total, trend: "Directory" },
                     groups: { count: groupCounts.total, trend: "Teams" },
-                    apps: { registered: appsCount, trend: "Enterprise" },
+                    apps: { registered: appsCount, trend: "Registrations" },
+                    enterpriseApps: { count: spCount, trend: "Principals" },
                     admins: { global_count: adminCounts.globalAdmins, trend: "Privileged" },
                     subscriptions: { active: subCounts.active, trend: "Verified" },
                     devices: { managed: deviceCounts.total, trend: "Managed" },
@@ -99,8 +105,10 @@ const EntraDashboard = () => {
             setSecureScore(scoreInfo);
             setMfaStats(mfaData);
             setSignInTrends(signInsData);
+            setError(null);
         } catch (error) {
             console.error("Dashboard fetch error:", error);
+            setError(error.message || "Failed to load dashboard data");
         } finally {
             if (isManual) {
                 const elapsedTime = Date.now() - startTime;
@@ -115,18 +123,32 @@ const EntraDashboard = () => {
     };
 
     const loadData = async () => {
-        const cached = await DataPersistenceService.load('EntraID');
-        if (cached && cached.raw) {
-            setStats(cached.raw.stats);
-            setSecureScore(cached.raw.secureScore);
-            setMfaStats(cached.raw.mfaStats || null);
-            setSignInTrends(cached.raw.signInTrends || []);
-            setLoading(false);
+        try {
+            const cached = await DataPersistenceService.load('EntraID');
+            if (cached && cached.raw && cached.raw.stats) {
+                // Merge with defaults to ensure new keys exist
+                setStats(prev => ({
+                    ...prev,
+                    ...cached.raw.stats,
+                    enterpriseApps: cached.raw.stats.enterpriseApps || prev.enterpriseApps
+                }));
 
-            if (DataPersistenceService.isExpired('EntraID', 30)) {
+                setSecureScore(cached.raw.secureScore || { current: 0, max: 100 });
+                setMfaStats(cached.raw.mfaStats || null);
+                setSignInTrends(cached.raw.signInTrends || []);
+                setLoading(false);
+
+                // Fetch if expired OR if we are using stale data structure
+                if (DataPersistenceService.isExpired('EntraID', 30) || !cached.raw.stats.enterpriseApps) {
+                    console.log("Cache expired or stale, refreshing...");
+                    fetchDashboardData(false);
+                }
+            } else {
                 fetchDashboardData(false);
             }
-        } else {
+        } catch (e) {
+            // Fallback if cache load fails
+            console.warn("Cache load failed, fetching fresh data", e);
             fetchDashboardData(false);
         }
     };
@@ -135,13 +157,16 @@ const EntraDashboard = () => {
         loadData();
     }, [accounts, instance]);
 
+    const totalSignIns = signInTrends.reduce((acc, curr) => acc + (curr.success || 0) + (curr.failure || 0), 0);
+
     const tiles = [
         { label: 'Total Identities', value: stats.users.total, trend: stats.users.growth, color: 'var(--accent-blue)', path: '/service/entra/users', icon: Users },
+        { label: 'Sign-In Events', value: totalSignIns, trend: 'Last 14 Days', color: '#f59e0b', path: '/service/entra/sign-in-logs', icon: Activity },
         { label: 'Cloud Groups', value: stats.groups.total, trend: stats.groups.growth, color: 'var(--accent-purple)', path: '/service/entra/groups', icon: LayoutGrid },
         { label: 'App Registrations', value: stats.apps.total, trend: stats.apps.growth, color: 'var(--accent-indigo)', path: '/service/entra/apps', icon: LayoutGrid },
         { label: 'Global Admins', value: stats.admins.total, trend: stats.admins.growth, color: 'var(--accent-error)', path: '/service/entra/admins', icon: Shield },
         { label: 'Subscriptions', value: stats.subs.total, trend: stats.subs.growth, color: 'var(--accent-cyan)', path: '/service/entra/subscriptions', icon: CreditCard },
-        { label: 'Managed Devices', value: stats.devices.total, trend: stats.devices.growth, color: 'var(--accent-success)', path: '/service/entra/devices', icon: Smartphone }
+        { label: 'All Azure Devices', value: stats.devices.total || 0, trend: 'Directory', color: 'var(--accent-pink)', path: '/service/entra/devices', icon: Monitor }
     ];
 
     const scorePercentage = Math.round((secureScore.current / secureScore.max) * 100);
@@ -185,6 +210,24 @@ const EntraDashboard = () => {
                 </div>
             </header>
 
+            {error && (
+                <div style={{
+                    padding: '16px',
+                    marginBottom: '24px',
+                    borderRadius: '12px',
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    color: '#ef4444',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                }}>
+                    <AlertTriangle size={20} />
+                    <span>{error}</span>
+                    <button onClick={() => fetchDashboardData(true)} style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', textDecoration: 'underline' }}>Retry</button>
+                </div>
+            )}
+
             {loading ? (
                 <Loader3D showOverlay={true} />
             ) : (
@@ -195,7 +238,7 @@ const EntraDashboard = () => {
                             // Prepare micro figures for Entra ID tiles
                             let microFigure = null;
 
-                            if (i === 0) {
+                            if (tile.label === 'Total Identities') {
                                 // Total Identities - Member vs Guest split
                                 const memberCount = Math.floor(stats.users.total * 0.85); // Approx 85% members
                                 const guestCount = stats.users.total - memberCount;
@@ -221,7 +264,7 @@ const EntraDashboard = () => {
                                         </div>
                                     );
                                 }
-                            } else if (i === 3) {
+                            } else if (tile.label === 'Global Admins') {
                                 // Global Admins - Risk badge if count > 5
                                 const adminCount = stats.admins.total;
                                 const severity = adminCount > 10 ? 'high' : adminCount > 5 ? 'medium' : 'low';
@@ -235,7 +278,7 @@ const EntraDashboard = () => {
                                         />
                                     </div>
                                 );
-                            } else if (i === 2) {
+                            } else if (tile.label === 'App Registrations') {
                                 // App Registrations - Enterprise vs Non-Enterprise (approximate)
                                 const enterpriseApps = Math.floor(stats.apps.total * 0.6); // Approx 60% enterprise
                                 const nonEnterpriseApps = stats.apps.total - enterpriseApps;
