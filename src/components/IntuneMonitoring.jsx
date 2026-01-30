@@ -67,6 +67,10 @@ const IntuneMonitoring = () => {
 
             await DataPersistenceService.save('Intune', persistenceData);
             setStats(dashboardStats);
+
+            // Background store for AI context (makes it available to the chatbot)
+            const SiteDataStore = (await import('../services/siteDataStore')).default;
+            SiteDataStore.store('intuneStats', dashboardStats);
         } catch (error) {
             console.error("Intune dashboard fetch error:", error);
         } finally {
@@ -397,7 +401,16 @@ const IntuneMonitoring = () => {
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
                             <XAxis type="number" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
                             <YAxis type="category" dataKey="name" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} width={50} />
-                            <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f3f4f6' }} />
+                            <Tooltip
+                                contentStyle={{
+                                    background: 'var(--tooltip-bg)',
+                                    border: '1px solid var(--tooltip-border)',
+                                    borderRadius: '12px',
+                                    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                                    color: 'var(--tooltip-text)'
+                                }}
+                                itemStyle={{ color: 'var(--tooltip-text)', fontSize: '12px', fontWeight: 600 }}
+                            />
                             <Legend iconType="circle" />
                             <Bar dataKey="compliant" stackId="compliance" fill="url(#gradComplaint)" name="Compliant" radius={[0, 0, 0, 0]} />
                             <Bar dataKey="inGrace" stackId="compliance" fill="url(#gradGrace)" name="In-Grace" />
@@ -418,7 +431,16 @@ const IntuneMonitoring = () => {
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                             <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
                             <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
-                            <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f3f4f6' }} />
+                            <Tooltip
+                                contentStyle={{
+                                    background: 'var(--tooltip-bg)',
+                                    border: '1px solid var(--tooltip-border)',
+                                    borderRadius: '12px',
+                                    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                                    color: 'var(--tooltip-text)'
+                                }}
+                                itemStyle={{ color: 'var(--tooltip-text)', fontSize: '12px', fontWeight: 600 }}
+                            />
                             <Bar dataKey="count" radius={[6, 6, 0, 0]}>
                                 {
                                     Object.entries(stats.osDistribution || {}).map(([name, count], index) => {

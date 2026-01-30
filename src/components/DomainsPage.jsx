@@ -20,6 +20,10 @@ const DomainsPage = () => {
             const graphService = new GraphService(response.accessToken);
             const data = await graphService.getDomains();
             setDomains(data);
+
+            // Background store for AI context
+            const SiteDataStore = (await import('../services/siteDataStore')).default;
+            SiteDataStore.store('domains', data);
         } catch (err) {
             setError("Organization domains could not be retrieved.");
         } finally {

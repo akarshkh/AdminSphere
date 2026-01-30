@@ -81,21 +81,32 @@ function saveLocally() {
     }
 }
 
-const persistToServer = async () => {
-    if (!memoryCache) return;
-
+const persistToServer = async (sectionKey = null, sectionData = null) => {
     try {
+        let payload;
+        if (sectionKey && sectionData) {
+            // Partial update: only send the changed section
+            payload = {
+                sectionKey,
+                sectionData
+            };
+        } else {
+            // Fallback: send everything if no specific section is provided
+            if (!memoryCache) return;
+            payload = memoryCache;
+        }
+
         const response = await fetch('/api/sitedata/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(memoryCache)
+            body: JSON.stringify(payload)
         });
 
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Server rejected storage: ${errorText}`);
         }
-        console.log('[SiteDataStore] Successfully persisted to server');
+        console.log(`[SiteDataStore] Successfully persisted${sectionKey ? ` section '${sectionKey}'` : ''} to server`);
     } catch (error) {
         console.error('[SiteDataStore] Failed to persist to server:', error.message);
     }
@@ -110,17 +121,18 @@ const persistToServer = async () => {
 export function store(sectionKey, data, metadata = {}) {
     const store = initStore();
 
-    store.sections[sectionKey] = {
+    const section = {
         data,
         timestamp: Date.now(),
         ...metadata
     };
 
+    store.sections[sectionKey] = section;
     store.lastUpdated = Date.now();
     saveLocally();
 
-    // Asynchronously persist to server
-    persistToServer();
+    // Asynchronously persist ONLY this section to server to avoid 413 (Payload Too Large)
+    persistToServer(sectionKey, section);
 }
 
 /**
@@ -328,6 +340,106 @@ export function getAISummary() {
                 summary.push(`### SharePoint Usage`);
                 summary.push(`- Active Sites Tracked: ${spDetail.length || 0}`);
                 summary.push(`- File Operations: ${totalFiles.toLocaleString()}`);
+            }
+            summary.push('');
+        }
+    });
+
+    // Organization Domains
+    if (sections.domains?.data) {
+        const doms = sections.domains.data;
+        summary.push(`## ORGANIZATION DOMAINS`);
+        summary.push(`- Total Registered Domains: ${doms.length || 0}`);
+        const verified = doms.filter(d => d.state === 'Verified').length;
+        summary.push(`- Verified Domains: ${verified}`);
+        if (doms.length > 0) {
+            summary.push(`- Primary/Default: ${doms.find(d => d.isDefault)?.id || 'None'}`);
+        }
+        summary.push('');
+    }
+
+    // Directory Groups
+    if (sections.groups?.data) {
+        const grps = sections.groups.data;
+        summary.push(`## ENTRA DIRECTORY GROUPS`);
+        summary.push(`- Total Groups: ${grps.length || 0}`);
+        const m365 = grps.filter(g => g.groupTypes?.includes('Unified')).length;
+        const security = grps.filter(g => g.securityEnabled && !g.groupTypes?.includes('Unified')).length;
+        summary.push(`- Microsoft 365 Groups: ${m365}`);
+        summary.push(`- Security Groups: ${security}`);
+        summary.push('');
+    }
+
+    // App Registrations
+    if (sections.applications?.data) {
+        const apps = sections.applications.data;
+        summary.push(`## APP REGISTRATIONS`);
+        summary.push(`- Total Applications: ${apps.length || 0}`);
+        if (apps.length > 0) {
+            summary.push(`- Recent Registrations: ${apps.slice(0, 3).map(a => a.displayName).join(', ')}`);
+        }
+        summary.push('');
+    }
+
+    // Privileged Roles
+    if (sections.privilegedRoles?.data) {
+        const roles = sections.privilegedRoles.data;
+        summary.push(`## PRIVILEGED ROLES (Active)`);
+        summary.push(`- Roles with Assignments: ${roles.length || 0}`);
+        roles.slice(0, 5).forEach(r => {
+            summary.push(`  * ${r.displayName}: ${r.members?.length || 0} members`);
+        });
+        summary.push('');
+    }
+
+    // Entra Subscriptions
+    if (sections.entraSubscriptions?.data) {
+        const subs = sections.entraSubscriptions.data;
+        summary.push(`## ENTRA SUBSCRIPTIONS / SKUS`);
+        summary.push(`- Active Licenses: ${subs.length || 0}`);
+        subs.slice(0, 3).forEach(s => {
+            summary.push(`  * ${s.skuPartNumber}: ${s.consumedUnits}/${s.prepaidUnits?.enabled || 0} used`);
+        });
+        summary.push('');
+    }
+
+    // Intune Monitoring (Dashboard Stats)
+    if (sections.intuneStats?.data) {
+        const is = sections.intuneStats.data;
+        summary.push(`## INTUNE DEVICE MANAGEMENT`);
+        summary.push(`- All Managed Devices: ${is.totalDevices || 0}`);
+        summary.push(`- Non-Compliant: ${is.nonCompliantDevices || 0}`);
+        summary.push(`- Inactive (>30d): ${is.inactiveDevices || 0}`);
+        summary.push(`- Compliance Policies: ${is.compliancePolicies || 0}`);
+        summary.push(`- Configuration Profiles: ${is.configProfiles || 0}`);
+        if (is.osDistribution) {
+            summary.push(`- OS Distribution: ${Object.entries(is.osDistribution).map(([os, count]) => `${os}: ${count}`).join(', ')}`);
+        }
+        summary.push('');
+    }
+
+    // Specific Intune Device Lists
+    if (sections.nonCompliantDevices?.data) {
+        const ncd = sections.nonCompliantDevices.data;
+        summary.push(`## NON-COMPLIANT DEVICES (List)`);
+        summary.push(`- Identified Issues: ${ncd.length || 0} devices failing policies`);
+        if (ncd.length > 0) {
+            summary.push(`- Affected Devices: ${ncd.slice(0, 5).map(d => d.deviceName).join(', ')}`);
+        }
+        summary.push('');
+    }
+
+    // Alerts (General & Security)
+    const alertSections = ['alerts', 'securityAlerts'];
+    alertSections.forEach(key => {
+        if (sections[key]?.data) {
+            const al = sections[key].data;
+            summary.push(`## ${key === 'alerts' ? 'SYSTEM ALERTS' : 'SECURITY ALERTS'}`);
+            summary.push(`- Total Alerts: ${al.length || 0}`);
+            const critical = al.filter(a => (a.severity || '').toLowerCase() === 'critical' || (a.severity || '').toLowerCase() === 'high').length;
+            summary.push(`- High/Critical Severity: ${critical}`);
+            if (al.length > 0) {
+                summary.push(`- Latest: ${al[0].title || al[0].eventDisplayName}`);
             }
             summary.push('');
         }

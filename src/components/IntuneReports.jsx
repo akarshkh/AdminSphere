@@ -91,6 +91,11 @@ const IntuneReports = () => {
 
     return (
         <div className="animate-in" style={{ paddingBottom: '40px' }}>
+            <button onClick={() => navigate('/service/intune')} className="btn-back">
+                <ArrowLeft size={14} style={{ marginRight: '8px' }} />
+                Back to Dashboard
+            </button>
+
             <header className="flex-between spacing-v-8">
                 <div>
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Reports & Insights</h1>
@@ -99,10 +104,6 @@ const IntuneReports = () => {
                 <div className="flex-gap-2">
                     <button className="sync-btn" onClick={loadData} title="Refresh Data">
                         <RefreshCw size={16} />
-                    </button>
-                    <button onClick={() => navigate('/service/intune')} className="btn-back">
-                        <ArrowLeft size={16} style={{ marginRight: '8px' }} />
-                        Back to Dashboard
                     </button>
                 </div>
             </header>
@@ -139,13 +140,13 @@ const IntuneReports = () => {
                             </Pie>
                             <Tooltip
                                 contentStyle={{
-                                    background: 'rgba(15, 23, 42, 0.9)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    background: 'var(--tooltip-bg)',
+                                    border: '1px solid var(--tooltip-border)',
                                     borderRadius: '12px',
                                     backdropFilter: 'blur(10px)',
                                     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                                 }}
-                                itemStyle={{ color: '#fff', fontSize: '12px' }}
+                                itemStyle={{ color: 'var(--tooltip-text)', fontSize: '12px', fontWeight: 600 }}
                             />
                             <Legend verticalAlign="bottom" height={36} iconType="circle" />
                         </RechartsPie>
@@ -179,8 +180,15 @@ const IntuneReports = () => {
                                 <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={12} tickLine={false} axisLine={false} />
                                 <YAxis stroke="var(--text-dim)" fontSize={12} tickLine={false} axisLine={false} domain={[80, 100]} />
                                 <Tooltip
-                                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                    contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
+                                    cursor={{ fill: 'var(--glass-bg-hover)' }}
+                                    contentStyle={{
+                                        background: 'var(--tooltip-bg)',
+                                        border: '1px solid var(--tooltip-border)',
+                                        borderRadius: '12px',
+                                        boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                                        color: 'var(--tooltip-text)'
+                                    }}
+                                    itemStyle={{ color: 'var(--tooltip-text)', fontSize: '12px', fontWeight: 600 }}
                                 />
                                 <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} />
                             </BarChart>

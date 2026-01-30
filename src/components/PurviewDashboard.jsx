@@ -5,7 +5,11 @@ import { loginRequest } from '../authConfig';
 import { PurviewService } from '../services/purview';
 import { DataPersistenceService } from '../services/dataPersistence';
 import { motion } from 'framer-motion';
-import { Database, FileSearch, GitBranch, Tags, BookOpen, Scan, Shield, FileKey, BarChart3, RefreshCw, Lock } from 'lucide-react';
+import {
+    Database, FileSearch, GitBranch, Tags, BookOpen, Scan, Shield,
+    FileKey, BarChart3, RefreshCw, Lock, Layout, Activity
+} from 'lucide-react';
+import { CustomTooltip } from './charts/CustomTooltip';
 import Loader3D from './Loader3D';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
@@ -194,8 +198,18 @@ const PurviewDashboard = () => {
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="glass-card" style={{ padding: '10px', border: '1px solid var(--accent-blue-glow)' }}>
-                    <p style={{ fontSize: '12px', fontWeight: 600 }}>{payload[0].name}: {payload[0].value}</p>
+                <div style={{
+                    background: 'var(--tooltip-bg)',
+                    border: '1px solid var(--tooltip-border)',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+                    backdropFilter: 'blur(12px)',
+                    minWidth: '140px'
+                }}>
+                    <p style={{ margin: 0, fontWeight: 700, color: 'var(--tooltip-text)', fontSize: '12px' }}>
+                        {payload[0].name}: {payload[0].value}
+                    </p>
                 </div>
             );
         }
@@ -433,10 +447,10 @@ const PurviewDashboard = () => {
                                         <stop offset="100%" stopColor="#10b981" stopOpacity={0.4} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} />
                                 <XAxis dataKey="name" stroke="var(--text-dim)" />
                                 <YAxis stroke="var(--text-dim)" />
-                                <Tooltip />
+                                <Tooltip content={<CustomTooltip />} />
                                 <Bar dataKey="count" fill="url(#barGrad1)" radius={[8, 8, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
@@ -457,10 +471,10 @@ const PurviewDashboard = () => {
                                     failed: stats.scanStats.inactiveSources || 0
                                 }
                             ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} />
                                 <XAxis type="number" stroke="var(--text-dim)" />
                                 <YAxis type="category" dataKey="name" stroke="var(--text-dim)" />
-                                <Tooltip />
+                                <Tooltip content={<CustomTooltip />} />
                                 <Legend />
                                 <Bar dataKey="completed" stackId="scan" fill="#10b981" name="Completed" radius={[0, 8, 8, 0]} />
                                 <Bar dataKey="pending" stackId="scan" fill="#f59e0b" name="Pending" />

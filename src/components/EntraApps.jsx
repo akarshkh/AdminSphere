@@ -20,6 +20,10 @@ const EntraApps = () => {
                     const graphService = new GraphService(response.accessToken);
                     const data = await graphService.getApplications();
                     setApps(data || []);
+
+                    // Background store for AI context
+                    const SiteDataStore = (await import('../services/siteDataStore')).default;
+                    SiteDataStore.store('applications', data || []);
                 }
             } catch (error) {
                 console.error("Failed to fetch apps", error);

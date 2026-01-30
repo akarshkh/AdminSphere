@@ -25,6 +25,10 @@ const IntuneNonCompliant = () => {
                     const client = new GraphService(response.accessToken).client;
                     const data = await IntuneService.getNonCompliantDevices(client, 100);
                     setDevices(data);
+
+                    // Background store for AI context
+                    const SiteDataStore = (await import('../services/siteDataStore')).default;
+                    SiteDataStore.store('nonCompliantDevices', data);
                 } catch (error) {
                     console.error("Non-compliant device fetch error:", error);
                 } finally {

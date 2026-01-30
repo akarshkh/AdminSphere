@@ -11,6 +11,7 @@ const SecurityAlertsPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const [alerts, setAlerts] = useState([]);
     const [filteredAlerts, setFilteredAlerts] = useState([]);
@@ -20,15 +21,32 @@ const SecurityAlertsPage = () => {
     const fetchAlerts = async (isManual = false) => {
         if (isManual) setRefreshing(true);
         else setLoading(true);
+        setError(null);
 
         try {
             const account = accounts[0];
             if (!account) throw new Error('No account found');
 
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account
-            });
+            let tokenResponse;
+            try {
+                tokenResponse = await instance.acquireTokenSilent({
+                    ...loginRequest,
+                    account
+                });
+            } catch (authErr) {
+                if (authErr.name === "InteractionRequiredAuthError") {
+                    if (isManual) {
+                        tokenResponse = await instance.acquireTokenPopup(loginRequest);
+                    } else {
+                        console.warn("Silent auth failed for Security Alerts");
+                        setError("InteractionRequired");
+                        setLoading(false);
+                        return;
+                    }
+                } else {
+                    throw authErr;
+                }
+            }
 
             const client = Client.init({
                 authProvider: (done) => done(null, tokenResponse.accessToken)
@@ -37,8 +55,12 @@ const SecurityAlertsPage = () => {
             const data = await SecurityService.getSecurityAlerts(client, 200);
             setAlerts(data);
             setFilteredAlerts(data);
+
+            const SiteDataStore = (await import('../services/siteDataStore')).default;
+            SiteDataStore.store('securityAlerts', data);
         } catch (err) {
             console.error('Failed to fetch security alerts:', err);
+            setError(err.name === "InteractionRequiredAuthError" ? "InteractionRequired" : "Failed to load alerts. Please check your permissions.");
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -113,6 +135,39 @@ const SecurityAlertsPage = () => {
                     {refreshing ? 'Refreshing...' : 'Refresh'}
                 </button>
             </div>
+
+            {error && (
+                <div style={{
+                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '24px',
+                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <span>{error === 'InteractionRequired' ? '🔐 Session expired. Please reconnect to access security alerts.' : error}</span>
+                    {error === 'InteractionRequired' && (
+                        <button
+                            onClick={() => fetchAlerts(true)}
+                            style={{
+                                background: 'var(--accent-blue)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Reconnect
+                        </button>
+                    )}
+                </div>
+            )}
 
             {/* Filters */}
             <div className="filters-bar glass-card">
@@ -199,7 +254,7 @@ const SecurityAlertsPage = () => {
                 )}
             </div>
 
-            <style jsx>{`
+            <style jsx="true">{`
                 .page-container {
                     padding: 0;
                 }

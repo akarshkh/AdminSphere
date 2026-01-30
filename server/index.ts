@@ -30,8 +30,41 @@ try {
 
 const app = express();
 app.use(cors()); // Allow all CORS for dev
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json({ limit: '500mb' }));
+app.use(bodyParser.urlencoded({ limit: '500mb', extended: true }));
+
+/**
+ * Proxy for downloading reports to bypass CORS
+ * GET /api/proxy/download?url=...
+ */
+app.get('/api/proxy/download', async (req, res) => {
+    try {
+        const { url } = req.query;
+        if (!url || typeof url !== 'string') {
+            return res.status(400).json({ error: 'Missing url parameter' });
+        }
+
+        console.log(`[Proxy] Downloading report from: ${url}`);
+
+        // Use native fetch (Node 18+) or dynamic import
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch report: ${response.statusText}`);
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (contentType) res.setHeader('Content-Type', contentType);
+
+        // Use arrayBuffer to read the full response and send it
+        const buffer = await response.arrayBuffer();
+        res.end(Buffer.from(buffer));
+
+    } catch (err: any) {
+        console.error('[Proxy] Download error:', err);
+        res.status(500).json({ error: String(err) });
+    }
+});
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
@@ -101,11 +134,11 @@ app.post('/api/script/reset', (_req, res) => {
  * Persists all API responses to sitedata.json
  */
 
-// Save site data to sitedata.json
+// Save site data to sitedata.json (supports full overwrite or partial section update)
 app.post('/api/sitedata/save', async (req, res) => {
     try {
-        const data = req.body;
-        if (!data) {
+        const body = req.body;
+        if (!body) {
             return res.status(400).json({ success: false, error: 'No data provided' });
         }
 
@@ -115,9 +148,34 @@ app.post('/api/sitedata/save', async (req, res) => {
             fs.mkdirSync(dataDir, { recursive: true });
         }
 
+        let finalData;
+
+        // Check if this is a partial update (a specific section)
+        if (body.sectionKey && body.sectionData) {
+            console.log(`[SiteData] Partial update received for section: ${body.sectionKey}`);
+            let currentData: any = { lastUpdated: Date.now(), sections: {} };
+
+            if (fs.existsSync(SITEDATA_PATH)) {
+                try {
+                    currentData = JSON.parse(fs.readFileSync(SITEDATA_PATH, 'utf-8'));
+                } catch (e) {
+                    console.warn('[SiteData] Existing file corrupted, starting fresh');
+                }
+            }
+
+            if (!currentData.sections) currentData.sections = {};
+            currentData.sections[body.sectionKey] = body.sectionData;
+            currentData.lastUpdated = Date.now();
+            finalData = currentData;
+        } else {
+            // Full overwrite
+            console.log(`[SiteData] Full overwrite received`);
+            finalData = body;
+        }
+
         // Write data to file
-        fs.writeFileSync(SITEDATA_PATH, JSON.stringify(data, null, 2), 'utf-8');
-        console.log(`[SiteData] Saved ${Object.keys(data.sections || {}).length} sections to sitedata.json`);
+        fs.writeFileSync(SITEDATA_PATH, JSON.stringify(finalData, null, 2), 'utf-8');
+        console.log(`[SiteData] Saved ${Object.keys(finalData.sections || {}).length} sections to sitedata.json`);
 
         res.json({ success: true, message: 'Site data saved successfully' });
     } catch (err: any) {

@@ -481,7 +481,16 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                                 <XAxis dataKey="name" stroke="var(--text-dim)" />
                                 <YAxis stroke="var(--text-dim)" />
-                                <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f3f4f6' }} />
+                                <Tooltip
+                                    contentStyle={{
+                                        background: 'var(--tooltip-bg)',
+                                        border: '1px solid var(--tooltip-border)',
+                                        borderRadius: '12px',
+                                        boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                                        color: 'var(--tooltip-text)'
+                                    }}
+                                    itemStyle={{ color: 'var(--tooltip-text)', fontSize: '12px', fontWeight: 600 }}
+                                />
                                 <Bar dataKey="count" fill="url(#gradEntity)" radius={[8, 8, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>

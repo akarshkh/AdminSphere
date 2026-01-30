@@ -147,15 +147,25 @@ const EntraDashboard = () => {
     const scorePercentage = Math.round((secureScore.current / secureScore.max) * 100);
     const scoreData = [
         { name: 'Achieved', value: secureScore.current, color: 'url(#scoreGrad)' },
-        { name: 'Remaining', value: secureScore.max - secureScore.current, color: 'rgba(255,255,255,0.3)' }
+        { name: 'Remaining', value: secureScore.max - secureScore.current, color: 'var(--progress-track)' }
     ];
 
     // Reusable Tooltip
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="glass-card" style={{ padding: '10px', border: '1px solid var(--accent-blue-glow)' }}>
-                    <p style={{ fontSize: '12px', fontWeight: 600 }}>{payload[0].name}: {payload[0].value}</p>
+                <div style={{
+                    background: 'var(--tooltip-bg)',
+                    border: '1px solid var(--tooltip-border)',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+                    backdropFilter: 'blur(12px)',
+                    minWidth: '140px'
+                }}>
+                    <p style={{ margin: 0, fontWeight: 700, color: 'var(--tooltip-text)', fontSize: '12px' }}>
+                        {payload[0].name}: {payload[0].value}
+                    </p>
                 </div>
             );
         }
@@ -382,11 +392,11 @@ const EntraDashboard = () => {
                         </div>
 
                         <div style={{ width: '100%', marginTop: 'auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flexShrink: 0, paddingTop: '24px' }}>
-                            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ textAlign: 'center', padding: '16px', background: 'var(--progress-track)', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
                                 <p style={{ fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>CURRENT POINTS</p>
                                 <p style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>{secureScore.current}</p>
                             </div>
-                            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ textAlign: 'center', padding: '16px', background: 'var(--progress-track)', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
                                 <p style={{ fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>TOTAL POSSIBLE</p>
                                 <p style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-dim)' }}>{secureScore.max}</p>
                             </div>
@@ -433,7 +443,7 @@ const EntraDashboard = () => {
                                             <stop offset="100%" stopColor="#f87171" />
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} horizontal={false} />
                                     <XAxis type="number" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
                                     <YAxis type="category" dataKey="name" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} width={50} />
                                     <Tooltip content={<CustomTooltip />} />
@@ -465,7 +475,7 @@ const EntraDashboard = () => {
                                             <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
                                     <XAxis dataKey="date" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
                                     <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
                                     <Tooltip content={<CustomTooltip />} />

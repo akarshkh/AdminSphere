@@ -96,7 +96,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "Conditional Access",
                 value: stats.entra.caPolicies,
-                path: '/service/entra/conditional-access',
+                path: '/service/governance/conditional-access',
                 custom: (
                     <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
                         Active Policies
@@ -106,7 +106,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "Identity Protection",
                 value: stats.entra.riskyUsers,
-                path: '/service/entra/risky-users',
+                path: '/service/security/risky-users',
                 custom: (
                     <span className={styles.statusText} style={{ color: stats.entra.riskyUsers > 0 ? '#ef4444' : '#10b981' }}>
                         {stats.entra.riskyUsers > 0 ? `${stats.entra.riskyUsers} At Risk` : "No Risks Detected"}
@@ -248,7 +248,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "OneDrive Accounts",
                 value: stats.collaboration.onedrive,
-                path: null,
+                path: '/service/usage',
                 custom: (
                     <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
                         Active Storage
@@ -265,7 +265,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "Information Protection",
                 value: stats.purview.labels,
-                path: null,
+                path: '/service/purview',
                 subValues: [
                     { label: "Sens. Labels", value: stats.purview.labels },
                     { label: "Ret. Labels", value: stats.purview.retentionPolicies }
@@ -274,7 +274,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "Data Loss Prevention",
                 value: stats.purview.dlpPolicies,
-                path: null,
+                path: '/service/purview/policies',
                 custom: (
                     <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
                         Active Policies & Searches
@@ -284,7 +284,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "eDiscovery Cases",
                 value: stats.purview.dlpAlerts,
-                path: null,
+                path: '/service/purview',
                 custom: (
                     <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
                         Active Investigations
@@ -311,7 +311,7 @@ export const generateSections = (stats, styles) => [
             {
                 label: "Storage Consumption",
                 value: `${(stats.usage.storage / 1073741824).toFixed(2)} GB`,
-                path: null,
+                path: '/service/usage',
                 custom: (
                     <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
                         OneDrive Total

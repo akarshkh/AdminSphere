@@ -16,11 +16,45 @@ export class GraphService {
     }
 
     /**
+     * Helper to fetch reports via proxy to avoid CORS
+     * @param {string} endpoint - Graph API endpoint (e.g., /reports/...)
+     */
+    async _fetchReport(endpoint) {
+        try {
+            const url = `https://graph.microsoft.com/beta${endpoint}`;
+            const resp = await fetch(url, {
+                headers: { "Authorization": `Bearer ${this.accessToken}` },
+                redirect: "manual"
+            });
+
+            if (resp.ok) {
+                // If it didn't redirect (unlikely for reports), return json
+                const json = await resp.json();
+                return json.value || [];
+            } else if (resp.status === 302 || resp.status === 301) {
+                const location = resp.headers.get("Location");
+                if (location) {
+                    // Use our server proxy to fetch the content
+                    const proxyUrl = `/api/proxy/download?url=${encodeURIComponent(location)}`;
+                    const dr = await fetch(proxyUrl);
+                    if (dr.ok) {
+                        const json = await dr.json();
+                        return json.value || [];
+                    }
+                }
+            }
+            return [];
+        } catch (e) {
+            console.warn(`Report fetch failed for ${endpoint}:`, e);
+            return [];
+        }
+    }
+
+    /**
      * Mailbox Usage Detail Report
      */
     async getExchangeMailboxReport() {
         try {
-            // Get users with beta properties
             const usersResponse = await this.client.api("/users")
                 .version("beta")
                 .select("id,displayName,userPrincipalName,mail,archiveStatus,assignedPlans,onPremisesSyncEnabled,userType,jobTitle,department,officeLocation,city,country,createdDateTime,accountEnabled,mobilePhone")
@@ -29,31 +63,8 @@ export class GraphService {
 
             const users = usersResponse.value;
 
-            // Fetch usage report
-            let usageReport = [];
-            try {
-                const reportUrl = "https://graph.microsoft.com/beta/reports/getMailboxUsageDetail(period='D7')?$format=application/json";
-                const resp = await fetch(reportUrl, {
-                    headers: { "Authorization": `Bearer ${this.accessToken}` },
-                    redirect: "manual"
-                });
-
-                if (resp.ok) {
-                    const json = await resp.json();
-                    usageReport = json.value || [];
-                } else if (resp.status === 302 || resp.status === 301) {
-                    const location = resp.headers.get("Location");
-                    if (location) {
-                        const dr = await fetch(location);
-                        if (dr.ok) {
-                            const json = await dr.json();
-                            usageReport = json.value || [];
-                        }
-                    }
-                }
-            } catch (e) {
-                console.warn("Mailbox usage report could not be synchronized.");
-            }
+            // Fetch usage report via proxy
+            const usageReport = await this._fetchReport("/reports/getMailboxUsageDetail(period='D7')?$format=application/json");
 
             let isConcealed = false;
             const detailedReports = users.map((user) => {
@@ -65,16 +76,12 @@ export class GraphService {
                     if (firstUPN && /^[A-F0-9]+$/.test(firstUPN)) isConcealed = true;
                 }
 
-                // Check archive status from usage report first (most reliable)
-                // hasArchive is a boolean in the usage report
                 let isArchiveEnabled = false;
                 if (reportInfo && reportInfo.hasArchive !== undefined && reportInfo.hasArchive !== null) {
                     isArchiveEnabled = reportInfo.hasArchive === true || reportInfo.hasArchive === 'True';
                 } else if (user.archiveStatus) {
-                    // Fallback to user's archiveStatus property
                     isArchiveEnabled = user.archiveStatus.toLowerCase() === 'active';
                 }
-                // If neither source has data, default to false (disabled)
 
                 const formatGB = (bytes) => (bytes ? (bytes / 1073741824).toFixed(2) : "0.00");
                 const quotaBytes = reportInfo?.prohibitSendReceiveQuotaInBytes || reportInfo?.archiveQuotaInBytes;
@@ -107,17 +114,8 @@ export class GraphService {
     }
 
     async getEmailActivityUserDetail(period = 'D7') {
-        try {
-            // Use the Graph SDK client which handles redirects properly
-            const response = await this.client
-                .api(`/reports/getEmailActivityUserDetail(period='${period}')`)
-                .version('beta')
-                .get();
-            return response.value || [];
-        } catch (error) {
-            console.debug('Email activity report fetch failed:', error);
-            return [];
-        }
+        // Use proxy helper
+        return await this._fetchReport(`/reports/getEmailActivityUserDetail(period='${period}')?$format=application/json`);
     }
 
     async getLicensingData() {
@@ -247,21 +245,9 @@ export class GraphService {
      * @param {string} period - D7, D30, D90, D180
      */
     async getActiveUserTrends(period = 'D30') {
-        try {
-            const response = await this.client
-                .api(`/reports/getOffice365ActiveUserCounts(period='${period}')`)
-                .version('beta')
-                .get();
-
-            // The response is CSV format, we need to parse it
-            if (response && response.value) {
-                return response.value;
-            }
-            return [];
-        } catch (error) {
-            console.warn('Active user trends fetch failed:', error);
-            return [];
-        }
+        // Use proxy helper
+        const data = await this._fetchReport(`/reports/getOffice365ActiveUserCounts(period='${period}')?$format=application/json`);
+        return data || [];
     }
 
     /**
@@ -287,17 +273,9 @@ export class GraphService {
      * @param {string} period - D7, D30
      */
     async getMailboxActivityTrend(period = 'D30') {
-        try {
-            const response = await this.client
-                .api(`/reports/getEmailActivityCounts(period='${period}')`)
-                .version('beta')
-                .get();
-
-            return response.value || [];
-        } catch (error) {
-            console.warn('Mailbox activity trend fetch failed:', error);
-            return [];
-        }
+        // Use proxy helper
+        const data = await this._fetchReport(`/reports/getEmailActivityCounts(period='${period}')?$format=application/json`);
+        return data || [];
     }
 
     /**
@@ -452,7 +430,7 @@ export class GraphService {
         try {
             const response = await this.client
                 .api('/security/incidents')
-                .top(100)
+                .top(50)
                 .get();
             return response.value || [];
         } catch (error) {
@@ -490,29 +468,14 @@ export class GraphService {
     }
 
     async getOneDriveUsage() {
-        try {
-            const response = await this.client
-                .api('/reports/getOneDriveUsageAccountDetail(period=\'D7\')')
-                .version('beta')
-                .get();
-            return response.value || [];
-        } catch (error) {
-            console.warn('OneDrive usage fetch failed:', error);
-            return [];
-        }
+        // Use proxy helper
+        const data = await this._fetchReport(`/reports/getOneDriveUsageAccountDetail(period='D7')?$format=application/json`);
+        return data || [];
     }
 
     async getActiveUsersCount(period = 'D7') {
-        try {
-            const response = await this.client
-                .api(`/reports/getOffice365ActiveUserDetail(period='${period}')`)
-                .version('beta')
-                .get();
-            return response.value || [];
-        } catch (error) {
-            console.warn('Active users count fetch failed:', error);
-            return [];
-        }
+        const data = await this._fetchReport(`/reports/getOffice365ActiveUserDetail(period='${period}')?$format=application/json`);
+        return data || [];
     }
 
     async getRiskyUsersCount() {
@@ -526,6 +489,24 @@ export class GraphService {
         } catch (error) {
             console.warn('Risky users count fetch failed:', error);
             return 0;
+        }
+    }
+
+    /**
+     * Get all users with basic properties for bulk operations
+     * @param {number} top - Maximum number of users to fetch
+     */
+    async getAllUsers(top = 999) {
+        try {
+            const response = await this.client
+                .api('/users')
+                .select('id,displayName,userPrincipalName,mail,jobTitle,department,accountEnabled,userType')
+                .top(top)
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.warn('All users fetch failed:', error);
+            return [];
         }
     }
 }

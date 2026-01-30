@@ -28,6 +28,10 @@ const IntuneManagedDevices = () => {
                     const client = new GraphService(response.accessToken).client;
                     const data = await IntuneService.getManagedDevices(client, 100);
                     setDevices(data);
+
+                    // Background store for AI context
+                    const SiteDataStore = (await import('../services/siteDataStore')).default;
+                    SiteDataStore.store('intuneDevices', data);
                 } catch (error) {
                     console.error("Device fetch error:", error);
                 } finally {

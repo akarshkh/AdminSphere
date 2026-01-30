@@ -76,13 +76,15 @@ const GovernanceDashboard = () => {
         if (active && payload && payload.length) {
             return (
                 <div style={{
-                    background: 'rgba(15, 23, 42, 0.95)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
-                    padding: '10px 14px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+                    background: 'var(--tooltip-bg)',
+                    border: '1px solid var(--tooltip-border)',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+                    backdropFilter: 'blur(12px)',
+                    minWidth: '140px'
                 }}>
-                    <p style={{ margin: 0, fontWeight: 600, color: '#fff', fontSize: '12px' }}>
+                    <p style={{ margin: 0, fontWeight: 700, color: 'var(--tooltip-text)', fontSize: '12px' }}>
                         {payload[0].name}: {payload[0].value}
                     </p>
                 </div>
@@ -368,7 +370,7 @@ const GovernanceDashboard = () => {
                 </div>
             </motion.div>
 
-            <style jsx>{`
+            <style jsx="true">{`
                 .stat-card {
                     display: flex;
                     align-items: center;

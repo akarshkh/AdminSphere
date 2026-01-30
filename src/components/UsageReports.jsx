@@ -133,13 +133,22 @@ const UsageReports = () => {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="glass-card" style={{ padding: '12px', border: '1px solid var(--glass-border)', background: 'var(--bg-primary)' }}>
-                    <p style={{ fontSize: '12px', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>{label}</p>
+                <div style={{
+                    background: 'var(--tooltip-bg)',
+                    border: '1px solid var(--tooltip-border)',
+                    borderRadius: '12px',
+                    padding: '12px',
+                    boxShadow: 'var(--shadow-lg)',
+                    backdropFilter: 'blur(12px)'
+                }}>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '11px', fontWeight: 700, color: 'var(--tooltip-text)', borderBottom: '1px solid var(--tooltip-border)', paddingBottom: '6px' }}>
+                        {label}
+                    </p>
                     {payload.map((entry, index) => (
-                        <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: entry.color || entry.fill }}></div>
-                            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{entry.name}:</span>
-                            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)' }}>{entry.value.toLocaleString()}</span>
+                        <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: entry.color }}></div>
+                            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', flex: 1 }}>{entry.name}:</span>
+                            <span style={{ fontSize: '11px', fontWeight: 700, color: entry.color || 'var(--tooltip-text)' }}>{entry.value.toLocaleString()}</span>
                         </div>
                     ))}
                 </div>
@@ -212,7 +221,7 @@ const UsageReports = () => {
                                         <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
                                 <XAxis
                                     dataKey="reportDate"
                                     stroke="var(--text-dim)"
@@ -245,7 +254,7 @@ const UsageReports = () => {
                                         <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
                                 <XAxis
                                     dataKey="reportDate"
                                     stroke="var(--text-dim)"
@@ -324,7 +333,7 @@ const UsageReports = () => {
                                         <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
                                 <XAxis
                                     dataKey="reportDate"
                                     stroke="var(--text-dim)"
@@ -401,7 +410,7 @@ const UsageReports = () => {
                                         <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
                                 <XAxis
                                     dataKey="reportDate"
                                     stroke="var(--text-dim)"

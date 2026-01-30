@@ -40,8 +40,8 @@ const OverviewDashboard = () => {
 
         try {
             const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-            const client = new GraphService(response.accessToken).client;
-            const overviewData = await AggregationService.getOverviewData(client, response.accessToken);
+            const graphService = new GraphService(response.accessToken);
+            const overviewData = await AggregationService.getOverviewData(graphService, response.accessToken);
 
             // Map to our persistence schema
             const persistenceData = {
@@ -155,7 +155,7 @@ const OverviewDashboard = () => {
             icon: Lock,
             color: 'var(--accent-success)',
             gradient: 'linear-gradient(135deg, #059669, #047857)',
-            path: null
+            path: '/service/admin/sign-ins'
         },
         {
             label: 'Active Roles',
@@ -163,7 +163,7 @@ const OverviewDashboard = () => {
             icon: Shield,
             color: 'var(--accent-warning)',
             gradient: 'linear-gradient(135deg, #f59e0b, #d97706)',
-            path: null
+            path: '/service/entra/admins'
         }
     ];
 
@@ -177,34 +177,36 @@ const OverviewDashboard = () => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     style={{
-                        background: 'rgba(31, 41, 55, 0.9)', // Dark background for contrast
-                        backdropFilter: 'blur(8px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
+                        background: 'var(--tooltip-bg)',
+                        backdropFilter: 'blur(12px)',
+                        border: '1px solid var(--tooltip-border)',
+                        borderRadius: '12px',
                         padding: '12px',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                        minWidth: '150px'
+                        boxShadow: 'var(--shadow-lg)',
+                        minWidth: '160px'
                     }}
                 >
                     {label && (
                         <p style={{
                             fontWeight: 700,
                             marginBottom: '12px',
-                            color: '#f3f4f6', // Light text
-                            fontSize: '14px',
+                            color: 'var(--tooltip-text)',
+                            fontSize: '13px',
                             letterSpacing: '0.3px',
-                            borderBottom: '1px solid rgba(255,255,255,0.1)',
+                            borderBottom: '1px solid var(--tooltip-border)',
                             paddingBottom: '8px'
                         }}>
                             {label}
                         </p>
                     )}
                     {payload.map((entry, index) => {
-                        // Safe color extraction: prefer stroke, then color, ignore URL fills
-                        let color = entry.stroke || entry.color || '#fff';
-                        if (color && typeof color === 'string' && color.startsWith('url(#')) {
-                            color = 'var(--text-primary)';
-                        }
+                        // Safe color extraction
+                        let baseColor = entry.payload?.fill || entry.color || 'var(--text-primary)';
+
+                        // Prevent invalid concatenation if it's a CSS variable
+                        const isCssVar = typeof baseColor === 'string' && baseColor.startsWith('var(');
+                        const dotColor = isCssVar ? baseColor : baseColor;
+                        const shadowColor = isCssVar ? 'transparent' : `${baseColor}40`;
 
                         return (
                             <div key={index} style={{
@@ -217,22 +219,22 @@ const OverviewDashboard = () => {
                                     width: '10px',
                                     height: '10px',
                                     borderRadius: '50%',
-                                    background: color,
-                                    boxShadow: `0 0 10px ${color}50`,
+                                    background: dotColor,
+                                    boxShadow: shadowColor !== 'transparent' ? `0 0 8px ${shadowColor}` : 'none',
                                     flexShrink: 0
                                 }}></div>
                                 <span style={{
-                                    fontSize: '13px',
-                                    color: '#d1d5db', // Light grey for label
+                                    fontSize: '12px',
+                                    color: 'var(--text-secondary)', // Higher contrast than text-dim
                                     flex: 1,
                                     fontWeight: 500
                                 }}>
                                     {entry.name}:
                                 </span>
                                 <span style={{
-                                    fontSize: '15px',
+                                    fontSize: '14px',
                                     fontWeight: 700,
-                                    color: color // Use the same color as the dot
+                                    color: dotColor // Use the same color as the dot
                                 }}>
                                     {typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value}
                                 </span>
@@ -434,7 +436,7 @@ const OverviewDashboard = () => {
                                     </div>
                                     <ResponsiveContainer width="100%" height={240}>
                                         <PieChart>
-                                            <Pie data={data.charts.userDistribution} cx="50%" cy="50%" outerRadius={80} innerRadius={60} paddingAngle={5} dataKey="value">
+                                            <Pie data={data.charts.userDistribution} cx="50%" cy="50%" outerRadius={80} innerRadius={60} paddingAngle={5} dataKey="value" stroke="var(--glass-bg)" strokeWidth={2}>
                                                 {data.charts.userDistribution.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={entry.name === 'Active' ? 'var(--accent-success)' : 'var(--accent-warning)'} />
                                                 ))}
@@ -472,10 +474,10 @@ const OverviewDashboard = () => {
                                                     <stop offset="100%" stopColor="var(--accent-purple)" />
                                                 </linearGradient>
                                             </defs>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
                                             <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
                                             <YAxis stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--glass-border)', opacity: 0.1 }} />
                                             <Bar dataKey="value" fill="url(#compGrad)" radius={[6, 6, 0, 0]} />
                                         </BarChart>
                                     </ResponsiveContainer>
@@ -507,7 +509,7 @@ const OverviewDashboard = () => {
                                                     <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{license.name}</span>
                                                     <span style={{ fontSize: '10px', fontWeight: 700 }}>{Math.round((license.assigned / (license.assigned + license.available)) * 100)}%</span>
                                                 </div>
-                                                <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                                                <div style={{ width: '100%', height: '4px', background: 'var(--progress-track)', borderRadius: '2px', overflow: 'hidden' }}>
                                                     <div style={{ width: `${(license.assigned / (license.assigned + license.available)) * 100}%`, height: '100%', background: 'var(--accent-cyan)' }} />
                                                 </div>
                                             </div>
@@ -573,9 +575,9 @@ const OverviewDashboard = () => {
                                         </div>
                                         <ResponsiveContainer width="100%" height={260}>
                                             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data.charts.securityRadar}>
-                                                <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                                                <PolarGrid stroke="var(--glass-border)" />
                                                 <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-dim)', fontSize: 10 }} />
-                                                <Radar name="Score" dataKey="value" stroke="var(--accent-blue)" fill="var(--accent-blue)" fillOpacity={0.6} />
+                                                <Radar name="Score" dataKey="value" stroke="var(--accent-blue)" fill="var(--accent-blue)" fillOpacity={0.3} />
                                                 <Tooltip content={<CustomTooltip />} />
                                             </RadarChart>
                                         </ResponsiveContainer>
@@ -606,7 +608,7 @@ const OverviewDashboard = () => {
                                                         <stop offset="95%" stopColor="var(--accent-blue)" stopOpacity={0} />
                                                     </linearGradient>
                                                 </defs>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
                                                 <XAxis dataKey="week" hide />
                                                 <YAxis hide />
                                                 <Tooltip content={<CustomTooltip />} />

@@ -20,6 +20,10 @@ const EntraSubscriptions = () => {
                     const client = new GraphService(response.accessToken).client;
                     const data = await SubscriptionsService.getSubscriptions(client);
                     setSubs(data || []);
+
+                    // Background store for AI context
+                    const SiteDataStore = (await import('../services/siteDataStore')).default;
+                    SiteDataStore.store('entraSubscriptions', data || []);
                 } catch (error) {
                     console.error("Subs fetch error", error);
                 } finally {
