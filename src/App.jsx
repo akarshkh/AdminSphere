@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LandingPage from './components/LandingPage';
 import ServicePage from './components/ServicePage';
 import ExchangeReport from './components/ExchangeReport';
+import BuildCommandsPage from './components/BuildCommandsPage';
 import DomainsPage from './components/DomainsPage';
 import LicensesPage from './components/LicensesPage';
 import GroupsPage from './components/GroupsPage';
@@ -93,6 +94,7 @@ function App() {
                 {/* Admin Center Routes */}
                 <Route path="admin" element={<ServicePage serviceId="admin" />} /> {/* /service/admin */}
                 <Route path="admin/report" element={<ExchangeReport />} />
+                <Route path="admin/build-commands" element={<BuildCommandsPage />} />
                 <Route path="admin/domains" element={<DomainsPage />} />
                 <Route path="admin/licenses" element={<LicensesPage />} />
                 <Route path="admin/groups" element={<GroupsPage />} />

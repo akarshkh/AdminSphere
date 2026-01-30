@@ -15,9 +15,9 @@ const StatsCard = ({ label, value, trend, color, icon: Icon, delay = 0 }) => {
                     <h3 className="stat-value">{value}</h3>
                     {trend && (
                         <span className={`badge ${trend.includes('+') || trend === 'Healthy' || trend === 'Active' || trend === 'Real-time'
-                                ? 'badge-success'
-                                : ''
-                            }`} style={{ background: !(trend.includes('+') || trend === 'Healthy' || trend === 'Active' || trend === 'Real-time') ? 'rgba(255,255,255,0.05)' : '', color: !(trend.includes('+') || trend === 'Healthy' || trend === 'Active' || trend === 'Real-time') ? 'var(--text-muted)' : '' }}>
+                            ? 'badge-success'
+                            : ''
+                            }`} style={{ background: !(trend.includes('+') || trend === 'Healthy' || trend === 'Active' || trend === 'Real-time') ? 'var(--progress-track)' : '', color: !(trend.includes('+') || trend === 'Healthy' || trend === 'Active' || trend === 'Real-time') ? 'var(--text-secondary)' : '' }}>
                             {trend}
                         </span>
                     )}

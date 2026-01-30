@@ -48,6 +48,10 @@ const AlertsPage = () => {
             // Calculate statistics
             const alertStats = AlertsService.getAlertStats(alertsData);
             setStats(alertStats);
+
+            // Background store for AI context
+            const SiteDataStore = (await import('../services/siteDataStore')).default;
+            SiteDataStore.store('alerts', alertsData);
         } catch (error) {
             console.error('Error fetching alerts:', error);
             // Keep empty array if fetch fails

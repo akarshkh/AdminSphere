@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Download, AlertCircle, Loader2, Shield, ArrowLeft, Mail, Search } from 'lucide-react';
+import { RefreshCw, Download, AlertCircle, Loader2, Shield, ArrowLeft, Mail, Search, Terminal } from 'lucide-react';
 import SiteDataStore from '../services/siteDataStore';
 
 const ExchangeReport = () => {
@@ -132,6 +132,10 @@ const ExchangeReport = () => {
                 <div className="flex-gap-4">
                     <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={fetchData} title="Sync & Refresh">
                         <RefreshCw size={16} />
+                    </button>
+                    <button className="btn btn-secondary" onClick={() => navigate('/service/admin/build-commands')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Terminal size={16} />
+                        Build Commands
                     </button>
                     <button className="btn btn-primary" onClick={handleDownloadCSV}>
                         <Download size={16} />

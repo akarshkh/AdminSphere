@@ -16,10 +16,27 @@ const SecureScorePage = () => {
     const fetchData = async (isManual = false) => {
         if (accounts.length > 0) {
             if (isManual) setLoading(true);
+            setError(null);
             try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const graphService = new GraphService(response.accessToken);
+                let response;
+                try {
+                    response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+                } catch (authErr) {
+                    if (authErr.name === "InteractionRequiredAuthError") {
+                        if (isManual) {
+                            response = await instance.acquireTokenPopup(loginRequest);
+                        } else {
+                            setError("InteractionRequired");
+                            setLoading(false);
+                            return;
+                        }
+                    } else {
+                        throw authErr;
+                    }
+                }
 
+                const graphService = new GraphService(response.accessToken);
+                // ... existing data fetching logic ...
                 const [scoreData, profiles] = await Promise.all([
                     graphService.getSecureScore(),
                     graphService.getSecureScoreControlProfiles()
@@ -68,13 +85,9 @@ const SecureScorePage = () => {
                 }
             } catch (err) {
                 console.error('Secure Score fetch error:', err);
-                setError("Secure Score telemetry could not be fetched.");
+                setError(err.name === "InteractionRequiredAuthError" ? "InteractionRequired" : "Secure Score telemetry could not be fetched.");
             } finally {
-                if (isManual) {
-                    setTimeout(() => setLoading(false), 500);
-                } else {
-                    setLoading(false);
-                }
+                setLoading(false);
             }
         }
     };
@@ -120,14 +133,39 @@ const SecureScorePage = () => {
                 </div>
             </header>
 
-            {error ? (
-                <div className="glass-card" style={{ background: 'hsla(0, 84%, 60%, 0.05)', borderColor: 'hsla(0, 84%, 60%, 0.2)' }}>
-                    <div className="flex-center justify-start flex-gap-4" style={{ color: 'var(--accent-error)' }}>
-                        <AlertCircle size={20} />
-                        <span>{error}</span>
+            {error && (
+                <div className="glass-card" style={{
+                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'hsla(0, 84%, 60%, 0.05)',
+                    borderColor: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'hsla(0, 84%, 60%, 0.2)',
+                    marginBottom: '24px',
+                    padding: '16px'
+                }}>
+                    <div className="flex-between">
+                        <div className="flex-center justify-start flex-gap-4" style={{ color: error === 'InteractionRequired' ? 'var(--accent-blue)' : 'var(--accent-error)' }}>
+                            <AlertCircle size={20} />
+                            <span>{error === 'InteractionRequired' ? '🔐 Session expired. Additional authentication required to view Secure Score labels and recommendations.' : error}</span>
+                        </div>
+                        {error === 'InteractionRequired' && (
+                            <button
+                                onClick={() => fetchData(true)}
+                                style={{
+                                    background: 'var(--accent-blue)',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '6px 12px',
+                                    borderRadius: '6px',
+                                    fontSize: '12px',
+                                    fontWeight: 700,
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Reconnect
+                            </button>
+                        )}
                     </div>
                 </div>
-            ) : score ? (
+            )}
+            {score ? (
                 <>
                     {/* Score Overview Cards */}
                     <div className="stat-grid" style={{ marginBottom: '24px' }}>
@@ -141,7 +179,7 @@ const SecureScorePage = () => {
                                 </div>
                                 <Target size={24} color="var(--accent-blue)" style={{ opacity: 0.5 }} />
                             </div>
-                            <div style={{ marginTop: '12px', height: '4px', background: 'hsla(0,0%,100%,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{ marginTop: '12px', height: '4px', background: 'var(--progress-track)', borderRadius: '2px', overflow: 'hidden' }}>
                                 <div style={{ width: `${percentage}%`, height: '100%', background: 'var(--accent-blue)', transition: 'width 0.5s ease' }} />
                             </div>
                         </div>

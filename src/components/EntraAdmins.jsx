@@ -23,6 +23,10 @@ const EntraAdmins = () => {
                     const data = await RolesService.getRoles(client);
                     const activeRoles = data.filter(r => r.members && r.members.length > 0);
                     setRoles(activeRoles);
+
+                    // Background store for AI context
+                    const SiteDataStore = (await import('../services/siteDataStore')).default;
+                    SiteDataStore.store('privilegedRoles', activeRoles);
                 } catch (error) {
                     console.error("Role fetch error", error);
                 } finally {

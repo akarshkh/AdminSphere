@@ -129,7 +129,7 @@ const LicensesPage = () => {
                                             <div className="stat-value" style={{ fontSize: '24px' }}>{sku.prepaidUnits?.enabled || 0}</div>
                                         </div>
                                     </div>
-                                    <div className="mt-4" style={{ height: '4px', background: 'hsla(0,0%,100%,0.05)', borderRadius: '10px', overflow: 'hidden', marginTop: '16px' }}>
+                                    <div className="mt-4" style={{ height: '4px', background: 'var(--progress-track)', borderRadius: '10px', overflow: 'hidden', marginTop: '16px' }}>
                                         <div style={{ height: '100%', width: `${percentage}%`, background: 'var(--accent-blue)', boxShadow: '0 0 10px var(--accent-blue-glow)' }}></div>
                                     </div>
                                     <div className="flex-between mt-2" style={{ marginTop: '8px' }}>

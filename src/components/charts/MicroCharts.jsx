@@ -86,7 +86,7 @@ export const MiniProgressBar = ({ value, max, color, height = 6, showLabel = fal
             <div style={{
                 width: '100%',
                 height: `${height}px`,
-                background: 'rgba(255, 255, 255, 0.08)',
+                background: 'var(--progress-track)',
                 borderRadius: `${height / 2}px`,
                 overflow: 'hidden',
                 position: 'relative',
@@ -190,12 +190,12 @@ export const MiniSegmentedBar = ({ segments, height = 8, showLabels = false }) =
             <div style={{
                 width: '100%',
                 height: `${height}px`,
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: 'var(--progress-track)',
                 borderRadius: `${height / 2}px`,
                 overflow: 'hidden',
                 display: 'flex',
                 boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)',
-                border: '1px solid rgba(255,255,255,0.05)'
+                border: '1px solid var(--glass-border)'
             }}>
                 {segments.map((seg, idx) => {
                     const percentage = total > 0 ? (seg.value / total) * 100 : 0;
@@ -260,6 +260,8 @@ export const MiniSeverityStrip = ({ severity = 'low', count = 0, height = 24 }) 
     };
 
     const config = severityConfig[severity.toLowerCase()] || severityConfig.low;
+    const baseColor = config.color;
+    const isCssVar = typeof baseColor === 'string' && baseColor.startsWith('var(');
 
     return (
         <motion.div
@@ -271,11 +273,13 @@ export const MiniSeverityStrip = ({ severity = 'low', count = 0, height = 24 }) 
                 alignItems: 'center',
                 gap: '6px',
                 padding: '4px 10px',
-                background: `linear-gradient(135deg, ${config.color}18, ${config.color}08)`,
-                border: `1.5px solid ${config.color}50`,
+                background: isCssVar ? baseColor : `linear-gradient(135deg, ${config.color}18, ${config.color}08)`,
+                backgroundOpacity: isCssVar ? 0.1 : 1,
+                border: `1.5px solid ${isCssVar ? baseColor : config.color}`,
+                borderOpacity: 0.3,
                 borderRadius: '8px',
                 height: `${height}px`,
-                boxShadow: `0 2px 8px ${config.color}20, inset 0 1px 0 rgba(255,255,255,0.1)`
+                boxShadow: isCssVar ? 'none' : `0 2px 8px ${config.color}20, inset 0 1px 0 rgba(255,255,255,0.1)`
             }}
         >
             {/* Pulsing dot indicator */}
@@ -303,7 +307,7 @@ export const MiniSeverityStrip = ({ severity = 'low', count = 0, height = 24 }) 
                 fontWeight: 700,
                 color: config.color,
                 letterSpacing: '0.3px',
-                textShadow: `0 1px 2px ${config.color}30`
+                textShadow: isCssVar ? 'none' : `0 1px 2px ${config.color}30`
             }}>
                 {count > 0 || typeof count === 'string' ? count : config.label}
             </span>
@@ -317,6 +321,8 @@ export const MiniSeverityStrip = ({ severity = 'low', count = 0, height = 24 }) 
  * @param {string} color - Color hex or var
  */
 export const MiniStatusGeneric = ({ status, color = 'var(--accent-blue)', height = 22 }) => {
+    const isCssVar = typeof color === 'string' && color.startsWith('var(');
+
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 5 }}
@@ -327,13 +333,15 @@ export const MiniStatusGeneric = ({ status, color = 'var(--accent-blue)', height
                 alignItems: 'center',
                 gap: '6px',
                 padding: '4px 10px',
-                background: `linear-gradient(135deg, ${color}18, ${color}08)`,
-                border: `1.5px solid ${color}50`,
+                background: isCssVar ? color : `linear-gradient(135deg, ${color}18, ${color}08)`,
+                backgroundOpacity: isCssVar ? 0.1 : 1,
+                border: `1.5px solid ${color}`,
+                borderOpacity: isCssVar ? 1 : 0.3,
                 borderRadius: '8px',
                 height: `${height}px`,
                 minWidth: 'fit-content',
                 maxWidth: '100%',
-                boxShadow: `0 2px 8px ${color}20, inset 0 1px 0 rgba(255,255,255,0.1)`
+                boxShadow: isCssVar ? 'none' : `0 2px 8px ${color}20, inset 0 1px 0 rgba(255,255,255,0.1)`
             }}
         >
             {/* Pulsing dot indicator */}

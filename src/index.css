@@ -24,6 +24,12 @@
   --glass-bg-hover: hsla(0, 0%, 100%, 0.06);
   --glass-border: hsla(0, 0%, 100%, 0.08);
   --glass-border-hover: hsla(0, 0%, 100%, 0.15);
+  --progress-track: hsla(0, 0%, 100%, 0.05);
+
+  /* Tooltip/Overlay Tokens */
+  --tooltip-bg: hsla(220, 25%, 12%, 0.95);
+  --tooltip-text: hsl(0, 0%, 100%);
+  --tooltip-border: hsla(0, 0%, 100%, 0.1);
 
   --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --sidebar-width: 180px;
@@ -67,8 +73,14 @@
   --glass-border-hover: #94a3b8;
   /* Slate 400 */
 
+  --tooltip-bg: #ffffff;
+  --tooltip-text: #0f172a;
+  --tooltip-border: #cbd5e1;
+  --progress-track: rgba(0, 0, 0, 0.1);
+
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
   /* Vivid Accents for White BG */
   --accent-blue: #0ea5e9;
@@ -131,6 +143,23 @@
 /* Exception for search input inside header if any */
 [data-theme="light"] .header-top input {
   color: white !important;
+}
+
+/* Recharts Global Overrides */
+.recharts-legend-item-text {
+  color: var(--text-primary) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  transition: color 0.3s ease;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: var(--text-dim) !important;
+  font-size: 10px !important;
+}
+
+.recharts-cartesian-grid-line {
+  stroke: var(--glass-border) !important;
 }
 
 * {

@@ -22,6 +22,10 @@ const EntraGroups = () => {
                     const client = new GraphService(response.accessToken).client;
                     const data = await GroupsService.getAllGroups(client, 100);
                     setGroups(data);
+
+                    // Background store for AI context
+                    const SiteDataStore = (await import('../services/siteDataStore')).default;
+                    SiteDataStore.store('groups', data);
                 } catch (error) {
                     console.error("Group fetch error:", error);
                 } finally {

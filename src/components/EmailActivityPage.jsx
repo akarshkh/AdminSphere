@@ -83,12 +83,9 @@ const EmailActivityPage = () => {
 
     return (
         <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
-            <button
-                onClick={() => navigate('/service/admin')}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', marginBottom: '24px', fontWeight: 600 }}
-            >
-                <ArrowLeft size={16} />
-                Back to Admin Dashboard
+            <button onClick={() => navigate('/service/admin')} className="btn-back">
+                <ArrowLeft size={14} style={{ marginRight: '8px' }} />
+                Back to Dashboard
             </button>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
@@ -168,7 +165,7 @@ const EmailActivityPage = () => {
                                     <td style={{ textAlign: 'center' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
                                             <span style={{ fontSize: '12px' }}>{u.readCount}</span>
-                                            <div style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                                            <div style={{ width: '60px', height: '4px', background: 'var(--progress-track)', borderRadius: '2px', overflow: 'hidden' }}>
                                                 <div style={{ height: '100%', background: 'var(--accent-success)', width: `${Math.min(100, (u.readCount / (u.receiveCount || 1)) * 100)}%` }} />
                                             </div>
                                         </div>

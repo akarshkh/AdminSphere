@@ -56,10 +56,27 @@ const SecurityDashboard = () => {
                 throw new Error('No account found');
             }
 
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account
-            });
+            let tokenResponse;
+            try {
+                tokenResponse = await instance.acquireTokenSilent({
+                    ...loginRequest,
+                    account
+                });
+            } catch (authErr) {
+                if (authErr.name === "InteractionRequiredAuthError") {
+                    if (isManual) {
+                        // Trigger popup if user clicked refresh
+                        tokenResponse = await instance.acquireTokenPopup(loginRequest);
+                    } else {
+                        console.warn("Silent auth failed for Security Dashboard");
+                        setError("InteractionRequired");
+                        setLoading(false);
+                        return;
+                    }
+                } else {
+                    throw authErr;
+                }
+            }
 
             const client = Client.init({
                 authProvider: (done) => done(null, tokenResponse.accessToken)
@@ -70,7 +87,7 @@ const SecurityDashboard = () => {
             DataPersistenceService.save(CACHE_KEY, data);
         } catch (err) {
             console.error('Failed to fetch security dashboard data:', err);
-            setError('Failed to load security data. Please try again.');
+            setError(err.name === "InteractionRequiredAuthError" ? "InteractionRequired" : "Failed to load security data. Please try again.");
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -86,14 +103,15 @@ const SecurityDashboard = () => {
         if (active && payload && payload.length) {
             return (
                 <div style={{
-                    background: 'rgba(15, 23, 42, 0.95)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
-                    padding: '10px 14px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-                    backdropFilter: 'blur(10px)'
+                    background: 'var(--tooltip-bg)',
+                    border: '1px solid var(--tooltip-border)',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+                    backdropFilter: 'blur(12px)',
+                    minWidth: '140px'
                 }}>
-                    <p style={{ margin: 0, fontWeight: 600, color: '#fff', fontSize: '12px' }}>
+                    <p style={{ margin: 0, fontWeight: 700, color: 'var(--tooltip-text)', fontSize: '12px' }}>
                         {payload[0].name}: {payload[0].value}
                     </p>
                 </div>
@@ -158,14 +176,34 @@ const SecurityDashboard = () => {
 
             {error && (
                 <div className="error-banner" style={{
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
                     borderRadius: '12px',
                     padding: '16px',
                     marginBottom: '24px',
-                    color: '#ef4444'
+                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
                 }}>
-                    {error}
+                    <span>{error === 'InteractionRequired' ? '🔐 Security session expired. Additional authentication required to load telemetry.' : error}</span>
+                    {error === 'InteractionRequired' && (
+                        <button
+                            onClick={() => fetchDashboardData(true)}
+                            style={{
+                                background: 'var(--accent-blue)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Reconnect
+                        </button>
+                    )}
                 </div>
             )}
 
@@ -478,7 +516,7 @@ const SecurityDashboard = () => {
                 </div>
             </motion.div>
 
-            <style jsx>{`
+            <style jsx="true">{`
                 .stat-card {
                     display: flex;
                     align-items: center;
