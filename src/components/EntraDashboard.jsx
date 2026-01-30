@@ -460,10 +460,11 @@ const EntraDashboard = () => {
 
                     {/* Line Chart: Sign-in Trends */}
                     {signInTrends.length > 0 && (
-                        <div className="glass-card" style={{ padding: '14px' }}>
+                        <div className="glass-card" style={{ padding: '14px', cursor: 'pointer' }} onClick={() => navigate('/service/entra/sign-in-logs')}>
                             <h3 style={{ fontSize: '12px', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <Activity size={14} color="var(--accent-blue)" />
                                 Sign-in Activity (14 Days)
+                                <ArrowRight size={12} style={{ marginLeft: 'auto', color: 'var(--text-dim)' }} />
                             </h3>
                             <ResponsiveContainer width="100%" height={250}>
                                 <AreaChart data={signInTrends} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>

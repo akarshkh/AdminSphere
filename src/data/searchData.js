@@ -169,6 +169,15 @@ export const searchableItems = [
         icon: LayoutGrid,
         tags: ['apps', 'applications', 'registrations', 'enterprise', 'oauth', 'api']
     },
+    {
+        id: 'entra-sign-in-logs',
+        title: 'Sign-In Logs',
+        description: 'User authentication activity and sign-in events',
+        path: '/service/entra/sign-in-logs',
+        category: 'Entra ID',
+        icon: Activity,
+        tags: ['sign-in', 'signin', 'login', 'authentication', 'logs', 'audit', 'activity', 'security', 'failed', 'success']
+    },
 
     // Intune
     {

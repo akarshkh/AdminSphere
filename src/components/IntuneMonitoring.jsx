@@ -88,8 +88,10 @@ const IntuneMonitoring = () => {
             setStats(cached.raw);
             setLoading(false);
 
-            // Refetch if cache is expired OR missing new schema fields (osDistribution)
-            const isSchemaOutdated = cached.raw.totalDevices > 0 && !cached.raw.osDistribution;
+            // Refetch if cache is expired OR missing new schema fields (osDistribution, securityBaselines, adminRoles)
+            const isSchemaOutdated = (cached.raw.totalDevices > 0 && !cached.raw.osDistribution) ||
+                (cached.raw.securityBaselines === 0) || // Force refetch if baselines is still placeholder
+                (cached.raw.adminRoles === 0); // Force refetch if adminRoles is still placeholder
 
             if (DataPersistenceService.isExpired('Intune', 30) || isSchemaOutdated) {
                 fetchDashboardData(false);
@@ -282,14 +284,10 @@ const IntuneMonitoring = () => {
                         // Removed fake sparkData generator
 
                         if (tile.label.includes('Policies') || tile.label.includes('Baselines')) {
-                            // Progress bar for "Health/Security" type tiles
+                            // Status indicator for Policy/Security type tiles
                             microFigure = (
-                                <div style={{ marginTop: '14px' }}>
-                                    <div className="flex-between" style={{ marginBottom: '6px' }}>
-                                        <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>Adherence</span>
-                                        <span style={{ fontSize: '10px', color: tile.color, fontWeight: 700 }}>92%</span>
-                                    </div>
-                                    <MiniProgressBar value={92} color={tile.color} height={4} />
+                                <div style={{ marginTop: '12px' }}>
+                                    <MiniStatusGeneric status={tile.trend || 'Active'} color={tile.color} />
                                 </div>
                             );
                         } else if (tile.label.includes('Applications') || tile.label.includes('Configuration') || tile.label.includes('Audit')) {
