@@ -25,19 +25,17 @@ const PDFViewerPage = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                         <button
                             onClick={() => navigate('/service/documentation')}
-                            className="glass-card"
+                            className="glass-btn"
                             style={{
-                                padding: '8px 12px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '8px',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: 'var(--text-secondary)'
+                                padding: '8px 16px',
+                                height: '40px'
                             }}
                         >
                             <ArrowLeft size={18} />
-                            Back
+                            Back to Docs
                         </button>
                         <h1 style={{ margin: 0, fontSize: '1.5rem' }}>Document Viewer</h1>
                     </div>

@@ -12,8 +12,10 @@ const TeamsListPage = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [teams, setTeams] = useState([]);
+    const [myTeams, setMyTeams] = useState([]);
     const [filteredTeams, setFilteredTeams] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterMode, setFilterMode] = useState('all'); // 'all' or 'my'
 
     const fetchTeams = async (isManual = false) => {
         if (isManual) setRefreshing(true);
@@ -32,9 +34,23 @@ const TeamsListPage = () => {
                 authProvider: (done) => done(null, tokenResponse.accessToken)
             });
 
-            const data = await TeamsService.getTeams(client, 200);
-            setTeams(data);
-            setFilteredTeams(data);
+            const [allTeams, myJoinedTeams] = await Promise.all([
+                TeamsService.getTeams(client, 999),
+                TeamsService.getMyJoinedTeams(client)
+            ]);
+
+            setTeams(allTeams);
+            setMyTeams(myJoinedTeams);
+
+            // Check URL params for initial filter
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('filter') === 'my') {
+                setFilterMode('my');
+                setFilteredTeams(myJoinedTeams);
+            } else {
+                setFilterMode('all');
+                setFilteredTeams(allTeams);
+            }
         } catch (err) {
             console.error('Failed to fetch teams:', err);
         } finally {
@@ -48,19 +64,21 @@ const TeamsListPage = () => {
     }, [instance, accounts]);
 
     useEffect(() => {
+        let source = filterMode === 'my' ? myTeams : teams;
+
         if (!searchTerm) {
-            setFilteredTeams(teams);
+            setFilteredTeams(source);
             return;
         }
 
-        const filtered = teams.filter(team =>
+        const filtered = source.filter(team =>
             team.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             team.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             team.mail?.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
         setFilteredTeams(filtered);
-    }, [teams, searchTerm]);
+    }, [teams, myTeams, searchTerm, filterMode]);
 
     const getVisibilityStyle = (visibility) => {
         switch (visibility) {
@@ -84,8 +102,9 @@ const TeamsListPage = () => {
             {/* Header */}
             <div className="page-header">
                 <div className="header-left">
-                    <button className="back-button" onClick={() => navigate('/service/teams')}>
+                    <button className="glass-btn btn-back-nav" onClick={() => navigate('/service/teams')}>
                         <ArrowLeft size={18} />
+                        Back to Dashboard
                     </button>
                     <div>
                         <h1 className="page-title">
@@ -98,7 +117,8 @@ const TeamsListPage = () => {
                 <button
                     onClick={() => fetchTeams(true)}
                     disabled={refreshing}
-                    className="refresh-button"
+                    className="glass-btn"
+                    style={{ padding: '8px 16px', display: 'flex', gap: '8px', alignItems: 'center' }}
                 >
                     <RefreshCw size={16} className={refreshing ? 'spin' : ''} />
                     {refreshing ? 'Refreshing...' : 'Refresh'}
@@ -115,6 +135,21 @@ const TeamsListPage = () => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
+                </div>
+
+                <div className="filter-group glass-card" style={{ padding: '4px', display: 'flex', gap: '4px' }}>
+                    <button
+                        className={`filter-tab ${filterMode === 'all' ? 'active' : ''}`}
+                        onClick={() => setFilterMode('all')}
+                    >
+                        All Teams
+                    </button>
+                    <button
+                        className={`filter-tab ${filterMode === 'my' ? 'active' : ''}`}
+                        onClick={() => setFilterMode('my')}
+                    >
+                        My Teams
+                    </button>
                 </div>
             </div>
 
@@ -166,10 +201,9 @@ const TeamsListPage = () => {
                 .page-container { padding: 0; }
                 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
                 .header-left { display: flex; align-items: center; gap: 16px; }
-                .back-button { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 10px; cursor: pointer; color: var(--text-primary); }
+                .btn-back-nav { display: flex; align-items: center; gap: 8px; padding: 8px 16px; height: 40px; }
                 .page-title { display: flex; align-items: center; gap: 12px; font-size: 20px; margin: 0; }
                 .page-subtitle { font-size: 13px; color: var(--text-secondary); margin: 4px 0 0 0; }
-                .refresh-button { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--text-primary); cursor: pointer; }
                 .filters-bar { display: flex; gap: 16px; padding: 16px; margin-bottom: 20px; border-radius: 12px; }
                 .search-box { display: flex; align-items: center; gap: 8px; flex: 1; background: var(--bg-tertiary); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); }
                 .search-box input { flex: 1; background: none; border: none; color: var(--text-primary); font-size: 13px; outline: none; }
@@ -187,6 +221,9 @@ const TeamsListPage = () => {
                 .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 16px; }
                 .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--glass-border); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite; }
                 .spin { animation: spin 1s linear infinite; }
+                .filter-group { display: flex; align-items: center; background: var(--bg-tertiary); border-radius: 8px; }
+                .filter-tab { background: none; border: none; padding: 6px 12px; border-radius: 6px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+                .filter-tab.active { background: var(--accent-blue); color: white; shadow: 0 2px 8px rgba(0,0,0,0.2); }
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
             `}</style>
         </div>

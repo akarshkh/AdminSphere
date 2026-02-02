@@ -160,8 +160,9 @@ const TeamsDashboard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1 * 0.1 }}
                     whileHover={{ y: -4, scale: 1.02 }}
-                    className="glass-card stat-card"
-                    style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.02))', cursor: 'default' }}
+                    className="glass-card stat-card clickable"
+                    style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.02))', cursor: 'pointer' }}
+                    onClick={() => navigate('/service/teams/list')}
                 >
                     <div className="stat-icon" style={{ background: 'rgba(59, 130, 246, 0.2)' }}>
                         <Hash size={20} style={{ color: '#3b82f6' }} />
@@ -175,6 +176,7 @@ const TeamsDashboard = () => {
                             joined teams
                         </span>
                     </div>
+                    <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
                 </motion.div>
 
                 <motion.div
@@ -284,36 +286,6 @@ const TeamsDashboard = () => {
                 </motion.div>
 
                 {/* My Teams */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="chart-card glass-card"
-                >
-                    <div className="chart-header">
-                        <h3><Hash size={16} /> My Joined Teams</h3>
-                    </div>
-                    <div className="my-teams-list">
-                        {dashboardData.myTeams.teams?.length > 0 ? (
-                            dashboardData.myTeams.teams.map((team, idx) => (
-                                <div key={team.id || idx} className="team-item">
-                                    <div className="team-icon">
-                                        {team.visibility === 'Public' ? <Globe size={14} /> : <Lock size={14} />}
-                                    </div>
-                                    <div className="team-info">
-                                        <span className="team-name">{team.displayName || 'Unnamed Team'}</span>
-                                        <span className="team-desc">{team.description?.substring(0, 50) || 'No description'}</span>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="no-data-state" style={{ padding: '40px' }}>
-                                <Hash size={40} style={{ opacity: 0.3 }} />
-                                <p>No joined teams</p>
-                            </div>
-                        )}
-                    </div>
-                </motion.div>
             </div>
 
             {/* Top Teams */}

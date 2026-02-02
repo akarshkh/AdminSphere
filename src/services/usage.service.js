@@ -45,7 +45,7 @@ export class UsageService {
             const data = await response.json();
             return data.value || [];
         } catch (error) {
-            console.warn(`Failed to fetch report ${endpoint}:`, error.message);
+            console.error(`Failed to fetch report ${endpoint}:`, error.message);
             return null;
         }
     }
@@ -228,7 +228,7 @@ export class UsageService {
         }
     }
 
-    // Data Generation methods removed.
+
 }
 
 export default UsageService;

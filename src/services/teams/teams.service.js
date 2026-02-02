@@ -5,7 +5,7 @@ export const TeamsService = {
      * Get all teams in the organization
      * @param {Client} client - Microsoft Graph client
      */
-    async getTeams(client, top = 100) {
+    async getTeams(client, top = 999) {
         try {
             const response = await client.api('/groups')
                 .filter("resourceProvisioningOptions/Any(x:x eq 'Team')")
@@ -14,7 +14,7 @@ export const TeamsService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Teams fetch failed:', error);
+            console.error('Teams fetch failed:', error);
             return [];
         }
     },
@@ -31,7 +31,7 @@ export const TeamsService = {
                 .get();
             return response;
         } catch (error) {
-            console.warn('Team details fetch failed:', error);
+            console.error('Team details fetch failed:', error);
             return null;
         }
     },
@@ -48,7 +48,7 @@ export const TeamsService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Team channels fetch failed:', error);
+            console.error('Team channels fetch failed:', error);
             return [];
         }
     },
@@ -66,7 +66,7 @@ export const TeamsService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Team members fetch failed:', error);
+            console.error('Team members fetch failed:', error);
             return [];
         }
     },
@@ -81,7 +81,7 @@ export const TeamsService = {
                 .get();
             return response;
         } catch (error) {
-            console.warn('Teams user activity report failed:', error);
+            console.error('Teams user activity report failed:', error);
             return null;
         }
     },
@@ -96,7 +96,7 @@ export const TeamsService = {
                 .get();
             return response;
         } catch (error) {
-            console.warn('Teams device usage report failed:', error);
+            console.error('Teams device usage report failed:', error);
             return null;
         }
     },
@@ -112,7 +112,7 @@ export const TeamsService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Chats fetch failed:', error);
+            console.error('Chats fetch failed:', error);
             return [];
         }
     },
@@ -128,7 +128,7 @@ export const TeamsService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Joined teams fetch failed:', error);
+            console.error('Joined teams fetch failed:', error);
             return [];
         }
     },
@@ -140,7 +140,7 @@ export const TeamsService = {
     async getDashboardSummary(client) {
         try {
             const [allTeams, myTeams, myChats] = await Promise.all([
-                this.getTeams(client, 100),
+                this.getTeams(client, 999),
                 this.getMyJoinedTeams(client),
                 this.getMyChats(client, 50)
             ]);

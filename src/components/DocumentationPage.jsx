@@ -129,8 +129,17 @@ const DocumentationPage = () => {
                             disabled={uploading}
                             className="upload-button"
                         >
-                            <Upload size={18} />
-                            {uploading ? 'Uploading...' : 'Upload PDF'}
+                            {uploading ? (
+                                <>
+                                    <div className="spinner-sm" style={{ border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', width: '14px', height: '14px', borderRadius: '50%' }}></div>
+                                    <span>Uploading...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Upload size={18} />
+                                    <span>Upload PDF</span>
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>
@@ -173,9 +182,21 @@ const DocumentationPage = () => {
                         <p className="doc-content">Loading documentation...</p>
                     </div>
                 ) : pdfFiles.length === 0 ? (
-                    <div className="glass-card" style={{ textAlign: 'center', padding: '60px 20px' }}>
-                        <FileText size={48} style={{ margin: '0 auto 20px', opacity: 0.3 }} />
-                        <p className="doc-content">No documentation files found</p>
+                    <div className="glass-card flex-center-col" style={{ padding: '80px 20px', minHeight: '400px' }}>
+                        <div style={{
+                            width: '80px', height: '80px', borderRadius: '50%',
+                            background: 'var(--glass-border)', display: 'flex',
+                            alignItems: 'center', justifyContent: 'center', marginBottom: '24px'
+                        }}>
+                            <FileText size={40} style={{ color: 'var(--text-tertiary)' }} />
+                        </div>
+                        <h3 style={{ fontSize: '18px', marginBottom: '8px' }}>No Documentation Found</h3>
+                        <p className="doc-content" style={{ maxWidth: '400px', margin: '0 auto 24px' }}>
+                            Upload PDF manuals, guides, or reports to make them accessible here.
+                        </p>
+                        <button onClick={handleUploadClick} className="secondary-button" style={{ fontSize: '14px', padding: '8px 20px' }}>
+                            Upload First Document
+                        </button>
                     </div>
                 ) : (
                     <div className="doc-grid">
@@ -196,8 +217,13 @@ const DocumentationPage = () => {
                                 </div>
                                 <h3 className="doc-title">{pdf.name}</h3>
                                 <p className="doc-content">Click to view PDF document</p>
-                                <div style={{ marginTop: '16px' }}>
+                                <div style={{ marginTop: 'auto', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span className="tag-label">PDF</span>
+                                    {pdf.uploadedAt && (
+                                        <span style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+                                            {new Date(pdf.uploadedAt).toLocaleDateString()}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         ))}

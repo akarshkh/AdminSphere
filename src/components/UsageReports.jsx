@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMsal } from "@azure/msal-react";
 import { useSearchParams } from 'react-router-dom';
 import { UsageService } from '../services/usage.service';
-import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -48,7 +48,7 @@ const UsageReports = () => {
             } catch (silentError) {
                 // If consent is required, use redirect (more reliable than popup)
                 if (silentError.name === "InteractionRequiredAuthError") {
-                    console.log("Consent required - redirecting to login...");
+
                     // Store current location to return after auth
                     sessionStorage.setItem('preAuthPath', window.location.pathname);
                     await instance.acquireTokenRedirect({
@@ -86,7 +86,6 @@ const UsageReports = () => {
 
             // Proactive Background Fetch: If we just fetched D7, also fetch D180 for the AI cache
             if (period === 'D7') {
-                console.log("Proactively fetching D180 data for AI context...");
                 Promise.all([
                     usageService.getTeamsUsage('D180'),
                     usageService.getExchangeUsage('D180'),
@@ -101,8 +100,7 @@ const UsageReports = () => {
                         onedrive: fO180,
                         period: 'D180'
                     }, { source: 'UsageReports_Background', period: 'D180' });
-                    console.log("D180 data successfully cached for AI.");
-                }).catch(err => console.warn("Background D180 fetch failed", err));
+                }).catch(() => { });
             }
         } catch (error) {
             console.error("Error fetching usage data:", error);
