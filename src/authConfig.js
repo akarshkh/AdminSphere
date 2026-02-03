@@ -10,6 +10,8 @@ export const msalConfig = {
     }
 };
 
+// Scopes for the Graph API calls we need
+
 export const loginRequest = {
     scopes: [
         "User.Read",
