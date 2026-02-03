@@ -46,7 +46,7 @@ export const loginRequest = {
         // Admin
         "Organization.Read.All",
         // Purview
-        "InformationProtectionPolicy.Read",
+        "InformationProtectionPolicy.Read.All",
         "RecordsManagement.Read.All",
         "eDiscovery.Read.All"
     ]
@@ -110,7 +110,7 @@ export const adminScopes = {
 
 export const purviewScopes = {
     scopes: [
-        "InformationProtectionPolicy.Read",
+        "InformationProtectionPolicy.Read.All",
         "RecordsManagement.Read.All",
         "eDiscovery.Read.All"
     ]
