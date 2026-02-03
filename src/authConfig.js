@@ -10,15 +10,12 @@ export const msalConfig = {
     }
 };
 
-// Scopes for the Graph API calls we need
 export const loginRequest = {
     scopes: [
         "User.Read",
         "Directory.Read.All",
         "Reports.Read.All",
-        "MailboxSettings.Read",
         "ServiceHealth.Read.All",
-        "AuditLog.Read.All",
         "Sites.Read.All"
     ]
 };
@@ -45,7 +42,10 @@ export const governanceScopes = {
 export const sharepointScopes = {
     scopes: [
         "Sites.Read.All",
-        "Files.Read.All"
+        "Files.Read.All",
+        "Reports.Read.All",
+        "ServiceHealth.Read.All",
+        "ServiceAnnouncement.Read.All"
     ]
 };
 
@@ -67,7 +67,8 @@ export const teamsScopes = {
         "Team.ReadBasic.All",
         "TeamSettings.Read.All",
         "Group.Read.All",
-        "Chat.Read"
+        "Chat.Read",
+        "Reports.Read.All"
     ]
 };
 
