@@ -24,6 +24,88 @@ import { MiniSparkline, MiniProgressBar, MiniSegmentedBar } from './charts/Micro
 import { useDataCaching } from '../hooks/useDataCaching';
 import SafeResponsiveContainer from './SafeResponsiveContainer';
 
+const CustomTreemapContent = (props) => {
+    const { x, y, width, height, name, fill } = props;
+    const showText = width > 70 && height > 35;
+
+    // Improved truncation: allow more text if space permits
+    const maxChars = Math.floor(width / 8);
+    const displayText = name.length > maxChars ? name.substring(0, maxChars - 3) + '...' : name;
+
+    return (
+        <g>
+            {/* Base Block with Shadow and Hover Effect placeholder */}
+            <rect
+                x={x + 2}
+                y={y + 2}
+                width={width - 4}
+                height={height - 4}
+                rx={12}
+                ry={12}
+                style={{
+                    fill: fill,
+                    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
+                    cursor: 'pointer'
+                }}
+            />
+
+            {/* Glassmorphism Overlay */}
+            <rect
+                x={x + 2}
+                y={y + 2}
+                width={width - 4}
+                height={height - 4}
+                rx={12}
+                ry={12}
+                fill="url(#treemapGlassGradient)"
+                style={{ pointerEvents: 'none' }}
+            />
+
+            {showText && (
+                <g>
+                    {/* Background Pill for Legibility */}
+                    <rect
+                        x={x + width / 2 - (displayText.length * 3.5 + 10)}
+                        y={y + height / 2 - 10}
+                        width={displayText.length * 7 + 20}
+                        height={20}
+                        rx={10}
+                        fill="rgba(15, 23, 42, 0.6)" // Hardcoded dark slate for consistent contrast
+                        style={{ backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    />
+                    <text
+                        x={x + width / 2}
+                        y={y + height / 2 + 4}
+                        textAnchor="middle"
+                        fill="#fff"
+                        style={{
+                            fontSize: width < 120 ? '9px' : '11px',
+                            fontWeight: 800,
+                            pointerEvents: 'none',
+                            letterSpacing: '0.4px',
+                            textTransform: 'uppercase'
+                        }}
+                    >
+                        {displayText}
+                    </text>
+                </g>
+            )}
+        </g>
+    );
+};
+
+const DashboardGlobalDefs = () => (
+    <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <defs>
+            <linearGradient id="treemapGlassGradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="white" stopOpacity={0.25} />
+                <stop offset="50%" stopColor="white" stopOpacity={0} />
+                <stop offset="100%" stopColor="black" stopOpacity={0.15} />
+            </linearGradient>
+        </defs>
+    </svg>
+);
+
 const OverviewDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
@@ -146,6 +228,11 @@ const OverviewDashboard = () => {
         }
     ];
 
+    const serviceHealthStats = data?.charts?.serviceHealth || [];
+    const operationalCount = serviceHealthStats.find(s => s.name === 'Operational')?.value || 0;
+    const totalServices = serviceHealthStats.reduce((acc, s) => acc + s.value, 0) || 1;
+    const healthPercentage = Math.round((operationalCount / totalServices) * 100);
+
 
     // Enhanced Premium Tooltip with Glassmorphism
     // Enhanced Premium Tooltip with Glassmorphism
@@ -228,6 +315,7 @@ const OverviewDashboard = () => {
 
     return (
         <div className="animate-in">
+            <DashboardGlobalDefs />
             <header className="flex-between spacing-v-8">
                 <div>
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Overview Dashboard</h1>
@@ -280,6 +368,49 @@ const OverviewDashboard = () => {
                         <BirdsEyeView embedded={true} />
                     </motion.div>
                 )}
+            </div>
+
+            {/* SERVICE HEALTH STATUS RING (New Production Detail) */}
+            <div style={{ marginBottom: '24px' }}>
+                <div className="glass-card" style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '32px', overflow: 'hidden' }}>
+                    <div style={{ flex: 1 }}>
+                        <div className="flex-center justify-start flex-gap-4" style={{ marginBottom: '8px' }}>
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: healthPercentage > 90 ? 'var(--accent-success)' : 'var(--accent-warning)', boxShadow: `0 0 10px ${healthPercentage > 90 ? 'var(--accent-success)' : 'var(--accent-warning)'}` }} />
+                            <h2 style={{ fontSize: '16px', fontWeight: 700 }}>Service Infrastructure</h2>
+                        </div>
+                        <p style={{ color: 'var(--text-dim)', fontSize: '13px', maxWidth: '400px' }}>
+                            Overall health across Microsoft 365 core services. {healthPercentage === 100 ? 'All systems are performing optimally.' : `Currently monitoring minor service degradations.`}
+                        </p>
+                    </div>
+
+                    <div style={{ width: '120px', height: '120px', position: 'relative', flexShrink: 0 }}>
+                        <SafeResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={[
+                                        { name: 'Healthy', value: healthPercentage },
+                                        { name: 'Gap', value: 100 - healthPercentage }
+                                    ]}
+                                    innerRadius={40}
+                                    outerRadius={50}
+                                    startAngle={90}
+                                    endAngle={450}
+                                    dataKey="value"
+                                    stroke="none"
+                                >
+                                    <Cell fill="var(--accent-success)" />
+                                    <Cell fill="rgba(255,255,255,0.05)" />
+                                    <Label
+                                        value={`${healthPercentage}%`}
+                                        position="center"
+                                        fill="currentColor"
+                                        style={{ fontSize: '16px', fontWeight: 800 }}
+                                    />
+                                </Pie>
+                            </PieChart>
+                        </SafeResponsiveContainer>
+                    </div>
+                </div>
             </div>
 
             {/* OVERVIEW DROPDOWN */}
@@ -583,38 +714,31 @@ const OverviewDashboard = () => {
                                     </div>
                                 )}
 
-                                {/* Growth Trends */}
-                                {/* Growth Trends - Only show if data is available */}
-                                {data?.charts.userGrowthTrend?.length > 1 && (
+                                {/* License Treemap (New Production Detail) */}
+                                {data?.charts.licenseTreemap?.length > 0 && (
                                     <div
                                         className="glass-card"
-                                        style={{ padding: '14px', cursor: 'pointer', transition: 'transform 0.2s' }}
-                                        onClick={() => navigate('/service/usage')}
-                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                        style={{ padding: '14px', gridColumn: 'span 2' }}
                                     >
                                         <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                                            <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', borderRadius: '6px' }}>
-                                                <TrendingUp size={14} color="white" />
+                                            <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-blue))', borderRadius: '6px' }}>
+                                                <LayoutGrid size={14} color="white" />
                                             </div>
-                                            <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Active User Trends</h3>
+                                            <h3 style={{ fontSize: '12px', fontWeight: 700 }}>License Distribution (By SKU Size)</h3>
                                         </div>
-                                        <div style={{ height: '260px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
+                                        <div style={{ height: '300px', width: '100%', marginTop: '16px' }}>
                                             {chartsVisible ? (
-                                                <SafeResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
-                                                    <AreaChart data={data.charts.userGrowthTrend}>
-                                                        <defs>
-                                                            <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
-                                                                <stop offset="5%" stopColor="var(--accent-blue)" stopOpacity={0.3} />
-                                                                <stop offset="95%" stopColor="var(--accent-blue)" stopOpacity={0} />
-                                                            </linearGradient>
-                                                        </defs>
-                                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
-                                                        <XAxis dataKey="week" hide />
-                                                        <YAxis hide />
+                                                <SafeResponsiveContainer width="100%" height="100%">
+                                                    <Treemap
+                                                        data={data.charts.licenseTreemap}
+                                                        dataKey="size"
+                                                        aspectRatio={4 / 3}
+                                                        stroke="var(--glass-bg)"
+                                                        fill="var(--accent-blue)"
+                                                        content={<CustomTreemapContent />}
+                                                    >
                                                         <Tooltip content={<CustomTooltip />} />
-                                                        <Area type="monotone" dataKey="active" stroke="var(--accent-blue)" fillOpacity={1} fill="url(#growthGrad)" strokeWidth={3} />
-                                                    </AreaChart>
+                                                    </Treemap>
                                                 </SafeResponsiveContainer>
                                             ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>}
                                         </div>
@@ -623,10 +747,9 @@ const OverviewDashboard = () => {
                             </div>
                         </div>
                     </motion.div>
-                )
-                }
-            </div >
-        </div >
+                )}
+            </div>
+        </div>
     );
 };
 

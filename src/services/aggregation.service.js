@@ -12,7 +12,9 @@ export class AggregationService {
                 secureScore,
                 signIns,
                 mfaStats,
-                roles
+                roles,
+                userTrends,
+                signInTrends
             ] = await Promise.all([
                 graphService.client.api('/users').select('id,displayName,userPrincipalName,accountEnabled').top(999).get().catch(() => ({ value: [] })),
                 graphService.client.api('/deviceManagement/managedDevices').select('id,deviceName,complianceState,operatingSystem').top(999).get().catch(() => ({ value: [] })),
@@ -21,7 +23,9 @@ export class AggregationService {
                 graphService.client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] })),
                 graphService.client.api('/auditLogs/signIns').filter('createdDateTime ge ' + new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()).top(100).get().catch(() => ({ value: [] })),
                 graphService.client.api('/reports/getCredentialUserRegistrationCount').version('beta').get().catch(() => ({ value: [] })),
-                graphService.client.api('/directoryRoles').select('id,displayName').get().catch(() => ({ value: [] }))
+                graphService.client.api('/directoryRoles').select('id,displayName').get().catch(() => ({ value: [] })),
+                graphService.getActiveUserTrends('D7').catch(() => []),
+                graphService.getSignInTrends(7).catch(() => [])
             ]);
 
             // Process Quick Stats
@@ -101,11 +105,17 @@ export class AggregationService {
 
             // Failed Sign-ins Chart Data
             const failedSignIns = signIns.value?.filter(s => s.status?.errorCode !== 0) || [];
-            const failedSignInsData = [{
-                name: 'Last 24h',
-                failed: failedSignIns.length,
-                successful: (signIns.value?.length || 0) - failedSignIns.length
-            }];
+            const failedSignInsData = signInTrends && signInTrends.length > 0
+                ? signInTrends.map(t => ({
+                    name: t.date,
+                    failed: t.failure,
+                    successful: t.success
+                }))
+                : [{
+                    name: 'Last 24h',
+                    failed: failedSignIns.length,
+                    successful: (signIns.value?.length || 0) - failedSignIns.length
+                }];
 
             // Email Activity Trend - Using GraphService proxy method
             let emailTrendData = [];
@@ -151,15 +161,21 @@ export class AggregationService {
                 { subject: 'Sign-in Success', value: (signIns.value && signIns.value.length > 0) ? Math.round(((signIns.value.length - failedSignIns.length) / signIns.value.length) * 100) : 100, fullMark: 100 }
             ];
 
-            // License Distribution Treemap Data
+            // License Distribution Treemap Data - Vibrant, high-contrast palette
             const treemapData = licenses.value?.map((sku, idx) => ({
                 name: sku.skuPartNumber?.replace(/_/g, ' ').substring(0, 25) || `License ${idx + 1}`,
                 size: (sku.consumedUnits || 0) > 0 ? sku.consumedUnits : 0,
-                fill: ['#3b82f6', '#a855f7', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'][idx % 8]
+                fill: ['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#d946ef', '#14b8a6'][idx % 8]
             })).filter(d => d.size > 0).slice(0, 8) || [];
 
-            // Growth and Trend placeholders (for future expansion)
-            const weeklyUserGrowth = [];
+            // Growth and Trend - Using real userTrends if available
+            const weeklyUserGrowth = userTrends && userTrends.length > 0
+                ? userTrends.map(t => ({
+                    week: t.reportRefreshDate,
+                    active: parseInt(t.office365Active) || 0
+                }))
+                : [];
+
             const enrollmentFunnel = [];
             const licenseTrendData = [];
 
