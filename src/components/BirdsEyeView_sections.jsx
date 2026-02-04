@@ -247,7 +247,7 @@ export const generateSections = (inputStats, styles) => {
                 {
                     label: "Storage Consumption",
                     value: `${(stats.usage.storage / 1073741824).toFixed(2)} GB`,
-                    path: '/service/usage',
+                    path: '/service/usage?tab=onedrive',
                     custom: (
                         <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
                             OneDrive Total
@@ -257,7 +257,7 @@ export const generateSections = (inputStats, styles) => {
                 {
                     label: "OneDrive Accounts",
                     value: stats.collaboration.onedrive,
-                    path: '/service/usage',
+                    path: '/service/usage?tab=onedrive',
                     custom: (
                         <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
                             Provisioned OneDrive

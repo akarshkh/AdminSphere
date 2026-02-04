@@ -1,5 +1,5 @@
 {
-  "lastUpdated": 1770199925832,
+  "lastUpdated": 1770200451244,
   "sections": {
     "overview": {
       "data": {
@@ -95,8 +95,8 @@
           "signIns": [
             {
               "name": "Last 24h",
-              "failed": 15,
-              "successful": 37
+              "failed": 14,
+              "successful": 30
             }
           ],
           "emailTrend": [
@@ -159,7 +159,7 @@
             },
             {
               "subject": "Sign-in Success",
-              "value": 71,
+              "value": 68,
               "fullMark": 100
             }
           ],
@@ -190,7 +190,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1770198273551,
+      "timestamp": 1770200226759,
       "source": "OverviewDashboard"
     },
     "birdsEye": {
@@ -281,7 +281,7 @@
           "teams": 5,
           "privateTeams": 1,
           "publicTeams": 4,
-          "sharepoint": 0,
+          "sharepoint": 11,
           "onedrive": 24,
           "mailboxes": 12,
           "activeEmail": 10
@@ -298,7 +298,7 @@
           "storage": 57612224557
         }
       },
-      "timestamp": 1770199377021,
+      "timestamp": 1770200439481,
       "source": "BirdsEyeView"
     },
     "emailActivity": {
@@ -1477,7 +1477,7 @@
           "counts": []
         }
       },
-      "timestamp": 1770199924768,
+      "timestamp": 1770200440595,
       "source": "UsageReports",
       "period": "D7"
     },
@@ -5512,7 +5512,7 @@
         },
         "period": "D180"
       },
-      "timestamp": 1770199925817,
+      "timestamp": 1770200441660,
       "source": "UsageReports_Background",
       "period": "D180"
     },
@@ -12578,7 +12578,7 @@
           ]
         }
       ],
-      "timestamp": 1770188151255
+      "timestamp": 1770200451199
     },
     "security": {
       "data": {
