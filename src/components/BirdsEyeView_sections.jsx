@@ -172,7 +172,7 @@ export const generateSections = (inputStats, styles) => {
                 },
                 {
                     label: "SharePoint Sites",
-                    value: stats.collaboration.sharepoint || "N/A",
+                    value: stats.collaboration.sharepoint,
                     path: '/service/sharepoint',
                     custom: (
                         <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
