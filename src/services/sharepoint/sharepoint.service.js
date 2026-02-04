@@ -140,6 +140,11 @@ export const SharePointService = {
      * @param {Client} client - Microsoft Graph client
      */
     async getSharePointUsage(client) {
+        // Skip on localhost to avoid CORS errors from 302 redirects to reports endpoints
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return null;
+        }
+
         try {
             // Reports return CSV, ensure we get it as text
             const response = await client.api('/reports/getSharePointSiteUsageDetail(period=\'D7\')')
@@ -176,6 +181,11 @@ export const SharePointService = {
      * @param {Client} client - Microsoft Graph client
      */
     async getOneDriveUsage(client) {
+        // Skip on localhost to avoid CORS errors from 302 redirects to reports endpoints
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return null;
+        }
+
         try {
             const response = await client.api('/reports/getOneDriveUsageAccountDetail(period=\'D7\')')
                 .responseType('text')
@@ -393,6 +403,11 @@ export const SharePointService = {
      * @param {string} period - Report period (D7, D30, D90, D180)
      */
     async getOneDriveActivity(client, period = 'D30') {
+        // Skip on localhost to avoid CORS errors from 302 redirects to reports endpoints
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return null;
+        }
+
         try {
             const response = await client.api(`/reports/getOneDriveUsageAccountCounts(period='${period}')`)
                 .responseType('text')
@@ -422,6 +437,11 @@ export const SharePointService = {
      * @param {string} period - Report period (D7, D30, D90, D180)
      */
     async getOneDriveFileActivity(client, period = 'D30') {
+        // Skip on localhost to avoid CORS errors from 302 redirects to reports endpoints
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return null;
+        }
+
         try {
             const response = await client.api(`/reports/getOneDriveActivityFileCounts(period='${period}')`)
                 .responseType('text')

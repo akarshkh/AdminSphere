@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import { CustomTooltip } from './charts/CustomTooltip';
 import Loader3D from './Loader3D';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import SafeResponsiveContainer from './SafeResponsiveContainer';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
 import SiteDataStore from '../services/siteDataStore';
 import { useDataCaching } from '../hooks/useDataCaching';
@@ -497,7 +498,7 @@ const PurviewDashboard = () => {
                             <Tags size={14} color="var(--accent-warning)" />
                             Classification Coverage
                         </h3>
-                        <ResponsiveContainer width="100%" height={250}>
+                        <SafeResponsiveContainer width="100%" height={250}>
                             <BarChart data={(Array.isArray(stats.classificationDistribution) && stats.classificationDistribution.length > 0) ? stats.classificationDistribution : [
                                 { name: 'Public', count: 0 },
                                 { name: 'Internal', count: 0 },
@@ -516,7 +517,7 @@ const PurviewDashboard = () => {
                                 <Tooltip content={<CustomTooltip />} />
                                 <Bar dataKey="count" fill="url(#barGrad1)" radius={[8, 8, 0, 0]} />
                             </BarChart>
-                        </ResponsiveContainer>
+                        </SafeResponsiveContainer>
                     </div>
 
                     {/* Scan Status */}
@@ -525,7 +526,7 @@ const PurviewDashboard = () => {
                             <Scan size={14} color="var(--accent-cyan)" />
                             Scan Status Overview
                         </h3>
-                        <ResponsiveContainer width="100%" height={250}>
+                        <SafeResponsiveContainer width="100%" height={250}>
                             <BarChart data={[
                                 {
                                     name: 'Sources',
@@ -543,7 +544,7 @@ const PurviewDashboard = () => {
                                 <Bar dataKey="pending" stackId="scan" fill="#f59e0b" name="Pending" />
                                 <Bar dataKey="failed" stackId="scan" fill="#ef4444" name="Failed" />
                             </BarChart>
-                        </ResponsiveContainer>
+                        </SafeResponsiveContainer>
                     </div>
                 </div>
             )}

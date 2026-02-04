@@ -12,8 +12,9 @@ import {
     Users, MessageSquare, Video, RefreshCw, ChevronRight, Hash, Lock, Globe, Archive
 } from 'lucide-react';
 import {
-    ResponsiveContainer, PieChart, Pie, Cell, Tooltip
+    PieChart, Pie, Cell, Tooltip
 } from 'recharts';
+import SafeResponsiveContainer from './SafeResponsiveContainer';
 import { useDataCaching } from '../hooks/useDataCaching';
 
 const TeamsDashboard = () => {
@@ -314,7 +315,7 @@ const TeamsDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {visibilityData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
+                            <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                                 <PieChart>
                                     <Pie
                                         data={visibilityData}
@@ -331,7 +332,7 @@ const TeamsDashboard = () => {
                                     </Pie>
                                     <Tooltip content={<CustomTooltip />} />
                                 </PieChart>
-                            </ResponsiveContainer>
+                            </SafeResponsiveContainer>
                         ) : (
                             <div className="no-data-state">
                                 <Users size={40} style={{ opacity: 0.3 }} />
@@ -403,10 +404,10 @@ const TeamsDashboard = () => {
                         )}
                     </div>
                 </motion.div>
-            </div>
+            </div >
 
             {/* Top Teams */}
-            <motion.div
+            < motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
@@ -450,7 +451,7 @@ const TeamsDashboard = () => {
                         </div>
                     )}
                 </div>
-            </motion.div>
+            </motion.div >
 
             <style>{`
                 .stat-card {
@@ -529,7 +530,7 @@ const TeamsDashboard = () => {
                 .count-val { display: block; font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1; }
                 .count-lbl { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; }
             `}</style>
-        </div>
+        </div >
     );
 };
 
