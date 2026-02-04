@@ -6311,7 +6311,7 @@
           "teams": 5,
           "privateTeams": 1,
           "publicTeams": 4,
-          "sharepoint": 10,
+          "sharepoint": 11,
           "onedrive": 24,
           "mailboxes": 12,
           "activeEmail": 10
@@ -6320,7 +6320,7 @@
           "labels": 0,
           "retentionPolicies": 0,
           "dlpPolicies": 0,
-          "dlpAlerts": 0
+          "dlpAlerts": 4
         },
         "usage": {
           "activeUsers7d": 11,
@@ -6328,7 +6328,7 @@
           "storage": 57612224557
         }
       },
-      "timestamp": 1770205027202,
+      "timestamp": 1770207984283,
       "source": "BirdsEyeView"
     },
     "alerts": {
@@ -6402,11 +6402,11 @@
           ],
           "deviceByPlatform": [
             {
-              "name": "Windows",
+              "name": "macOS",
               "value": 1
             },
             {
-              "name": "macOS",
+              "name": "Windows",
               "value": 1
             }
           ],
@@ -6439,9 +6439,39 @@
           ],
           "signIns": [
             {
-              "name": "Last 24h",
+              "name": "28/1/2026",
+              "failed": 0,
+              "successful": 2
+            },
+            {
+              "name": "29/1/2026",
+              "failed": 14,
+              "successful": 32
+            },
+            {
+              "name": "30/1/2026",
               "failed": 15,
-              "successful": 29
+              "successful": 46
+            },
+            {
+              "name": "31/1/2026",
+              "failed": 1,
+              "successful": 18
+            },
+            {
+              "name": "2/2/2026",
+              "failed": 13,
+              "successful": 52
+            },
+            {
+              "name": "3/2/2026",
+              "failed": 49,
+              "successful": 59
+            },
+            {
+              "name": "4/2/2026",
+              "failed": 11,
+              "successful": 24
             }
           ],
           "emailTrend": [
@@ -6517,7 +6547,7 @@
             {
               "name": "CCIBOTS PRIVPREV VIRAL",
               "size": 2,
-              "fill": "#a855f7"
+              "fill": "#8b5cf6"
             },
             {
               "name": "DEVELOPERPACK E5",
@@ -6530,12 +6560,41 @@
               "fill": "#f59e0b"
             }
           ],
-          "userGrowthTrend": [],
+          "userGrowthTrend": [
+            {
+              "week": "2026-02-03",
+              "active": 0
+            },
+            {
+              "week": "2026-02-03",
+              "active": 0
+            },
+            {
+              "week": "2026-02-03",
+              "active": 0
+            },
+            {
+              "week": "2026-02-03",
+              "active": 0
+            },
+            {
+              "week": "2026-02-03",
+              "active": 0
+            },
+            {
+              "week": "2026-02-03",
+              "active": 0
+            },
+            {
+              "week": "2026-02-03",
+              "active": 0
+            }
+          ],
           "enrollmentFunnel": [],
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1770204021696,
+      "timestamp": 1770207966015,
       "source": "OverviewDashboard"
     },
     "usageReports": {
@@ -11492,7 +11551,47 @@
       "timestamp": 1770204039275,
       "source": "UsageReports_Background",
       "period": "D180"
+    },
+    "entra_id": {
+      "data": {
+        "identities": {
+          "total": 12,
+          "trend": "Directory"
+        },
+        "groups": {
+          "count": 58,
+          "trend": "Teams"
+        },
+        "apps": {
+          "registered": 31,
+          "trend": "Registrations"
+        },
+        "enterpriseApps": {
+          "count": 41,
+          "trend": "Principals"
+        },
+        "admins": {
+          "global_count": 6,
+          "trend": "Privileged"
+        },
+        "subscriptions": {
+          "active": 5,
+          "trend": "Verified"
+        },
+        "devices": {
+          "managed": 18,
+          "trend": "Managed"
+        },
+        "compliance": {
+          "score_percentage": "65%",
+          "score_points": 183.88,
+          "max_points": 283,
+          "status": "Identity Guard"
+        }
+      },
+      "timestamp": 1770207783372,
+      "source": "EntraDashboard"
     }
   },
-  "lastUpdated": 1770205051091
+  "lastUpdated": 1770207984318
 }

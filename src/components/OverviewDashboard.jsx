@@ -26,15 +26,21 @@ import SafeResponsiveContainer from './SafeResponsiveContainer';
 
 const CustomTreemapContent = (props) => {
     const { x, y, width, height, name, fill } = props;
-    const showText = width > 70 && height > 35;
+    const showText = width > 60 && height > 35;
 
-    // Improved truncation: allow more text if space permits
-    const maxChars = Math.floor(width / 8);
-    const displayText = name.length > maxChars ? name.substring(0, maxChars - 3) + '...' : name;
+    // Improved truncation logic: adaptive to block width
+    const maxChars = Math.max(1, Math.floor(width / 7.5));
+    const isTruncated = name.length > maxChars;
+    const displayText = isTruncated ? (name.substring(0, Math.max(0, maxChars - 2)) + '..') : name;
+
+    // Dynamic label styling
+    const pillPadding = 10;
+    const estimatedTextWidth = displayText.length * 7;
+    const pillWidth = Math.min(width - 12, estimatedTextWidth + pillPadding * 2);
 
     return (
         <g>
-            {/* Base Block with Shadow and Hover Effect placeholder */}
+            {/* Base Block with Smooth Rounded Corners and Depth */}
             <rect
                 x={x + 2}
                 y={y + 2}
@@ -44,12 +50,13 @@ const CustomTreemapContent = (props) => {
                 ry={12}
                 style={{
                     fill: fill,
-                    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
-                    cursor: 'pointer'
+                    filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))',
+                    cursor: 'pointer',
+                    transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
             />
 
-            {/* Glassmorphism Overlay */}
+            {/* Premium Glassmorphism Overlay (Inner Glow & Subtle Shine) */}
             <rect
                 x={x + 2}
                 y={y + 2}
@@ -63,27 +70,31 @@ const CustomTreemapContent = (props) => {
 
             {showText && (
                 <g>
-                    {/* Background Pill for Legibility */}
+                    {/* Adaptive Background Pill for High Legibility */}
                     <rect
-                        x={x + width / 2 - (displayText.length * 3.5 + 10)}
+                        x={x + (width - pillWidth) / 2}
                         y={y + height / 2 - 10}
-                        width={displayText.length * 7 + 20}
+                        width={pillWidth}
                         height={20}
                         rx={10}
-                        fill="rgba(15, 23, 42, 0.6)" // Hardcoded dark slate for consistent contrast
-                        style={{ backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}
+                        fill="rgba(15, 23, 42, 0.75)" // Deep slate for premium contrast
+                        style={{
+                            backdropFilter: 'blur(10px)',
+                            pointerEvents: 'none'
+                        }}
                     />
                     <text
                         x={x + width / 2}
-                        y={y + height / 2 + 4}
+                        y={y + height / 2 + 3.5}
                         textAnchor="middle"
                         fill="#fff"
                         style={{
-                            fontSize: width < 120 ? '9px' : '11px',
-                            fontWeight: 800,
+                            fontSize: width < 100 ? '8px' : '10.5px',
+                            fontWeight: 900,
                             pointerEvents: 'none',
-                            letterSpacing: '0.4px',
-                            textTransform: 'uppercase'
+                            letterSpacing: '0.6px',
+                            textTransform: 'uppercase',
+                            fontFamily: 'Inter, system-ui, sans-serif'
                         }}
                     >
                         {displayText}
@@ -98,9 +109,9 @@ const DashboardGlobalDefs = () => (
     <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
             <linearGradient id="treemapGlassGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="white" stopOpacity={0.25} />
-                <stop offset="50%" stopColor="white" stopOpacity={0} />
-                <stop offset="100%" stopColor="black" stopOpacity={0.15} />
+                <stop offset="0%" stopColor="white" stopOpacity={0.15} />
+                <stop offset="45%" stopColor="white" stopOpacity={0} />
+                <stop offset="100%" stopColor="black" stopOpacity={0.1} />
             </linearGradient>
         </defs>
     </svg>
