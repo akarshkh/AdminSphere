@@ -26,27 +26,33 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         });
         const graphService = new GraphService(response.accessToken);
 
-        const [exchangeResult, licensingResult, domainsCount, groupsCount, deletedUsersCount, score, health, signIns] = await Promise.all([
+        const [exchangeResult, licensingResult, domainsCount, groups, deletedUsersCount, score, health, signIns] = await Promise.all([
             graphService.getExchangeMailboxReport().catch(() => ({ reports: [] })),
             graphService.getLicensingData().catch(() => ({ skus: [], users: [] })),
             graphService.getDomains().then(d => d.length),
-            graphService.getGroups().then(g => g.length),
+            graphService.getGroups(),
             graphService.getDeletedUsers().then(u => u?.length || 0),
             graphService.getSecureScore(),
             graphService.getServiceHealth(),
-            graphService.getFailedSignIns()
+            graphService.getRecentSignIns(24)
         ]);
+
+        console.log(`[ServicePage] API Response - Sign-ins:`, signIns?.length || 0);
+        if (signIns && signIns.length > 0) {
+            console.log(`[ServicePage] Sample Sign-in:`, signIns[0]);
+        }
 
         const persistenceData = {
             mailboxes: { total: exchangeResult.reports?.length || 0, status: "Live" },
             licenses: { used: licensingResult.skus?.reduce((acc, curr) => acc + (curr.consumedUnits || 0), 0) || 0, status: "Active" },
-            groups: { count: groupsCount, action: "Manage" },
+            groups: { count: groups.length, action: "Manage" },
             domains: { count: domainsCount, action: "Manage" },
             users: { deleted_count: deletedUsersCount, action: "Restore" },
             security: {
                 secure_score_percentage: score ? `${Math.round((score.currentScore / score.maxScore) * 100)}%` : "0%",
                 secure_score_points: score?.currentScore || 0,
-                failed_logins_24h: signIns?.length || 0,
+                total_signins_24h: signIns?.length || 0,
+                failed_signins_24h: signIns?.filter(s => s.status?.errorCode !== 0).length || 0,
                 action: "Review"
             },
             service_health: { issues_count: health?.filter(s => s.status !== 'ServiceOperational').length || 0, status: "View Status" }
@@ -54,16 +60,18 @@ const ServicePage = ({ serviceId: propServiceId }) => {
 
         DataPersistenceService.save('AdminCenter_Legacy', persistenceData);
 
-        return {
+        const result = {
             exchangeData: exchangeResult.reports || [],
             licensingSummary: licensingResult.skus || [],
             domainsCount,
-            groupsCount,
+            groupsCount: groups.length,
+            groups: groups,
             deletedUsersCount,
             secureScore: score,
             serviceHealth: health,
-            failedSignIns: signIns
+            signIns: signIns
         };
+        return result;
     };
 
     const {
@@ -72,7 +80,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         refreshing,
         error: fetchError,
         refetch
-    } = useDataCaching('AdminCenter_v2', fetchFn, {
+    } = useDataCaching('AdminCenter_v5', fetchFn, {
         maxAge: 30,
         enabled: accounts.length > 0 && isAdmin,
         storeSection: 'admincenter',
@@ -83,10 +91,11 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const licensingSummary = dashboardData?.licensingSummary || [];
     const domainsCount = dashboardData?.domainsCount || 0;
     const groupsCount = dashboardData?.groupsCount || 0;
+    const groups = dashboardData?.groups || [];
     const deletedUsersCount = dashboardData?.deletedUsersCount || 0;
     const secureScore = dashboardData?.secureScore || null;
     const serviceHealth = dashboardData?.serviceHealth || [];
-    const failedSignIns = dashboardData?.failedSignIns || [];
+    const signIns = dashboardData?.signIns || [];
 
     const [interactionError, setInteractionError] = useState(false);
 
@@ -109,7 +118,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         { label: 'Domains', value: domainsCount, icon: Globe, color: 'var(--accent-success)', path: '/service/admin/domains', trend: 'Manage' },
         { label: 'Deleted Users', value: deletedUsersCount, icon: Trash2, color: 'var(--accent-error)', path: '/service/admin/deleted-users', trend: 'Restore' },
         { label: 'Secure Score', value: secureScore ? `${Math.round((secureScore.currentScore / secureScore.maxScore) * 100)}%` : '--', icon: Shield, color: 'var(--accent-blue)', path: '/service/admin/secure-score', trend: `${secureScore?.currentScore || 0} Pts` },
-        { label: 'Failed Logins (24h)', value: failedSignIns.length, icon: AlertTriangle, color: 'var(--accent-error)', path: '/service/entra/sign-in-logs', trend: 'Review' }
+        { label: 'Sign-in Events (24h)', value: signIns.length, icon: Activity, color: 'var(--accent-success)', path: '/service/entra/sign-in-logs', trend: 'Live' }
     ];
 
     return (
@@ -219,14 +228,70 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                                 </div>
                             );
                         }
+                    } else if (i === 2) {
+                        // Groups - Type breakdown
+                        const m365Groups = groups.filter(g => g.groupTypes?.includes('Unified')).length;
+                        const securityGroups = groups.filter(g => g.securityEnabled && !g.groupTypes?.includes('Unified')).length;
+                        const distributionGroups = groups.filter(g => g.mailEnabled && !g.securityEnabled && !g.groupTypes?.includes('Unified')).length;
+                        const otherGroups = groups.length - (m365Groups + securityGroups + distributionGroups);
+
+                        if (groups.length > 0) {
+                            const segments = [
+                                { label: 'M365', value: m365Groups, color: 'var(--accent-pink)' },
+                                { label: 'Security', value: securityGroups, color: 'var(--accent-purple)' },
+                                { label: 'Dist', value: distributionGroups, color: 'var(--accent-success)' }
+                            ].filter(s => s.value > 0);
+
+                            if (otherGroups > 0) {
+                                segments.push({ label: 'Other', value: otherGroups, color: 'var(--text-dim)' });
+                            }
+
+                            microFigure = (
+                                <div style={{ marginTop: '12px' }}>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>Group Breakdown</div>
+                                    <MiniSegmentedBar segments={segments} height={8} />
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '6px' }}>
+                                        {segments.map((seg, idx) => (
+                                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: seg.color }}></div>
+                                                <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>
+                                                    {seg.label}: {seg.value.toLocaleString()}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        }
                     } else if (i === 6) {
-                        // Removed fake trend data generation for Failed Logins
-                        microFigure = (
-                            <div style={{ marginTop: '12px' }}>
-                                <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>Last 24h</div>
-                                <div style={{ fontSize: '16px', fontWeight: 600 }}>{failedSignIns.length}</div>
-                            </div>
-                        );
+                        // Sign-in Events - Success vs Failure breakdown
+                        const failedCount = signIns.filter(s => s.status?.errorCode !== 0).length;
+                        const totalCount = signIns.length;
+                        const successCount = totalCount - failedCount;
+
+                        if (totalCount > 0) {
+                            const segments = [
+                                { label: 'Success', value: successCount, color: '#10b981' }, // Green
+                                { label: 'Failure', value: failedCount, color: '#ef4444' }   // Red
+                            ].filter(s => s.value > 0);
+
+                            microFigure = (
+                                <div style={{ marginTop: '12px' }}>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>Auth Trends</div>
+                                    <MiniSegmentedBar segments={segments} height={8} />
+                                    <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                                        {segments.map((seg, idx) => (
+                                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: seg.color }}></div>
+                                                <span style={{ fontSize: '9px', color: 'var(--text-dim)' }}>
+                                                    {seg.label}: {seg.value.toLocaleString()} ({Math.round((seg.value / totalCount) * 100)}%)
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        }
                     }
 
                     // Generic Fallback -> Upgrade to Rich Visuals if not already set

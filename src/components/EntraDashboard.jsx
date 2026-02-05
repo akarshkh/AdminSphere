@@ -6,7 +6,7 @@ import { GraphService } from '../services/graphService';
 import { UsersService, GroupsService, DevicesService, SubscriptionsService, RolesService } from '../services/entra';
 import { DataPersistenceService } from '../services/dataPersistence';
 import { motion } from 'framer-motion';
-import { Users, Shield, Smartphone, CreditCard, LayoutGrid, ArrowRight, ShieldCheck, Activity, RefreshCw, Monitor, Box, Globe, AlertTriangle } from 'lucide-react';
+import { Users, Shield, Smartphone, CreditCard, LayoutGrid, ArrowRight, ArrowLeft, ShieldCheck, Activity, RefreshCw, Monitor, Box, Globe, AlertTriangle } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import SiteDataStore from '../services/siteDataStore';
@@ -47,7 +47,7 @@ const EntraDashboard = () => {
             users: { total: userCounts.total, growth: 'Directory' },
             groups: { total: groupCounts.total, growth: 'Teams' },
             devices: { total: deviceCounts.total, managed: deviceCounts.managed, growth: 'By Intune' },
-            subs: { total: subCounts.active, growth: 'Verified' },
+            subs: { total: subCounts.active, usagePercentage: subCounts.usagePercentage, growth: 'Verified' },
             admins: { total: adminCounts.globalAdmins, growth: 'Privileged' },
             apps: { total: appsCount, growth: 'Registrations' },
             enterpriseApps: { total: spCount, growth: 'Principals' }
@@ -101,7 +101,7 @@ const EntraDashboard = () => {
         users: { total: 0, growth: 'Directory' },
         groups: { total: 0, growth: 'Teams' },
         devices: { total: 0, growth: 'Managed' },
-        subs: { total: 0, growth: 'Verified' },
+        subs: { total: 0, usagePercentage: 0, growth: 'Verified' },
         admins: { total: 0, growth: 'Privileged' },
         apps: { total: 0, growth: 'Registrations' },
         enterpriseApps: { total: 0, growth: 'Service Principals' }
@@ -153,6 +153,11 @@ const EntraDashboard = () => {
 
     return (
         <div className="animate-in">
+            <button onClick={() => navigate('/service/birdseye')} className="btn-back">
+                <ArrowLeft size={14} style={{ marginRight: '8px' }} />
+                Back to Birds Eye View
+            </button>
+
             <header className="flex-between spacing-v-8">
                 <div>
                     <a
@@ -284,16 +289,16 @@ const EntraDashboard = () => {
                                         <div style={{ marginTop: '14px' }}>
                                             <div className="flex-between" style={{ marginBottom: '6px' }}>
                                                 <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>Usage</span>
-                                                <span style={{ fontSize: '10px', color: tile.color, fontWeight: 700 }}>64%</span>
+                                                <span style={{ fontSize: '10px', color: tile.color, fontWeight: 700 }}>{stats.subs.usagePercentage}%</span>
                                             </div>
-                                            <MiniProgressBar value={64} color={tile.color} height={4} />
+                                            <MiniProgressBar value={stats.subs.usagePercentage} color={tile.color} height={4} />
                                         </div>
                                     );
                                 } else {
                                     // Default to sparkline for Counts (Users, Groups, etc.)
                                     microFigure = (
                                         <div style={{ marginTop: '12px' }}>
-                                            <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>30-Day Trend</div>
+                                            <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>{tile.trend || 'Trend Analysis'}</div>
                                             <MiniSparkline data={sparkData} color={tile.color} height={30} />
                                         </div>
                                     );

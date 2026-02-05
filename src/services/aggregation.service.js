@@ -21,7 +21,7 @@ export class AggregationService {
                 graphService.client.api('/subscribedSkus').get().catch(() => ({ value: [] })),
                 graphService.client.api('/admin/serviceAnnouncement/healthOverviews').get().catch(() => ({ value: [] })),
                 graphService.client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] })),
-                graphService.client.api('/auditLogs/signIns').filter('createdDateTime ge ' + new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()).top(100).get().catch(() => ({ value: [] })),
+                graphService.client.api('/auditLogs/signIns').filter(`createdDateTime ge ${new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()}`).top(100).get().catch(() => ({ value: [] })),
                 graphService.client.api('/reports/getCredentialUserRegistrationCount').version('beta').get().catch(() => ({ value: [] })),
                 graphService.client.api('/directoryRoles').select('id,displayName').get().catch(() => ({ value: [] })),
                 graphService.getActiveUserTrends('D7').catch(() => []),

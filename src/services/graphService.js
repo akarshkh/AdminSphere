@@ -129,7 +129,12 @@ export class GraphService {
     }
 
     async getGroups() {
-        return this.client.api("/groups").get().then(r => r.value || []).catch(() => []);
+        return this.client.api("/groups")
+            .select("id,displayName,groupTypes,mailEnabled,securityEnabled")
+            .top(999)
+            .get()
+            .then(r => r.value || [])
+            .catch(() => []);
     }
 
     async getApplications() {
@@ -196,7 +201,31 @@ export class GraphService {
     }
 
     async getFailedSignIns() {
-        return this.client.api("/auditLogs/signIns").filter("status/errorCode ne 0").top(5).orderby("createdDateTime desc").get().then(r => r.value || []).catch(() => []);
+        const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        return this.client.api("/auditLogs/signIns")
+            .filter(`status/errorCode ne 0 and createdDateTime ge ${last24h}`)
+            .top(999)
+            .orderby("createdDateTime desc")
+            .get()
+            .then(r => r.value || [])
+            .catch((err) => {
+                console.error("[GraphService] Failed to fetch failed sign-ins:", err);
+                return [];
+            });
+    }
+
+    async getRecentSignIns(hours = 24) {
+        const startTime = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+        return this.client.api("/auditLogs/signIns")
+            .filter(`createdDateTime ge ${startTime}`)
+            .top(999)
+            .orderby("createdDateTime desc")
+            .get()
+            .then(r => r.value || [])
+            .catch((err) => {
+                console.error("[GraphService] Failed to fetch recent sign-ins:", err);
+                return [];
+            });
     }
 
     async getDeletedUsers() {

@@ -66,9 +66,10 @@ export const MiniProgressBar = ({ value, max, color, height = 6, showLabel = fal
                 '#10b981'
     );
 
+    const isCssVar = typeof barColor === 'string' && barColor.startsWith('var(');
     // Create gradient colors
     const gradientStart = barColor;
-    const gradientEnd = barColor + 'cc'; // Add transparency
+    const gradientEnd = isCssVar ? barColor : (barColor + 'cc');
 
     return (
         <div style={{ width: '100%', position: 'relative' }}>
@@ -100,8 +101,8 @@ export const MiniProgressBar = ({ value, max, color, height = 6, showLabel = fal
                     transition={{ duration: 1.2, ease: "easeOut" }}
                     style={{
                         height: '100%',
-                        background: `linear-gradient(90deg, ${gradientStart}, ${gradientEnd})`,
-                        boxShadow: `0 0 12px ${barColor}60, inset 0 1px 0 rgba(255,255,255,0.3)`,
+                        background: isCssVar ? barColor : `linear-gradient(90deg, ${gradientStart}, ${gradientEnd})`,
+                        boxShadow: isCssVar ? `0 0 12px ${barColor}` : `0 0 12px ${barColor}60, inset 0 1px 0 rgba(255,255,255,0.3)`,
                         borderRadius: `${height / 2}px`,
                         position: 'relative'
                     }}
@@ -219,7 +220,9 @@ export const MiniSegmentedBar = ({ segments, height = 8, showLabels = false }) =
                             onMouseLeave={() => setHoveredIndex(null)}
                             style={{
                                 height: '100%',
-                                background: `linear-gradient(180deg, ${seg.color}, ${seg.color}dd)`,
+                                background: typeof seg.color === 'string' && seg.color.startsWith('var(')
+                                    ? seg.color
+                                    : `linear-gradient(180deg, ${seg.color}, ${seg.color}dd)`,
                                 borderRight: idx < segments.length - 1 ? '1px solid rgba(0,0,0,0.3)' : 'none',
                                 cursor: 'pointer',
                                 position: 'relative',

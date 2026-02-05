@@ -19,6 +19,7 @@
   --accent-success: hsl(150, 84%, 40%);
   --accent-error: hsl(0, 84%, 60%);
   --accent-warning: hsl(38, 92%, 50%);
+  --accent-pink: hsl(330, 81%, 60%);
 
   --glass-bg: hsla(0, 0%, 100%, 0.03);
   --glass-bg-hover: hsla(0, 0%, 100%, 0.06);
@@ -92,6 +93,7 @@
   --accent-blue: #0ea5e9;
   --accent-indigo: #6366f1;
   --accent-cyan: #06b6d4;
+  --accent-pink: #db2777;
 
   /* Force Header to stay Dark (User Preference) */
   --header-bg: hsla(220, 25%, 2%, 0.8);
@@ -481,6 +483,8 @@ h6 {
 }
 
 .btn-back {
+  display: flex;
+  align-items: center;
   background: transparent;
   color: var(--text-secondary);
   padding: 8px 16px;
@@ -848,21 +852,22 @@ select.input option {
    ======================================== */
 
 .recommendations-table-wrapper {
-  background: hsl(220, 25%, 8%);
-  border: 1px solid hsl(220, 20%, 15%);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
   overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
 .recommendations-header {
   padding: 20px 24px;
-  border-bottom: 1px solid hsl(220, 20%, 15%);
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
-  background: hsl(220, 25%, 10%);
+  background: var(--glass-bg-hover);
 }
 
 .recommendations-header h3 {
@@ -894,7 +899,7 @@ select.input option {
 }
 
 .recommendations-table thead {
-  background: hsl(220, 25%, 12%);
+  background: var(--bg-light);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -918,12 +923,12 @@ select.input option {
 
 .recommendations-table tbody tr {
   transition: all 0.2s ease;
-  border-bottom: 1px solid hsl(220, 20%, 12%);
-  background: hsl(220, 25%, 6%);
+  border-bottom: 1px solid var(--glass-border);
+  background: transparent;
 }
 
 .recommendations-table tbody tr:hover {
-  background: hsl(220, 30%, 14%);
+  background: var(--glass-bg-hover);
 }
 
 .recommendations-table tbody tr.clickable {
@@ -931,7 +936,7 @@ select.input option {
 }
 
 .recommendations-table tbody tr.clickable:hover {
-  background: hsl(217, 35%, 18%);
+  background: var(--accent-blue-glow);
 }
 
 .recommendations-table td {
