@@ -30,6 +30,9 @@
   --tooltip-bg: hsla(220, 25%, 12%, 0.95);
   --tooltip-text: hsl(0, 0%, 100%);
   --tooltip-border: hsla(0, 0%, 100%, 0.1);
+  --treemap-pill-bg: hsla(220, 25%, 5%, 0.45);
+  --treemap-pill-text: #ffffff;
+  --treemap-pill-border: hsla(0, 0%, 100%, 0.15);
 
   --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --sidebar-width: 180px;
@@ -76,6 +79,9 @@
   --tooltip-bg: #ffffff;
   --tooltip-text: #0f172a;
   --tooltip-border: #cbd5e1;
+  --treemap-pill-bg: #1e293b;
+  --treemap-pill-text: #ffffff;
+  --treemap-pill-border: rgba(255, 255, 255, 0.2);
   --progress-track: rgba(0, 0, 0, 0.1);
 
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);

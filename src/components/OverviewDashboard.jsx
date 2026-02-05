@@ -26,21 +26,27 @@ import SafeResponsiveContainer from './SafeResponsiveContainer';
 
 const CustomTreemapContent = (props) => {
     const { x, y, width, height, name, fill } = props;
-    const showText = width > 60 && height > 35;
 
-    // Improved truncation logic: adaptive to block width
-    const maxChars = Math.max(1, Math.floor(width / 7.5));
-    const isTruncated = name.length > maxChars;
-    const displayText = isTruncated ? (name.substring(0, Math.max(0, maxChars - 2)) + '..') : name;
+    // Minimum dimensions to show any text at all
+    const MIN_W = 40;
+    const MIN_H = 30;
+    const isVisible = width > MIN_W && height > MIN_H;
 
-    // Dynamic label styling
-    const pillPadding = 10;
-    const estimatedTextWidth = displayText.length * 7;
-    const pillWidth = Math.min(width - 12, estimatedTextWidth + pillPadding * 2);
+    if (!isVisible) return <rect x={x + 1} y={y + 1} width={width - 2} height={height - 2} fill={fill} rx={8} ry={8} />;
+
+    // Dynamic Font Sizing
+    const fontSize = Math.min(12, Math.max(9, Math.floor(width / 15)));
+
+    // Character limit based on width and font size
+    const charWidth = fontSize * 0.6;
+    const maxChars = Math.floor((width - 20) / charWidth);
+    const displayText = name.length > maxChars ? name.substring(0, Math.max(0, maxChars - 3)) + '...' : name;
+
+    const shouldShowText = displayText.length >= 3;
 
     return (
         <g>
-            {/* Base Block with Smooth Rounded Corners and Depth */}
+            {/* Primary Block */}
             <rect
                 x={x + 2}
                 y={y + 2}
@@ -50,13 +56,12 @@ const CustomTreemapContent = (props) => {
                 ry={12}
                 style={{
                     fill: fill,
-                    filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))',
-                    cursor: 'pointer',
-                    transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+                    filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.25))',
+                    cursor: 'pointer'
                 }}
             />
 
-            {/* Premium Glassmorphism Overlay (Inner Glow & Subtle Shine) */}
+            {/* Premium Glass Overlay: Less aggressive in light mode via soft-light blend */}
             <rect
                 x={x + 2}
                 y={y + 2}
@@ -65,36 +70,33 @@ const CustomTreemapContent = (props) => {
                 rx={12}
                 ry={12}
                 fill="url(#treemapGlassGradient)"
-                style={{ pointerEvents: 'none' }}
+                style={{ pointerEvents: 'none', mixBlendMode: 'soft-light', opacity: 0.6 }}
             />
 
-            {showText && (
+            {shouldShowText && (
                 <g>
-                    {/* Adaptive Background Pill for High Legibility */}
+                    {/* Background Pill: Uses theme-aware variables for high contrast */}
                     <rect
-                        x={x + (width - pillWidth) / 2}
-                        y={y + height / 2 - 10}
-                        width={pillWidth}
-                        height={20}
-                        rx={10}
-                        fill="rgba(15, 23, 42, 0.75)" // Deep slate for premium contrast
-                        style={{
-                            backdropFilter: 'blur(10px)',
-                            pointerEvents: 'none'
-                        }}
+                        x={x + (width / 2) - Math.min((width - 10) / 2, (displayText.length * charWidth + 12) / 2)}
+                        y={y + (height / 2) - (fontSize * 0.8)}
+                        width={Math.min(width - 10, displayText.length * charWidth + 12)}
+                        height={fontSize * 1.6}
+                        rx={fontSize * 0.8}
+                        fill="var(--treemap-pill-bg)"
+                        style={{ backdropFilter: 'blur(8px)', border: '1px solid var(--treemap-pill-border)' }}
                     />
                     <text
                         x={x + width / 2}
-                        y={y + height / 2 + 3.5}
+                        y={y + height / 2 + (fontSize / 3)}
                         textAnchor="middle"
-                        fill="#fff"
+                        fill="var(--treemap-pill-text)"
                         style={{
-                            fontSize: width < 100 ? '8px' : '10.5px',
-                            fontWeight: 900,
+                            fontSize: `${fontSize}px`,
+                            fontWeight: 800,
                             pointerEvents: 'none',
-                            letterSpacing: '0.6px',
+                            letterSpacing: '0.2px',
                             textTransform: 'uppercase',
-                            fontFamily: 'Inter, system-ui, sans-serif'
+                            fontFamily: 'inherit'
                         }}
                     >
                         {displayText}
@@ -109,8 +111,8 @@ const DashboardGlobalDefs = () => (
     <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
             <linearGradient id="treemapGlassGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="white" stopOpacity={0.15} />
-                <stop offset="45%" stopColor="white" stopOpacity={0} />
+                <stop offset="0%" stopColor="white" stopOpacity={0.2} />
+                <stop offset="50%" stopColor="white" stopOpacity={0.05} />
                 <stop offset="100%" stopColor="black" stopOpacity={0.1} />
             </linearGradient>
         </defs>
