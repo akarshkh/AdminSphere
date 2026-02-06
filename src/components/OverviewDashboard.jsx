@@ -397,7 +397,7 @@ const OverviewDashboard = () => {
                     </div>
 
                     <div style={{ width: '120px', height: '120px', position: 'relative', flexShrink: 0 }}>
-                        <ResponsiveContainer width="100%" height={240}>
+                        <ResponsiveContainer width="100%" height={120}>
                             <PieChart>
                                 <Pie
                                     data={[
