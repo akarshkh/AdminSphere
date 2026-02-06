@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import {
     Smartphone, AlertTriangle, Clock, Shield, Settings,
     Package, Rocket, Lock, Users, UserCog, FileText,
-    TrendingUp, ArrowRight, RefreshCw, Search
+    TrendingUp, ArrowRight, RefreshCw, Search, ArrowLeft
 } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { DataPersistenceService } from '../services/dataPersistence';
@@ -183,6 +183,7 @@ const IntuneMonitoring = () => {
 
     return (
         <div className="animate-in">
+
             <header className="flex-between spacing-v-8">
                 <div>
                     <a
@@ -297,11 +298,10 @@ const IntuneMonitoring = () => {
                                 </div>
                             );
                         } else if (tile.label.includes('Applications') || tile.label.includes('Configuration') || tile.label.includes('Audit')) {
-                            // Removed fake sparkline
                             microFigure = (
                                 <div style={{ marginTop: '12px' }}>
-                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>7-Day Activity</div>
-                                    <div style={{ fontSize: '14px', fontWeight: 600 }}>Overview</div>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>Status</div>
+                                    <div style={{ fontSize: '12px', fontWeight: 600, color: tile.color }}>{tile.trend}</div>
                                 </div>
                             );
                         } else {

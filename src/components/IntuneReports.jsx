@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '../authConfig';
 import { ArrowLeft, TrendingUp, RefreshCw, BarChart3, PieChart, Activity } from 'lucide-react';
 import { IntuneService } from '../services/intune';
 import { GraphService } from '../services/graphService';
@@ -16,6 +17,7 @@ const IntuneReports = () => {
         complianceRate: 0,
         totalDevices: 0,
         osDistribution: {},
+        osChartData: [],
         appFailures: 0
     });
 
@@ -45,34 +47,14 @@ const IntuneReports = () => {
                 value: osDist[key]
             })).filter(d => d.value > 0);
 
-            // Fallback mock data if actual data is missing for visualization
-            if (osChartData.length === 0) {
-                osChartData = [
-                    { name: 'Windows', value: 45 },
-                    { name: 'iOS', value: 25 },
-                    { name: 'Android', value: 20 },
-                    { name: 'macOS', value: 10 }
-                ];
-            }
-
             setStats({
                 ...dashboardStats,
                 osChartData,
                 complianceRate: dashboardStats.complianceRate ||
-                    (dashboardStats.totalDevices > 0 ? ((dashboardStats.totalDevices - dashboardStats.nonCompliantDevices) / dashboardStats.totalDevices * 100) : 94.5)
+                    (dashboardStats.totalDevices > 0 ? ((dashboardStats.totalDevices - dashboardStats.nonCompliantDevices) / dashboardStats.totalDevices * 100) : 0)
             });
         } catch (error) {
             console.error("Failed to load report data", error);
-            // Even on error, show some visual for attractive UI
-            setStats(prev => ({
-                ...prev,
-                osChartData: [
-                    { name: 'Windows', value: 60 },
-                    { name: 'iOS', value: 30 },
-                    { name: 'Other', value: 10 }
-                ],
-                complianceRate: 92.4
-            }));
         } finally {
             if (isManual) {
                 const elapsedTime = Date.now() - startTime;
@@ -86,17 +68,6 @@ const IntuneReports = () => {
     };
 
     const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-
-    // Mock trend data for visualization
-    const trendData = [
-        { name: 'Mon', value: 91 },
-        { name: 'Tue', value: 89 },
-        { name: 'Wed', value: 92 },
-        { name: 'Thu', value: 94 },
-        { name: 'Fri', value: 91 },
-        { name: 'Sat', value: 95 },
-        { name: 'Sun', value: Math.round(stats.complianceRate) || 96 },
-    ];
 
     if (loading) return <Loader3D showOverlay={true} />;
 
@@ -165,31 +136,36 @@ const IntuneReports = () => {
                         {/* Center Text for Doughnut Style */}
                         <div style={{ position: 'absolute', top: '42%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
                             <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)' }}>
-                                {stats.totalDevices || stats.osChartData.reduce((a, b) => a + b.value, 0)}
+                                {stats.totalDevices || (stats.osChartData || []).reduce((a, b) => a + b.value, 0)}
                             </div>
                             <div style={{ fontSize: '10px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Fleet Size</div>
                         </div>
                     </div>
                 </div>
 
-                {/* Compliance Trend Chart */}
+                {/* Compliance Distribution Breakdown */}
                 <div className="glass-card" style={{ minHeight: '300px' }}>
                     <div className="flex-between" style={{ marginBottom: '20px' }}>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             <div style={{ padding: '8px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
                                 <TrendingUp size={20} />
                             </div>
-                            <span style={{ fontWeight: 600 }}>Compliance Trend (7 Days)</span>
+                            <span style={{ fontWeight: 600 }}>Compliance Breakdown</span>
                         </div>
-                        <span className="badge badge-success">{stats.complianceRate?.toFixed(1)}% Current</span>
+                        <span className="badge badge-success">{stats.complianceRate?.toFixed(1)}% Rate</span>
                     </div>
 
                     <div style={{ height: '220px', width: '100%' }}>
-                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-                            <BarChart data={trendData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="var(--text-dim)" fontSize={12} tickLine={false} axisLine={false} domain={[80, 100]} />
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={[
+                                { name: 'Compliant', value: stats.compliantDevices || 0, color: '#10b981' },
+                                { name: 'In-Grace', value: stats.inGracePeriodDevices || 0, color: '#f59e0b' },
+                                { name: 'Non-Compliant', value: stats.nonCompliantDevices || 0, color: '#ef4444' },
+                                { name: 'Unknown', value: stats.unknownComplianceDevices || 0, color: '#6b7280' }
+                            ]}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
+                                <YAxis stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
                                 <Tooltip
                                     cursor={{ fill: 'var(--glass-bg-hover)' }}
                                     contentStyle={{
@@ -199,9 +175,18 @@ const IntuneReports = () => {
                                         boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
                                         color: 'var(--tooltip-text)'
                                     }}
-                                    itemStyle={{ color: 'var(--tooltip-text)', fontSize: '12px', fontWeight: 600 }}
+                                    itemStyle={{ fontSize: '12px', fontWeight: 600 }}
                                 />
-                                <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                    {[
+                                        { name: 'Compliant', color: '#10b981' },
+                                        { name: 'In-Grace', color: '#f59e0b' },
+                                        { name: 'Non-Compliant', color: '#ef4444' },
+                                        { name: 'Unknown', color: '#6b7280' }
+                                    ].map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Bar>
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

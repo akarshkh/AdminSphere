@@ -85,7 +85,7 @@ const IntuneManagedDevices = () => {
         <div className={styles.pageContainer}>
             <div className={styles.contentWrapper}>
                 <button onClick={() => navigate('/service/intune')} className={styles.backButton}>
-                    <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+                    <ArrowLeft size={14} style={{ marginRight: '8px' }} />
                     Back to Dashboard
                 </button>
 

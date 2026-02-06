@@ -101,6 +101,7 @@
 
   /* Sidebar stays Dark (User Preference) */
   --sidebar-bg: hsla(220, 25%, 3%, 0.8);
+  color-scheme: light;
 }
 
 [data-theme="light"] body {
@@ -534,11 +535,10 @@ select.input {
   padding-right: 44px;
 }
 
-select.input option {
+select option {
   background-color: var(--bg-darker);
   color: var(--text-primary);
   padding: 8px;
-  background-image: none !important;
 }
 
 /* Light mode option elements - remove inherited background */

@@ -105,7 +105,6 @@ export const IntuneService = {
                 totalDevices: managedDevices,
                 osDistribution,
                 nonCompliantDevices,
-                nonCompliantDevices,
                 inactiveDevices,
                 compliantDevices: compliantCount,
                 inGracePeriodDevices: inGracePeriodCount,

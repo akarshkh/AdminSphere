@@ -283,7 +283,9 @@ export const MiniSeverityStrip = ({ severity = 'low', count = 0, height = 24 }) 
                 border: `1.5px solid ${isCssVar ? baseColor : config.color}`,
                 borderOpacity: 0.3,
                 borderRadius: '8px',
-                height: `${height}px`,
+                minHeight: `${height}px`,
+                height: 'auto',
+                maxWidth: '100%',
                 boxShadow: isCssVar ? 'none' : `0 2px 8px ${config.color}20, inset 0 1px 0 rgba(255,255,255,0.1)`
             }}
         >
@@ -312,7 +314,10 @@ export const MiniSeverityStrip = ({ severity = 'low', count = 0, height = 24 }) 
                 fontWeight: 700,
                 color: config.color,
                 letterSpacing: '0.3px',
-                textShadow: isCssVar ? 'none' : `0 1px 2px ${config.color}30`
+                textShadow: isCssVar ? 'none' : `0 1px 2px ${config.color}30`,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
             }}>
                 {count > 0 || typeof count === 'string' ? count : config.label}
             </span>
@@ -343,7 +348,8 @@ export const MiniStatusGeneric = ({ status, color = 'var(--accent-blue)', height
                 border: `1.5px solid ${color}`,
                 borderOpacity: isCssVar ? 1 : 0.3,
                 borderRadius: '8px',
-                height: `${height}px`,
+                minHeight: `${height}px`,
+                height: 'auto',
                 minWidth: 'fit-content',
                 maxWidth: '100%',
                 boxShadow: isCssVar ? 'none' : `0 2px 8px ${color}20, inset 0 1px 0 rgba(255,255,255,0.1)`
