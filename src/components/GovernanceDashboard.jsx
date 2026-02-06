@@ -8,6 +8,7 @@ import { GovernanceService } from '../services/governance/governance.service';
 import { DataPersistenceService } from '../services/dataPersistence';
 import AnimatedTile from './AnimatedTile';
 import Loader3D from './Loader3D';
+
 import {
     Shield, Key, UserCheck, RefreshCw, ChevronRight, Lock, Settings,
     ClipboardList, FolderKey, CheckCircle2, XCircle, AlertCircle
@@ -20,6 +21,13 @@ import { useDataCaching } from '../hooks/useDataCaching';
 const GovernanceDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const [chartsVisible, setChartsVisible] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setChartsVisible(true), 500);
+        return () => clearTimeout(timer);
+    }, []);
+
     const fetchFn = async () => {
         const account = accounts[0];
         if (!account) throw new Error('No account found');
@@ -275,24 +283,26 @@ const GovernanceDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {caPolicyData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-                                <PieChart>
-                                    <Pie
-                                        data={caPolicyData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={50}
-                                        outerRadius={80}
-                                        paddingAngle={3}
-                                        dataKey="value"
-                                    >
-                                        {caPolicyData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
-                                </PieChart>
-                            </ResponsiveContainer>
+                            chartsVisible ? (
+                                <ResponsiveContainer width="100%" height={220} minWidth={0} minHeight={0} debounce={50}>
+                                    <PieChart>
+                                        <Pie
+                                            data={caPolicyData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={50}
+                                            outerRadius={80}
+                                            paddingAngle={3}
+                                            dataKey="value"
+                                        >
+                                            {caPolicyData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>
                         ) : (
                             <div className="no-data-state">
                                 <Lock size={40} style={{ opacity: 0.3 }} />
@@ -327,18 +337,20 @@ const GovernanceDashboard = () => {
                         </button>
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
-                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-                            <BarChart data={roleData} layout="vertical">
-                                <XAxis type="number" hide />
-                                <YAxis type="category" dataKey="name" width={110} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Bar dataKey="value" radius={[0, 6, 6, 0]}>
-                                    {roleData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
+                        {chartsVisible ? (
+                            <ResponsiveContainer width="100%" height={220} minWidth={0} minHeight={0} debounce={50}>
+                                <BarChart data={roleData} layout="vertical">
+                                    <XAxis type="number" hide />
+                                    <YAxis type="category" dataKey="name" width={110} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                                        {roleData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>}
                     </div>
                 </motion.div>
             </div>

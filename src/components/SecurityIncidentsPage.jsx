@@ -6,6 +6,8 @@ import { loginRequest } from '../authConfig';
 import { SecurityService } from '../services/security/security.service';
 import { AlertOctagon, ArrowLeft, RefreshCw, Filter, Search, Clock, Users } from 'lucide-react';
 
+import styles from './DetailPage.module.css';
+
 const SecurityIncidentsPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
@@ -39,12 +41,8 @@ const SecurityIncidentsPage = () => {
         } catch (err) {
             console.error('Failed to fetch security incidents:', err);
         } finally {
-            if (isManual) {
-                setTimeout(() => setRefreshing(false), 1000);
-            } else {
-                setLoading(false);
-                setRefreshing(false);
-            }
+            setLoading(false);
+            setRefreshing(false);
         }
     };
 
@@ -54,18 +52,15 @@ const SecurityIncidentsPage = () => {
 
     useEffect(() => {
         let filtered = incidents;
-
         if (statusFilter !== 'all') {
             filtered = filtered.filter(i => i.status?.toLowerCase() === statusFilter);
         }
-
         if (searchTerm) {
             filtered = filtered.filter(i =>
                 i.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 i.incidentWebUrl?.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
-
         setFilteredIncidents(filtered);
     }, [incidents, statusFilter, searchTerm]);
 
@@ -83,306 +78,112 @@ const SecurityIncidentsPage = () => {
             case 'active': return '#ef4444';
             case 'inprogress': return '#f59e0b';
             case 'resolved': return '#22c55e';
-            case 'redirected': return '#3b82f6';
             default: return '#6b7280';
         }
     };
 
     if (loading) {
-        return (
-            <div className="loading-container">
-                <div className="loading-spinner"></div>
-                <p>Loading Security Incidents...</p>
-            </div>
-        );
+        return <Loader3D showOverlay={true} text="Loading Security Incidents..." />;
     }
 
     return (
-        <div className="page-container">
-            {/* Header */}
-            <div className="page-header">
-                <div className="header-left">
-                    <button className="back-button" onClick={() => navigate('/service/security')}>
-                        <ArrowLeft size={18} />
-                    </button>
-                    <div>
-                        <h1 className="page-title">
-                            <AlertOctagon size={24} style={{ color: '#f59e0b' }} />
-                            Security Incidents
-                        </h1>
-                        <p className="page-subtitle">{filteredIncidents.length} incidents found</p>
-                    </div>
-                </div>
-                <button
-                    onClick={() => fetchIncidents(true)}
-                    disabled={refreshing}
-                    className="refresh-button"
-                >
-                    <RefreshCw size={16} className={refreshing ? 'spin' : ''} />
-                    {refreshing ? 'Refreshing...' : 'Refresh'}
+        <div className={styles.pageContainer}>
+            <div className={styles.contentWrapper}>
+                <button onClick={() => navigate('/service/security')} className={styles.backButton}>
+                    <ArrowLeft size={14} style={{ marginRight: '8px' }} />
+                    Back to Dashboard
                 </button>
-            </div>
 
-            {/* Filters */}
-            <div className="filters-bar glass-card">
-                <div className="search-box">
-                    <Search size={16} />
-                    <input
-                        type="text"
-                        placeholder="Search incidents..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                <div className={styles.pageHeader}>
+                    <h1 className={styles.pageTitle}>
+                        <AlertOctagon style={{ width: '2rem', height: '2rem', color: '#f59e0b' }} />
+                        Security Incidents
+                    </h1>
+                    <p className={styles.pageSubtitle}>
+                        {filteredIncidents.length} active security incidents identified for investigation
+                    </p>
                 </div>
-                <div className="filter-group">
-                    <Filter size={14} />
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                    >
-                        <option value="all">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="inprogress">In Progress</option>
-                        <option value="resolved">Resolved</option>
-                    </select>
-                </div>
-            </div>
 
-            {/* Incidents Grid */}
-            <div className="incidents-grid">
-                {filteredIncidents.length > 0 ? (
-                    filteredIncidents.map((incident, idx) => (
-                        <div key={incident.id || idx} className="incident-card glass-card">
-                            <div className="incident-header">
-                                <span
-                                    className="severity-badge"
-                                    style={{
-                                        background: `${getSeverityColor(incident.severity)}20`,
-                                        color: getSeverityColor(incident.severity)
-                                    }}
-                                >
-                                    {incident.severity || 'Unknown'}
-                                </span>
-                                <span
-                                    className="status-badge"
-                                    style={{
-                                        background: `${getStatusColor(incident.status)}20`,
-                                        color: getStatusColor(incident.status)
-                                    }}
-                                >
-                                    {incident.status || 'Unknown'}
-                                </span>
-                            </div>
-                            <h3 className="incident-title">{incident.displayName || 'Untitled Incident'}</h3>
-                            <div className="incident-meta">
-                                <div className="meta-item">
-                                    <Clock size={12} />
-                                    <span>{incident.createdDateTime ? new Date(incident.createdDateTime).toLocaleDateString() : 'N/A'}</span>
-                                </div>
-                                <div className="meta-item">
-                                    <Users size={12} />
-                                    <span>{incident.alertCount || 0} alerts</span>
-                                </div>
-                            </div>
-                            {incident.incidentWebUrl && (
-                                <a
-                                    href={incident.incidentWebUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="view-link"
-                                >
-                                    View in Microsoft 365 Defender →
-                                </a>
-                            )}
-                        </div>
-                    ))
-                ) : (
-                    <div className="no-data-state">
-                        <AlertOctagon size={48} style={{ opacity: 0.3 }} />
-                        <p>No security incidents found</p>
+                <div className={styles.filterBar}>
+                    <div style={{ position: 'relative', flex: 1, minWidth: '250px' }}>
+                        <Search style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '1rem', height: '1rem', color: '#6b7280' }} />
+                        <input
+                            type="text"
+                            placeholder="Search incidents..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className={styles.filterInput}
+                            style={{ paddingLeft: '2.75rem' }}
+                        />
                     </div>
-                )}
-            </div>
+                    <div className={styles.filterGroup}>
+                        <Filter size={14} />
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className={styles.filterSelect}
+                        >
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inprogress">In Progress</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                    </div>
+                </div>
 
-            <style jsx>{`
-                .page-container {
-                    padding: 0;
-                }
-                .page-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 24px;
-                }
-                .header-left {
-                    display: flex;
-                    align-items: center;
-                    gap: 16px;
-                }
-                .back-button {
-                    background: var(--glass-bg);
-                    border: 1px solid var(--glass-border);
-                    border-radius: 10px;
-                    padding: 10px;
-                    cursor: pointer;
-                    color: var(--text-primary);
-                    transition: all 0.2s;
-                }
-                .back-button:hover {
-                    background: var(--glass-bg-hover);
-                }
-                .page-title {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    font-size: 20px;
-                    margin: 0;
-                }
-                .page-subtitle {
-                    font-size: 13px;
-                    color: var(--text-secondary);
-                    margin: 4px 0 0 0;
-                }
-                .refresh-button {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 10px 20px;
-                    background: var(--glass-bg);
-                    border: 1px solid var(--glass-border);
-                    border-radius: 10px;
-                    color: var(--text-primary);
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                .filters-bar {
-                    display: flex;
-                    gap: 16px;
-                    padding: 16px;
-                    margin-bottom: 20px;
-                    border-radius: 12px;
-                }
-                .search-box {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    flex: 1;
-                    background: var(--bg-tertiary);
-                    padding: 8px 12px;
-                    border-radius: 8px;
-                    border: 1px solid var(--glass-border);
-                }
-                .search-box input {
-                    flex: 1;
-                    background: none;
-                    border: none;
-                    color: var(--text-primary);
-                    font-size: 13px;
-                    outline: none;
-                }
-                .filter-group {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-                .filter-group select {
-                    background: var(--bg-tertiary);
-                    border: 1px solid var(--glass-border);
-                    border-radius: 8px;
-                    padding: 8px 12px;
-                    color: var(--text-primary);
-                    font-size: 12px;
-                    cursor: pointer;
-                }
-                .incidents-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-                    gap: 16px;
-                }
-                .incident-card {
-                    padding: 20px;
-                    border-radius: 16px;
-                    transition: all 0.3s ease;
-                }
-                .incident-card:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-                }
-                .incident-header {
-                    display: flex;
-                    gap: 8px;
-                    margin-bottom: 12px;
-                }
-                .severity-badge, .status-badge {
-                    padding: 4px 10px;
-                    border-radius: 12px;
-                    font-size: 10px;
-                    font-weight: 600;
-                    text-transform: capitalize;
-                }
-                .incident-title {
-                    font-size: 14px;
-                    font-weight: 600;
-                    margin: 0 0 12px 0;
-                    color: var(--text-primary);
-                    line-height: 1.4;
-                }
-                .incident-meta {
-                    display: flex;
-                    gap: 16px;
-                    margin-bottom: 12px;
-                }
-                .meta-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    font-size: 11px;
-                    color: var(--text-tertiary);
-                }
-                .view-link {
-                    display: inline-block;
-                    font-size: 12px;
-                    color: var(--accent-blue);
-                    text-decoration: none;
-                    transition: opacity 0.2s;
-                }
-                .view-link:hover {
-                    opacity: 0.8;
-                }
-                .no-data-state {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 60px;
-                    color: var(--text-tertiary);
-                    gap: 12px;
-                    grid-column: 1 / -1;
-                }
-                .loading-container {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    height: 60vh;
-                    gap: 16px;
-                }
-                .loading-spinner {
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid var(--glass-border);
-                    border-top-color: var(--accent-blue);
-                    border-radius: 50%;
-                    animation: spin 1s linear infinite;
-                }
-                .spin {
-                    animation: spin 1s linear infinite;
-                }
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-            `}</style>
+                <div className={styles.grid}>
+                    {filteredIncidents.length > 0 ? (
+                        filteredIncidents.map((incident, idx) => (
+                            <div key={incident.id || idx} className={styles.statCard} style={{ cursor: 'default' }}>
+                                <div className="flex-between spacing-v-4">
+                                    <span className={styles.badge} style={{
+                                        background: `${getSeverityColor(incident.severity)}20`,
+                                        color: getSeverityColor(incident.severity),
+                                        borderColor: `${getSeverityColor(incident.severity)}40`
+                                    }}>
+                                        {incident.severity || 'Unknown'} SEVERITY
+                                    </span>
+                                    <span className={styles.badge} style={{
+                                        background: `${getStatusColor(incident.status)}20`,
+                                        color: getStatusColor(incident.status),
+                                        borderColor: `${getStatusColor(incident.status)}40`
+                                    }}>
+                                        {incident.status || 'Unknown'}
+                                    </span>
+                                </div>
+                                <h3 className={styles.cardTitle} style={{ marginTop: '12px', fontSize: '15px' }}>
+                                    {incident.displayName || 'Untitled Incident'}
+                                </h3>
+                                <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+                                    <div className="flex-gap-1" style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
+                                        <Clock size={12} />
+                                        <span>{incident.createdDateTime ? new Date(incident.createdDateTime).toLocaleDateString() : 'N/A'}</span>
+                                    </div>
+                                    <div className="flex-gap-1" style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
+                                        <Users size={12} />
+                                        <span>{incident.alertCount || 0} alerts</span>
+                                    </div>
+                                </div>
+                                {incident.incidentWebUrl && (
+                                    <a
+                                        href={incident.incidentWebUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={styles.viewMoreBtn}
+                                        style={{ marginTop: '16px', display: 'flex', width: '100%', justifyContent: 'center' }}
+                                    >
+                                        M365 Defender →
+                                    </a>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <div className={styles.emptyState} style={{ gridColumn: '1 / -1' }}>
+                            No security incidents found matching your criteria.
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

@@ -8,6 +8,7 @@ import { SecurityService } from '../services/security/security.service';
 import { DataPersistenceService } from '../services/dataPersistence';
 import AnimatedTile from './AnimatedTile';
 import Loader3D from './Loader3D';
+import { useDataCaching } from '../hooks/useDataCaching';
 import {
     Shield, AlertTriangle, AlertOctagon, UserX, Activity, Lock,
     TrendingUp, RefreshCw, ChevronRight, Eye, FileWarning, Target
@@ -16,11 +17,12 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
     Tooltip, LineChart, Line, AreaChart, Area
 } from 'recharts';
-import { useDataCaching } from '../hooks/useDataCaching';
+import styles from './DetailPage.module.css';
 
 const SecurityDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+
     const fetchFn = async () => {
         const account = accounts[0];
         if (!account) throw new Error('No account found');
@@ -43,7 +45,7 @@ const SecurityDashboard = () => {
         refreshing,
         error: fetchError,
         refetch
-    } = useDataCaching('Security_Dashboard_v3', fetchFn, {
+    } = useDataCaching('Security_Dashboard_v4', fetchFn, {
         maxAge: 30,
         storeSection: 'security',
         storeMetadata: { source: 'SecurityDashboard' },
@@ -58,7 +60,6 @@ const SecurityDashboard = () => {
         }
     }, [fetchError]);
 
-    // Ensure we have a valid initial state for render logic
     const safeData = dashboardData || {
         alerts: { total: 0, highSeverity: 0, mediumSeverity: 0, lowSeverity: 0 },
         incidents: { total: 0, active: 0, resolved: 0 },
@@ -68,12 +69,6 @@ const SecurityDashboard = () => {
         mfa: { registered: 0, total: 0, coverage: 0 }
     };
 
-    const CACHE_KEY = 'security_dashboard';
-    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-
-
-    // Custom Tooltip
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
             return (
@@ -95,7 +90,6 @@ const SecurityDashboard = () => {
         return null;
     };
 
-    // Color schemes
     const severityColors = {
         high: '#ef4444',
         medium: '#f59e0b',
@@ -103,9 +97,6 @@ const SecurityDashboard = () => {
         unknown: '#6b7280'
     };
 
-    const riskColors = ['#ef4444', '#f59e0b', '#22c55e'];
-
-    // Prepare chart data
     const alertSeverityData = [
         { name: 'High', value: safeData.alerts.highSeverity, color: severityColors.high },
         { name: 'Medium', value: safeData.alerts.mediumSeverity, color: severityColors.medium },
@@ -118,573 +109,213 @@ const SecurityDashboard = () => {
         { name: 'Low Risk', value: safeData.riskyUsers.low, color: severityColors.low }
     ].filter(d => d.value > 0);
 
-    const mfaData = [
-        { name: 'MFA Enabled', value: safeData.mfa.registered, color: '#22c55e' },
-        { name: 'No MFA', value: safeData.mfa.total - safeData.mfa.registered, color: '#ef4444' }
-    ].filter(d => d.value > 0);
-
     if (loading && !dashboardData) {
         return <Loader3D showOverlay={true} text="Loading Security Dashboard..." />;
     }
 
     return (
-        <div className="animate-in">
-            {/* Header */}
-            <header className="flex-between spacing-v-8">
-                <div>
-                    <a
-                        href="https://security.microsoft.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ textDecoration: 'none' }}
-                    >
-                        <h1 className="title-gradient" style={{ fontSize: '32px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-                            <Shield size={28} style={{ color: '#ef4444' }} />
-                            Security Dashboard
-                        </h1>
-                    </a>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Threat protection, detection, and response</p>
-                </div>
-                <div className="flex-gap-2">
-                    <button
-                        className={`sync-btn ${refreshing ? 'spinning' : ''}`}
-                        onClick={() => refetch(true)}
-                        title="Sync & Refresh"
-                    >
-                        <RefreshCw size={16} />
-                    </button>
-                </div>
-            </header>
-
-            {fetchError && !interactionError && (
-                <div className="error-banner" style={{
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
-                    borderRadius: '12px',
-                    padding: '16px',
-                    marginBottom: '24px',
-                    color: '#ef4444',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <AlertTriangle size={14} />
-                    <span>{fetchError}</span>
-                </div>
-            )}
-
-            {interactionError && (
-                <div className="error-banner" style={{
-                    background: 'rgba(59, 130, 246, 0.1)',
-                    border: '1px solid rgba(59, 130, 246, 0.3)',
-                    borderRadius: '12px',
-                    padding: '16px',
-                    marginBottom: '24px',
-                    color: 'var(--accent-blue)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <Shield size={14} />
-                    <span>🔐 Session expired or additional permissions required to load security data.</span>
-                    <button
-                        onClick={() => refetch(true)}
-                        className="reconnect-btn"
-                        style={{
-                            background: 'var(--accent-blue)',
-                            color: 'white',
-                            border: 'none',
-                            padding: '6px 12px',
-                            borderRadius: '6px',
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Reconnect
-                    </button>
-                </div>
-            )}
-
-            {/* Top Stats Row */}
-            <div className="stats-grid" style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '16px',
-                marginBottom: '24px'
-            }}>
-                {/* Secure Score */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0 * 0.1 }}
-                    whileHover={{ y: -4, scale: 1.02 }}
-                    className="glass-card stat-card"
-                    style={{ background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.02))', cursor: 'default' }}
-                >
-                    <div className="stat-icon" style={{ background: 'rgba(34, 197, 94, 0.2)' }}>
-                        <Target size={20} style={{ color: '#22c55e' }} />
-                    </div>
-                    <div className="stat-content">
-                        <span className="stat-label">Secure Score</span>
-                        <span className="stat-value" style={{ color: '#22c55e' }}>
-                            {safeData.secureScore.percentage}%
-                        </span>
-                        <span className="stat-sublabel">
-                            {safeData.secureScore.current}/{safeData.secureScore.max}
-                        </span>
-                    </div>
-                </motion.div>
-
-                {/* Total Alerts */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1 * 0.1 }}
-                    whileHover={{ y: -4, scale: 1.02 }}
-                    className="glass-card stat-card clickable"
-                    style={{ background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.02))', cursor: 'pointer' }}
-                    onClick={() => navigate('/service/security/alerts')}
-                >
-                    <div className="stat-icon" style={{ background: 'rgba(239, 68, 68, 0.2)' }}>
-                        <AlertTriangle size={20} style={{ color: '#ef4444' }} />
-                    </div>
-                    <div className="stat-content">
-                        <span className="stat-label">Security Alerts</span>
-                        <span className="stat-value" style={{ color: '#ef4444' }}>
-                            {safeData.alerts.total}
-                        </span>
-                        <span className="stat-sublabel">
-                            {safeData.alerts.highSeverity} high severity
-                        </span>
-                    </div>
-                    <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
-                </motion.div>
-
-                {/* Incidents */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 2 * 0.1 }}
-                    whileHover={{ y: -4, scale: 1.02 }}
-                    className="glass-card stat-card clickable"
-                    style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.02))', cursor: 'pointer' }}
-                    onClick={() => navigate('/service/security/incidents')}
-                >
-                    <div className="stat-icon" style={{ background: 'rgba(245, 158, 11, 0.2)' }}>
-                        <AlertOctagon size={20} style={{ color: '#f59e0b' }} />
-                    </div>
-                    <div className="stat-content">
-                        <span className="stat-label">Incidents</span>
-                        <span className="stat-value" style={{ color: '#f59e0b' }}>
-                            {safeData.incidents.active}
-                        </span>
-                        <span className="stat-sublabel">
-                            {safeData.incidents.total} total
-                        </span>
-                    </div>
-                    <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
-                </motion.div>
-
-                {/* Risky Users */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 3 * 0.1 }}
-                    whileHover={{ y: -4, scale: 1.02 }}
-                    className="glass-card stat-card clickable"
-                    style={{ background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(168, 85, 247, 0.02))', cursor: 'pointer' }}
-                    onClick={() => navigate('/service/security/risky-users')}
-                >
-                    <div className="stat-icon" style={{ background: 'rgba(168, 85, 247, 0.2)' }}>
-                        <UserX size={20} style={{ color: '#a855f7' }} />
-                    </div>
-                    <div className="stat-content">
-                        <span className="stat-label">Risky Users</span>
-                        <span className="stat-value" style={{ color: '#a855f7' }}>
-                            {safeData.riskyUsers.total}
-                        </span>
-                        <span className="stat-sublabel">
-                            {safeData.riskyUsers.high} high risk
-                        </span>
-                    </div>
-                    <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
-                </motion.div>
-            </div>
-
-            {/* Charts Row */}
-            <div className="charts-grid" style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-                gap: '20px',
-                marginBottom: '24px',
-                alignItems: 'start'
-            }}>
-                {/* Alert Severity Distribution */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="chart-card glass-card"
-                >
-                    <div className="chart-header">
-                        <h3><AlertTriangle size={16} /> Alerts by Severity</h3>
-                        <button
-                            className="view-all-btn"
-                            onClick={() => navigate('/service/security/alerts')}
-                        >
-                            View All <ChevronRight size={14} />
-                        </button>
-                    </div>
-                    <div className="chart-body" style={{ height: '220px' }}>
-                        {alertSeverityData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-                                <PieChart>
-                                    <Pie
-                                        data={alertSeverityData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={50}
-                                        outerRadius={80}
-                                        paddingAngle={3}
-                                        dataKey="value"
-                                    >
-                                        {alertSeverityData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        ) : (
-                            <div className="no-data-state">
-                                <Shield size={40} style={{ opacity: 0.3 }} />
-                                <p>No alerts found</p>
-                            </div>
-                        )}
-                    </div>
-                    <div className="chart-legend">
-                        {alertSeverityData.map((item, idx) => (
-                            <div key={idx} className="legend-item">
-                                <span className="legend-dot" style={{ background: item.color }}></span>
-                                <span>{item.name}: {item.value}</span>
-                            </div>
-                        ))}
-                    </div>
-                </motion.div>
-
-                {/* Risky Users Distribution */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="chart-card glass-card"
-                >
-                    <div className="chart-header">
-                        <h3><UserX size={16} /> Risky Users by Level</h3>
-                        <button
-                            className="view-all-btn"
-                            onClick={() => navigate('/service/security/risky-users')}
-                        >
-                            View All <ChevronRight size={14} />
-                        </button>
-                    </div>
-                    <div className="chart-body" style={{ height: '220px' }}>
-                        {riskyUsersData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-                                <BarChart data={riskyUsersData} layout="vertical">
-                                    <XAxis type="number" hide />
-                                    <YAxis type="category" dataKey="name" width={90} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Bar dataKey="value" radius={[0, 6, 6, 0]}>
-                                        {riskyUsersData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        ) : (
-                            <div className="no-data-state">
-                                <UserX size={40} style={{ opacity: 0.3 }} />
-                                <p>No risky users detected</p>
-                            </div>
-                        )}
-                    </div>
-                </motion.div>
-
-                {/* MFA Coverage */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className="chart-card glass-card"
-                >
-                    <div className="chart-header">
-                        <h3><Lock size={16} /> MFA Coverage</h3>
-                    </div>
-                    <div className="chart-body" style={{ height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{
-                                width: '140px',
-                                height: '140px',
-                                borderRadius: '50%',
-                                background: `conic-gradient(#22c55e ${dashboardData.mfa.coverage * 3.6}deg, rgba(239, 68, 68, 0.3) 0deg)`,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto'
-                            }}>
-                                <div style={{
-                                    width: '100px',
-                                    height: '100px',
-                                    borderRadius: '50%',
-                                    background: 'var(--bg-secondary)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    flexDirection: 'column'
-                                }}>
-                                    <span style={{ fontSize: '28px', fontWeight: 700, color: '#22c55e' }}>
-                                        {dashboardData.mfa.coverage}%
-                                    </span>
-                                    <span style={{ fontSize: '10px', color: 'var(--text-tertiary)' }}>Coverage</span>
-                                </div>
-                            </div>
-                            <p style={{ marginTop: '12px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                                {dashboardData.mfa.registered} of {dashboardData.mfa.total} users
+        <div className={styles.pageContainer}>
+            <div className={styles.contentWrapper}>
+                <div className={styles.pageHeader}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <h1 className={styles.pageTitle}>
+                                <Shield style={{ width: '2rem', height: '2rem', color: '#ef4444' }} />
+                                Security Dashboard
+                            </h1>
+                            <p className={styles.pageSubtitle}>
+                                Threat protection, detection, and response across your Microsoft 365 environment
                             </p>
                         </div>
+                        <button
+                            className={`${styles.actionButtonSecondary} ${refreshing ? 'spinning' : ''}`}
+                            onClick={() => refetch(true)}
+                            style={{ borderRadius: '12px', padding: '12px' }}
+                        >
+                            <RefreshCw size={18} />
+                        </button>
                     </div>
-                </motion.div>
-            </div>
-
-            {/* Recent Risk Detections */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="table-card glass-card"
-            >
-                <div className="table-header">
-                    <h3><FileWarning size={16} /> Recent Risk Detections</h3>
-                    <button
-                        className="view-all-btn"
-                        onClick={() => navigate('/service/security/risk-detections')}
-                    >
-                        View All <ChevronRight size={14} />
-                    </button>
                 </div>
-                <div className="table-body">
-                    {dashboardData.riskDetections.recent.length > 0 ? (
-                        <table className="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Detection Type</th>
-                                    <th>Risk Level</th>
-                                    <th>User</th>
-                                    <th>Detected</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {dashboardData.riskDetections.recent.map((detection, idx) => (
-                                    <tr key={idx}>
-                                        <td>{detection.riskEventType || 'Unknown'}</td>
-                                        <td>
-                                            <span className={`badge badge-${detection.riskLevel}`}>
-                                                {detection.riskLevel || 'unknown'}
-                                            </span>
-                                        </td>
-                                        <td>{detection.userDisplayName || detection.userPrincipalName || 'N/A'}</td>
-                                        <td>{detection.detectedDateTime ? new Date(detection.detectedDateTime).toLocaleDateString() : 'N/A'}</td>
-                                        <td>
-                                            <span className={`badge badge-${detection.riskState}`}>
-                                                {detection.riskState || 'active'}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    ) : (
-                        <div className="no-data-state" style={{ padding: '40px' }}>
-                            <Activity size={40} style={{ opacity: 0.3 }} />
-                            <p>No recent risk detections</p>
+
+                {fetchError && !interactionError && (
+                    <div className={styles.alert || 'error-banner'} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '1rem', borderRadius: '12px', marginBottom: '2rem' }}>
+                        <AlertTriangle size={14} style={{ marginRight: '8px' }} />
+                        <span>{fetchError}</span>
+                    </div>
+                )}
+
+                {interactionError && (
+                    <div className={styles.alert || 'error-banner'} style={{ background: 'rgba(59, 130, 246, 0.1)', color: 'var(--accent-blue)', border: '1px solid rgba(59, 130, 246, 0.2)', padding: '1rem', borderRadius: '12px', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <Shield size={14} style={{ marginRight: '8px' }} />
+                            <span>🔐 Session expired or additional permissions required.</span>
                         </div>
-                    )}
-                </div>
-            </motion.div>
+                        <button onClick={() => refetch(true)} className={styles.actionButtonPrimary} style={{ padding: '6px 16px', fontSize: '12px' }}>Reconnect</button>
+                    </div>
+                )}
 
-            <style>{`
-                .stat-card {
-                    display: flex;
-                    align-items: center;
-                    gap: 16px;
-                    padding: 20px;
-                    border-radius: 16px;
-                    border: 1px solid var(--glass-border);
-                    transition: all 0.3s ease;
-                }
-                .stat-card.clickable {
-                    cursor: pointer;
-                }
-                .stat-card.clickable:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-                }
-                .stat-icon {
-                    width: 48px;
-                    height: 48px;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .stat-content {
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                }
-                .stat-label {
-                    font-size: 12px;
-                    color: var(--text-secondary);
-                    margin-bottom: 4px;
-                }
-                .stat-value {
-                    font-size: 28px;
-                    font-weight: 700;
-                    line-height: 1;
-                }
-                .stat-sublabel {
-                    font-size: 11px;
-                    color: var(--text-tertiary);
-                    margin-top: 4px;
-                }
-                .chart-card {
-                    padding: 16px;
-                    border-radius: 16px;
-                    max-height: 280px;
-                }
-                .chart-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 16px;
-                }
-                .chart-header h3 {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: var(--text-primary);
-                    margin: 0;
-                }
-                .view-all-btn {
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                    background: none;
-                    border: none;
-                    color: var(--accent-blue);
-                    font-size: 12px;
-                    cursor: pointer;
-                    transition: opacity 0.2s;
-                }
-                .view-all-btn:hover {
-                    opacity: 0.8;
-                }
-                .chart-legend {
-                    display: flex;
-                    justify-content: center;
-                    gap: 20px;
-                    margin-top: 12px;
-                }
-                .legend-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    font-size: 11px;
-                    color: var(--text-secondary);
-                }
-                .legend-dot {
-                    width: 8px;
-                    height: 8px;
-                    border-radius: 50%;
-                }
-                .no-data-state {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100%;
-                    color: var(--text-tertiary);
-                    gap: 12px;
-                }
-                .no-data-state p {
-                    font-size: 13px;
-                    margin: 0;
-                }
-                .table-card {
-                    padding: 20px;
-                    border-radius: 16px;
-                }
-                .table-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 16px;
-                }
-                .table-header h3 {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    margin: 0;
-                }
-                .data-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                .data-table th,
-                .data-table td {
-                    padding: 12px;
-                    text-align: left;
-                    border-bottom: 1px solid var(--glass-border);
-                    font-size: 12px;
-                }
-                .data-table th {
-                    color: var(--text-tertiary);
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    font-size: 10px;
-                    letter-spacing: 0.5px;
-                }
-                .badge {
-                    padding: 4px 10px;
-                    border-radius: 12px;
-                    font-size: 10px;
-                    font-weight: 600;
-                    text-transform: capitalize;
-                }
-                .badge-high, .badge-atRisk {
-                    background: rgba(239, 68, 68, 0.15);
-                    color: #ef4444;
-                }
-                .badge-medium {
-                    background: rgba(245, 158, 11, 0.15);
-                    color: #f59e0b;
-                }
-                .badge-low, .badge-remediated, .badge-dismissed {
-                    background: rgba(34, 197, 94, 0.15);
-                    color: #22c55e;
-                }
-                .badge-confirmedCompromised {
-                    background: rgba(239, 68, 68, 0.25);
-                    color: #ef4444;
-                }
-                .spin {
+                <div className={styles.statsGrid}>
+                    <motion.div whileHover={{ y: -5 }} className={styles.statCard} onClick={() => { }} style={{ cursor: 'default' }}>
+                        <div className={styles.statLabel}>
+                            <Target size={16} style={{ color: '#22c55e' }} />
+                            Secure Score
+                        </div>
+                        <div className={styles.statValue} style={{ color: '#22c55e' }}>{safeData.secureScore.percentage}%</div>
+                        <div className={styles.statSubtext} style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
+                            {safeData.secureScore.current}/{safeData.secureScore.max} points
+                        </div>
+                    </motion.div>
+
+                    <motion.div whileHover={{ y: -5 }} className={styles.statCard} onClick={() => navigate('/service/security/alerts')} style={{ cursor: 'pointer' }}>
+                        <div className={styles.statLabel}>
+                            <AlertTriangle size={16} style={{ color: '#ef4444' }} />
+                            Security Alerts
+                        </div>
+                        <div className={styles.statValue} style={{ color: '#ef4444' }}>{safeData.alerts.total}</div>
+                        <div className={styles.statSubtext} style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
+                            {safeData.alerts.highSeverity} high severity
+                        </div>
+                    </motion.div>
+
+                    <motion.div whileHover={{ y: -5 }} className={styles.statCard} onClick={() => navigate('/service/security/incidents')} style={{ cursor: 'pointer' }}>
+                        <div className={styles.statLabel}>
+                            <AlertOctagon size={16} style={{ color: '#f59e0b' }} />
+                            Incidents
+                        </div>
+                        <div className={styles.statValue} style={{ color: '#f59e0b' }}>{safeData.incidents.active}</div>
+                        <div className={styles.statSubtext} style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
+                            {safeData.incidents.total} total
+                        </div>
+                    </motion.div>
+
+                    <motion.div whileHover={{ y: -5 }} className={styles.statCard} onClick={() => navigate('/service/security/explorer')} style={{ cursor: 'pointer' }}>
+                        <div className={styles.statLabel}>
+                            <UserX size={16} style={{ color: '#a855f7' }} />
+                            Risky Users
+                        </div>
+                        <div className={styles.statValue} style={{ color: '#a855f7' }}>{safeData.riskyUsers.total}</div>
+                        <div className={styles.statSubtext} style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
+                            {safeData.riskyUsers.high} high risk
+                        </div>
+                    </motion.div>
+                </div>
+
+                <div className={styles.grid}>
+                    <div className={styles.card}>
+                        <div className={styles.cardHeader}>
+                            <h3 className={styles.cardTitle}>
+                                <AlertTriangle size={18} style={{ color: '#ef4444' }} />
+                                Alerts by Severity
+                            </h3>
+                            <button className={styles.viewMoreBtn} onClick={() => navigate('/service/security/alerts')}>
+                                View All <ChevronRight size={14} />
+                            </button>
+                        </div>
+                        <div className={styles.cardBody} style={{ height: '300px' }}>
+                            {alertSeverityData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie data={alertSeverityData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={5} dataKey="value">
+                                            {alertSeverityData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className={styles.emptyState}>No alerts found</div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className={styles.card}>
+                        <div className={styles.cardHeader}>
+                            <h3 className={styles.cardTitle}>
+                                <UserX size={18} style={{ color: '#a855f7' }} />
+                                Risky Users
+                            </h3>
+                            <button className={styles.viewMoreBtn} onClick={() => navigate('/service/security/explorer')}>
+                                View All <ChevronRight size={14} />
+                            </button>
+                        </div>
+                        <div className={styles.cardBody} style={{ height: '300px' }}>
+                            {riskyUsersData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={riskyUsersData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                                        <XAxis type="number" hide />
+                                        <YAxis type="category" dataKey="name" width={100} tick={{ fill: 'var(--text-secondary)', fontSize: 12 }} />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={30}>
+                                            {riskyUsersData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className={styles.emptyState}>No risky users detected</div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className={styles.card} style={{ marginTop: '2.5rem' }}>
+                    <div className={styles.cardHeader}>
+                        <h3 className={styles.cardTitle}>
+                            <FileWarning size={18} style={{ color: '#f59e0b' }} />
+                            Recent Risk Detections
+                        </h3>
+                        <button className={styles.viewMoreBtn} onClick={() => navigate('/service/security/explorer')}>
+                            Open Explorer <ChevronRight size={14} />
+                        </button>
+                    </div>
+                    <div className={styles.tableContainer}>
+                        <div className={styles.scrollableTable}>
+                            <table className={styles.table}>
+                                <thead className={styles.tableHead}>
+                                    <tr>
+                                        <th>Detection Type</th>
+                                        <th>Risk Level</th>
+                                        <th>User</th>
+                                        <th>Detected</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {safeData.riskDetections.recent.length > 0 ? (
+                                        safeData.riskDetections.recent.map((risk, idx) => (
+                                            <tr key={risk.id || idx} className={styles.tableRow}>
+                                                <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{risk.riskEventType}</td>
+                                                <td>
+                                                    <span className={styles.badge} style={{
+                                                        background: `${severityColors[risk.riskLevel?.toLowerCase()] || '#6b7280'}20`,
+                                                        color: severityColors[risk.riskLevel?.toLowerCase()] || '#6b7280',
+                                                        borderColor: `${severityColors[risk.riskLevel?.toLowerCase()] || '#6b7280'}40`
+                                                    }}>
+                                                        {risk.riskLevel}
+                                                    </span>
+                                                </td>
+                                                <td style={{ color: 'var(--text-secondary)' }}>{risk.userDisplayName || risk.userPrincipalName}</td>
+                                                <td style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
+                                                    {risk.detectedDateTime ? new Date(risk.detectedDateTime).toLocaleDateString() : 'N/A'}
+                                                </td>
+                                                <td>
+                                                    <span className={`${styles.badge} ${styles.badgeInfo}`}>
+                                                        {risk.riskState}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="5" className={styles.emptyState}>No recent risk detections</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <style jsx="true">{`
+                .spinning {
                     animation: spin 1s linear infinite;
                 }
                 @keyframes spin {
@@ -692,7 +323,7 @@ const SecurityDashboard = () => {
                     to { transform: rotate(360deg); }
                 }
             `}</style>
-        </div >
+        </div>
     );
 };
 

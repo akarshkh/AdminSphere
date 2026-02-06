@@ -22,7 +22,8 @@ import { DataPersistenceService } from '../services/dataPersistence';
 import SiteDataStore from '../services/siteDataStore';
 import { MiniSparkline, MiniProgressBar, MiniSegmentedBar } from './charts/MicroCharts';
 import { useDataCaching } from '../hooks/useDataCaching';
-import SafeResponsiveContainer from './SafeResponsiveContainer';
+// SafeResponsiveContainer was removed in favor of standard ResponsiveContainer with fixed height for better reliability
+// import SafeResponsiveContainer from './SafeResponsiveContainer';
 
 const CustomTreemapContent = (props) => {
     const { x, y, width, height, name, fill } = props;
@@ -397,7 +398,7 @@ const OverviewDashboard = () => {
                     </div>
 
                     <div style={{ width: '120px', height: '120px', position: 'relative', flexShrink: 0 }}>
-                        <SafeResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={240}>
                             <PieChart>
                                 <Pie
                                     data={[
@@ -421,7 +422,7 @@ const OverviewDashboard = () => {
                                     />
                                 </Pie>
                             </PieChart>
-                        </SafeResponsiveContainer>
+                        </ResponsiveContainer>
                     </div>
                 </div>
             </div>
@@ -563,7 +564,7 @@ const OverviewDashboard = () => {
                                     </div>
                                     <div style={{ height: '240px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
                                         {chartsVisible ? (
-                                            <SafeResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
+                                            <ResponsiveContainer width="100%" height={260} minWidth={1} minHeight={1} debounce={200}>
                                                 <PieChart>
                                                     <Pie data={data.charts.userDistribution} cx="50%" cy="50%" outerRadius={80} innerRadius={60} paddingAngle={5} dataKey="value" stroke="var(--glass-bg)" strokeWidth={2}>
                                                         {data.charts.userDistribution.map((entry, index) => (
@@ -573,7 +574,7 @@ const OverviewDashboard = () => {
                                                     <Tooltip content={<CustomTooltip />} />
                                                     <Legend verticalAlign="bottom" height={36} />
                                                 </PieChart>
-                                            </SafeResponsiveContainer>
+                                            </ResponsiveContainer>
                                         ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>}
                                     </div>
                                 </div>
@@ -599,7 +600,7 @@ const OverviewDashboard = () => {
                                     </div>
                                     <div style={{ height: '240px', minWidth: '0', overflow: 'hidden' }}>
                                         {chartsVisible && (
-                                            <SafeResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
+                                            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
                                                 <BarChart data={data.charts.deviceCompliance} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
                                                     <defs>
                                                         <linearGradient id="compGrad" x1="0" y1="0" x2="0" y2="1">
@@ -613,7 +614,7 @@ const OverviewDashboard = () => {
                                                     <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--glass-border)', opacity: 0.1 }} />
                                                     <Bar dataKey="value" fill="url(#compGrad)" radius={[6, 6, 0, 0]} />
                                                 </BarChart>
-                                            </SafeResponsiveContainer>
+                                            </ResponsiveContainer>
                                         )}
                                     </div>
                                 </div>
@@ -673,7 +674,7 @@ const OverviewDashboard = () => {
                                     </div>
                                     <div style={{ height: '240px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
                                         {chartsVisible ? (
-                                            <SafeResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
+                                            <ResponsiveContainer width="100%" height={260} minWidth={1} minHeight={1} debounce={200}>
                                                 <AreaChart data={data.charts.emailTrend}>
                                                     <defs>
                                                         <linearGradient id="emailGrad" x1="0" y1="0" x2="0" y2="1">
@@ -686,7 +687,7 @@ const OverviewDashboard = () => {
                                                     <Area type="monotone" dataKey="sent" name="Sent" stroke="var(--accent-indigo)" fillOpacity={1} fill="url(#emailGrad)" strokeWidth={2} />
                                                     <Area type="monotone" dataKey="received" name="Received" stroke="var(--accent-cyan)" fillOpacity={0} strokeWidth={2} />
                                                 </AreaChart>
-                                            </SafeResponsiveContainer>
+                                            </ResponsiveContainer>
                                         ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>}
                                     </div>
                                 </div>
@@ -714,14 +715,14 @@ const OverviewDashboard = () => {
                                         </div>
                                         <div style={{ height: '260px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
                                             {chartsVisible ? (
-                                                <SafeResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
+                                                <ResponsiveContainer width="100%" height={260} minWidth={1} minHeight={1} debounce={200}>
                                                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data.charts.securityRadar}>
                                                         <PolarGrid stroke="var(--glass-border)" />
                                                         <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-dim)', fontSize: 10 }} />
                                                         <Radar name="Score" dataKey="value" stroke="var(--accent-blue)" fill="var(--accent-blue)" fillOpacity={0.3} />
                                                         <Tooltip content={<CustomTooltip />} />
                                                     </RadarChart>
-                                                </SafeResponsiveContainer>
+                                                </ResponsiveContainer>
                                             ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>}
                                         </div>
                                     </div>
@@ -741,7 +742,7 @@ const OverviewDashboard = () => {
                                         </div>
                                         <div style={{ height: '300px', width: '100%', marginTop: '16px' }}>
                                             {chartsVisible ? (
-                                                <SafeResponsiveContainer width="100%" height="100%">
+                                                <ResponsiveContainer width="100%" height={300}>
                                                     <Treemap
                                                         data={data.charts.licenseTreemap}
                                                         dataKey="size"
@@ -752,7 +753,7 @@ const OverviewDashboard = () => {
                                                     >
                                                         <Tooltip content={<CustomTooltip />} />
                                                     </Treemap>
-                                                </SafeResponsiveContainer>
+                                                </ResponsiveContainer>
                                             ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>}
                                         </div>
                                     </div>

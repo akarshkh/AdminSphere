@@ -30,14 +30,21 @@ const LineagePage = () => {
                 account: accounts[0]
             });
 
-            // For demo, using mock asset GUID
-            const mockGuid = 'sample-asset-guid-123';
-            const lineage = await PurviewService.getLineage(response.accessToken, mockGuid, direction);
+            // Production: Lineage requires a specific asset GUID
+            // This should ideally come from navigation state or a search selection
+            const queryParams = new URLSearchParams(window.location.search);
+            const assetGuid = queryParams.get('guid');
 
+            if (!assetGuid) {
+                setLineageData({ nodes: [], edges: [], message: 'Please select an asset from the catalog to view its lineage.' });
+                setLoading(false);
+                return;
+            }
+
+            const lineage = await PurviewService.getLineage(response.accessToken, assetGuid, direction);
             setLineageData(lineage);
         } catch (error) {
             console.error('Error fetching lineage:', error);
-            console.warn('Purview API call failed. Please configure Purview endpoint in .env');
             setLineageData({ nodes: [], edges: [] });
         } finally {
             setLoading(false);

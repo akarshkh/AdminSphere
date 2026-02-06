@@ -472,18 +472,41 @@ export const SharePointService = {
      * @param {Client} client - Microsoft Graph client
      */
     async getServiceMessages(client) {
+        // Skip if we already know this will fail with 403 (insufficient permissions)
+        // Check both window and localStorage (for persistence across refreshes)
+        if (window._serviceMessages403Warned || localStorage.getItem('m365_sm_403_silenced')) {
+            window._serviceMessages403Warned = true; // Sync window flag
+            return [];
+        }
+
+        // If a request is already in progress, don't start another one to avoid multiple console errors
+        if (window._serviceMessagesRequestInProgress) {
+            return [];
+        }
+
         try {
+            window._serviceMessagesRequestInProgress = true;
             const response = await client.api('/admin/serviceAnnouncement/messages')
                 .top(5)
                 .select('id,title,startDateTime,lastModifiedDateTime,category,details')
                 .orderby('lastModifiedDateTime desc')
                 .get();
+
+            window._serviceMessagesRequestInProgress = false;
             return response.value || [];
         } catch (error) {
+            window._serviceMessagesRequestInProgress = false;
+
             // Suppress 403 errors (requires ServiceMessage.Read.All permission)
-            if (!window._serviceMessages403Warned && error.statusCode === 403) {
-                console.warn('Service Announcement API requires additional admin permissions (ServiceMessage.Read.All). Using fallback.');
-                window._serviceMessages403Warned = true;
+            if (error.statusCode === 403 || error.status === 403) {
+                if (!window._serviceMessages403Warned) {
+                    console.warn('[SharePointService] Service Announcement API requires additional admin permissions (ServiceMessage.Read.All). Message Center will be empty.');
+                    window._serviceMessages403Warned = true;
+                    // Persist this flag to avoid console noise on subsequent refreshes
+                    localStorage.setItem('m365_sm_403_silenced', 'true');
+                }
+            } else {
+                console.error('[SharePointService] Error fetching service messages:', error);
             }
             return [];
         }

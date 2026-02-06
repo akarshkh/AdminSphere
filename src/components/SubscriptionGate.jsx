@@ -82,7 +82,7 @@ const SubscriptionGate = ({ children }) => {
                         <button
                             className="glass-btn"
                             style={{ width: '100%', padding: '16px' }}
-                            onClick={() => window.location.href = 'mailto:sales@example.com'}
+                            onClick={() => window.location.href = 'mailto:support@meridiansolutions.com'}
                         >
                             <CreditCard size={18} style={{ marginRight: '8px' }} />
                             Contact Sales for Enterprise

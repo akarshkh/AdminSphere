@@ -12,9 +12,8 @@ import {
     Users, MessageSquare, Video, RefreshCw, ChevronRight, Hash, Lock, Globe, Archive
 } from 'lucide-react';
 import {
-    PieChart, Pie, Cell, Tooltip
+    ResponsiveContainer, PieChart, Pie, Cell, Tooltip
 } from 'recharts';
-import SafeResponsiveContainer from './SafeResponsiveContainer';
 import { useDataCaching } from '../hooks/useDataCaching';
 
 const TeamsDashboard = () => {
@@ -40,13 +39,7 @@ const TeamsDashboard = () => {
 
         return {
             ...dashboardSummary,
-            recentActivity: recentActivity.length > 0 ? recentActivity.slice(0, 10) : [
-                { displayName: 'Pilot User', lastActivityDate: new Date().toISOString(), teamChatMessages: 12, privateChatMessages: 45, calls: 3, meetings: 2 },
-                { displayName: 'Global Admin', lastActivityDate: new Date(Date.now() - 3600000).toISOString(), teamChatMessages: 8, privateChatMessages: 12, calls: 1, meetings: 5 },
-                { displayName: 'System Auditor', lastActivityDate: new Date(Date.now() - 7200000).toISOString(), teamChatMessages: 0, privateChatMessages: 5, calls: 0, meetings: 1 },
-                { displayName: 'Compliance Manager', lastActivityDate: new Date(Date.now() - 86400000).toISOString(), teamChatMessages: 15, privateChatMessages: 30, calls: 5, meetings: 8 },
-                { displayName: 'Security Expert', lastActivityDate: new Date(Date.now() - 172800000).toISOString(), teamChatMessages: 5, privateChatMessages: 10, calls: 2, meetings: 3 }
-            ]
+            recentActivity: recentActivity || []
         };
     };
 
@@ -315,7 +308,7 @@ const TeamsDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {visibilityData.length > 0 ? (
-                            <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
+                            <ResponsiveContainer width="100%" height={220} minWidth={0} minHeight={0} debounce={50}>
                                 <PieChart>
                                     <Pie
                                         data={visibilityData}
@@ -332,7 +325,7 @@ const TeamsDashboard = () => {
                                     </Pie>
                                     <Tooltip content={<CustomTooltip />} />
                                 </PieChart>
-                            </SafeResponsiveContainer>
+                            </ResponsiveContainer>
                         ) : (
                             <div className="no-data-state">
                                 <Users size={40} style={{ opacity: 0.3 }} />

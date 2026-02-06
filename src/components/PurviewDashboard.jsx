@@ -11,8 +11,7 @@ import {
 } from 'lucide-react';
 import { CustomTooltip } from './charts/CustomTooltip';
 import Loader3D from './Loader3D';
-import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
-import SafeResponsiveContainer from './SafeResponsiveContainer';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
 import SiteDataStore from '../services/siteDataStore';
 import { useDataCaching } from '../hooks/useDataCaching';
@@ -247,10 +246,10 @@ const PurviewDashboard = () => {
             {cachedData && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px', alignItems: 'start' }}>
                     <div style={{ gridColumn: '1 / -1' }}>
-                        {stats.isMock && (
+                        {stats.isConfigured === false && (
                             <div style={{
-                                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05))',
-                                border: '1px solid rgba(245, 158, 11, 0.2)',
+                                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05))',
+                                border: '1px solid rgba(59, 130, 246, 0.2)',
                                 borderRadius: '16px',
                                 padding: '20px 24px',
                                 marginBottom: '24px',
@@ -263,20 +262,20 @@ const PurviewDashboard = () => {
                                 <div style={{
                                     width: '48px',
                                     height: '48px',
-                                    background: 'rgba(245, 158, 11, 0.1)',
+                                    background: 'rgba(59, 130, 246, 0.1)',
                                     borderRadius: '12px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    color: 'var(--accent-warning)',
+                                    color: 'var(--accent-blue)',
                                     flexShrink: 0
                                 }}>
                                     <Shield size={24} />
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-primary)', fontWeight: 700 }}>Demo Mode: Purview Connection Required</h3>
+                                    <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-primary)', fontWeight: 700 }}>Purview Connection Required</h3>
                                     <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-dim)', lineHeight: 1.5 }}>
-                                        The dashboard is currently showing <strong>mock governance data</strong>. To view your real asset catalog, configure <code>VITE_PURVIEW_ACCOUNT_NAME</code> and <code>VITE_PURVIEW_ENDPOINT</code> in your <code>.env</code> file.
+                                        To view your real asset catalog, configure <code>VITE_PURVIEW_ACCOUNT_NAME</code> and <code>VITE_PURVIEW_ENDPOINT</code> in your <code>.env</code> file.
                                     </p>
                                 </div>
                                 <div style={{ display: 'flex', gap: '12px' }}>
@@ -498,7 +497,7 @@ const PurviewDashboard = () => {
                             <Tags size={14} color="var(--accent-warning)" />
                             Classification Coverage
                         </h3>
-                        <SafeResponsiveContainer width="100%" height={250}>
+                        <ResponsiveContainer width="100%" height={250}>
                             <BarChart data={(Array.isArray(stats.classificationDistribution) && stats.classificationDistribution.length > 0) ? stats.classificationDistribution : [
                                 { name: 'Public', count: 0 },
                                 { name: 'Internal', count: 0 },
@@ -517,7 +516,7 @@ const PurviewDashboard = () => {
                                 <Tooltip content={<CustomTooltip />} />
                                 <Bar dataKey="count" fill="url(#barGrad1)" radius={[8, 8, 0, 0]} />
                             </BarChart>
-                        </SafeResponsiveContainer>
+                        </ResponsiveContainer>
                     </div>
 
                     {/* Scan Status */}
@@ -526,7 +525,7 @@ const PurviewDashboard = () => {
                             <Scan size={14} color="var(--accent-cyan)" />
                             Scan Status Overview
                         </h3>
-                        <SafeResponsiveContainer width="100%" height={250}>
+                        <ResponsiveContainer width="100%" height={250}>
                             <BarChart data={[
                                 {
                                     name: 'Sources',
@@ -544,7 +543,7 @@ const PurviewDashboard = () => {
                                 <Bar dataKey="pending" stackId="scan" fill="#f59e0b" name="Pending" />
                                 <Bar dataKey="failed" stackId="scan" fill="#ef4444" name="Failed" />
                             </BarChart>
-                        </SafeResponsiveContainer>
+                        </ResponsiveContainer>
                     </div>
                 </div>
             )}

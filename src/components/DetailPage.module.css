@@ -110,6 +110,13 @@
     margin-bottom: 2.5rem;
 }
 
+/* For pages that need a grid of glass cards specifically */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
 .statCard {
     padding: 1.75rem;
     border-radius: 1rem;
@@ -151,7 +158,13 @@
 
 /* Tables */
 .tableContainer {
+    overflow: hidden;
+    border-radius: 0 0 1.25rem 1.25rem;
+}
+
+.scrollableTable {
     overflow-x: auto;
+    width: 100%;
 }
 
 .table {
@@ -318,31 +331,58 @@
     box-shadow: 0 4px 12px var(--accent-blue-glow);
 }
 
-.actionButtonSecondary {
-    background: var(--glass-bg);
-    color: var(--text-primary);
-    border-color: var(--glass-border);
-}
-
 .actionButtonSecondary:hover {
     background: var(--glass-bg-hover);
     border-color: var(--glass-border-hover);
+}
+
+.viewMoreBtn {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 200ms ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.viewMoreBtn:hover {
+    background: rgba(59, 130, 246, 0.1);
+    transform: translateX(3px);
 }
 
 /* Filters */
 .filterBar {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
     flex-wrap: wrap;
+    background: var(--glass-bg);
+    padding: 1.25rem;
+    border-radius: 1rem;
+    border: 1px solid var(--glass-border);
+}
+
+.filterGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-secondary);
 }
 
 .filterInput {
     flex: 1;
     min-width: 250px;
-    padding: 0.75rem 1rem;
-    background: var(--glass-bg);
+    padding: 0.75rem 1.25rem;
+    background: var(--bg-tertiary);
     border: 1px solid var(--glass-border);
     border-radius: 0.75rem;
     color: var(--text-primary);
@@ -350,9 +390,21 @@
     transition: all 200ms ease;
 }
 
-.filterInput:focus {
+.filterSelect {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
     outline: none;
-    background: var(--glass-bg-hover);
+    transition: all 200ms ease;
+}
+
+.filterInput:focus,
+.filterSelect:focus {
+    outline: none;
     border-color: var(--accent-blue);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }

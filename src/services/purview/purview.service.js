@@ -404,41 +404,28 @@ export const PurviewService = {
     // Get comprehensive dashboard data
     async getDashboardData(accessToken) {
         if (!this.isConfigured()) {
-            console.warn('Purview not configured - returning mock data');
+            console.warn('Purview not configured - returning empty state');
             return {
-                totalAssets: 1240,
-                assetDistribution: [
-                    { name: 'Azure SQL Database', value: 450 },
-                    { name: 'Blob Storage', value: 320 },
-                    { name: 'Power BI', value: 180 },
-                    { name: 'AWS S3', value: 120 },
-                    { name: 'On-prem SQL', value: 95 },
-                    { name: 'Other', value: 75 }
-                ],
-                assetTypes: 12,
-                classifications: 42,
-                classificationDistribution: [
-                    { name: 'Confidential', count: 120 },
-                    { name: 'Highly Confidential', count: 45 },
-                    { name: 'Public', count: 800 },
-                    { name: 'Credit Card Number', count: 15 },
-                    { name: 'Passport Number', count: 8 }
-                ],
-                glossaryTermsCount: 85,
-                glossaryCategoriesCount: 14,
-                dataSources: 18,
+                totalAssets: 0,
+                assetDistribution: [],
+                assetTypes: 0,
+                classifications: 0,
+                classificationDistribution: [],
+                glossaryTermsCount: 0,
+                glossaryCategoriesCount: 0,
+                dataSources: 0,
                 scanStats: {
-                    totalSources: 18,
-                    activeSources: 15,
-                    inactiveSources: 3,
+                    totalSources: 0,
+                    activeSources: 0,
+                    inactiveSources: 0,
                     pendingSources: 0
                 },
-                collections: 8,
-                policies: 5,
-                assetsWithLineage: 412,
-                sensitiveAssets: 68,
+                collections: 0,
+                policies: 0,
+                assetsWithLineage: 0,
+                sensitiveAssets: 0,
                 lastUpdated: new Date().toISOString(),
-                isMock: true
+                isConfigured: false
             };
         }
 
@@ -521,7 +508,8 @@ export const PurviewService = {
                 scanStats: { totalSources: 0, activeSources: 0, inactiveSources: 0 },
                 collections: 0,
                 policies: 0,
-                lastUpdated: new Date().toISOString()
+                lastUpdated: new Date().toISOString(),
+                isConfigured: false
             };
         }
     }

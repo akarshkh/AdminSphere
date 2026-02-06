@@ -14,6 +14,7 @@ const SafeResponsiveContainer = ({ children, width = "100%", height = "100%", ..
         if (!containerRef.current) return;
 
         const checkDimensions = () => {
+            if (!containerRef.current) return;
             const { clientWidth, clientHeight } = containerRef.current;
             // We use a small threshold like 1px to be safe, though > 0 is strictly required
             if (clientWidth > 0 && clientHeight > 0) {

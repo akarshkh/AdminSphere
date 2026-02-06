@@ -219,7 +219,7 @@ const ConditionalAccessPage = () => {
                 )}
             </div>
 
-            <style jsx>{`
+            <style>{`
                 .page-container { padding: 0; }
                 .page-header {
                     display: flex;

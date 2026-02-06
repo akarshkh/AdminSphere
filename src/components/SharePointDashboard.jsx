@@ -8,6 +8,7 @@ import { SharePointService } from '../services/sharepoint/sharepoint.service';
 import { DataPersistenceService } from '../services/dataPersistence';
 import AnimatedTile from './AnimatedTile';
 import Loader3D from './Loader3D';
+import SafeResponsiveContainer from './SafeResponsiveContainer';
 import {
     Globe, HardDrive, Database, RefreshCw, ChevronRight, FolderOpen, Cloud, ExternalLink, Activity, FileText, Bell, AlertCircle, Maximize2
 } from 'lucide-react';
@@ -17,7 +18,15 @@ import {
 import { useDataCaching } from '../hooks/useDataCaching';
 
 const SharePointDashboard = () => {
+    const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const [chartsVisible, setChartsVisible] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setChartsVisible(true), 500);
+        return () => clearTimeout(timer);
+    }, []);
+
     const fetchFn = async () => {
         const account = accounts[0];
         if (!account) throw new Error('No account found');
@@ -91,24 +100,9 @@ const SharePointDashboard = () => {
             } : null,
             activity: {
                 totalFiles: odUsage?.totalFiles || 0,
-                oneDrive: Array.isArray(oneDriveActivity) && oneDriveActivity.length > 0 ? oneDriveActivity : [
-                    { date: 'Jan 2', active: 1, total: 8 },
-                    { date: 'Jan 7', active: 1.2, total: 8 },
-                    { date: 'Jan 12', active: 2.1, total: 8 },
-                    { date: 'Jan 17', active: 0.8, total: 8 },
-                    { date: 'Jan 22', active: 1.1, total: 8 },
-                    { date: 'Jan 27', active: 1, total: 8 },
-                    { date: 'Jan 31', active: 1.1, total: 8 },
-                ],
-                files: Array.isArray(fileActivity) && fileActivity.length > 0 ? fileActivity : [
-                    { date: 'Jan 2', viewed: 1, synced: 0.1, sharedInternally: 0.2, sharedExternally: 0.05 },
-                    { date: 'Jan 7', viewed: 1.2, synced: 0.2, sharedInternally: 0.3, sharedExternally: 0.1 },
-                    { date: 'Jan 12', viewed: 2.0, synced: 0.4, sharedInternally: 0.5, sharedExternally: 0.15 },
-                    { date: 'Jan 17', viewed: 1.1, synced: 0.3, sharedInternally: 0.4, sharedExternally: 0.08 },
-                    { date: 'Jan 22', viewed: 1.5, synced: 0.5, sharedInternally: 0.7, sharedExternally: 0.12 },
-                    { date: 'Jan 27', viewed: 1.8, synced: 0.3, sharedInternally: 0.6, sharedExternally: 0.1 },
-                    { date: 'Jan 31', viewed: 1.9, synced: 0.4, sharedInternally: 0.6, sharedExternally: 0.15 },
-                ]
+                oneDrive: Array.isArray(oneDriveActivity) ? oneDriveActivity : [],
+                files: Array.isArray(fileActivity) ? fileActivity : []
+
             },
             messages: messages || []
         };
@@ -385,33 +379,35 @@ const SharePointDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {siteTypeData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-                                <PieChart>
-                                    <defs>
-                                        {siteTypeData.map((entry, index) => (
-                                            <linearGradient key={`grad-${index}`} id={`colorSite-${index}`} x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor={entry.color} stopOpacity={0.8} />
-                                                <stop offset="95%" stopColor={entry.color} stopOpacity={0.2} />
-                                            </linearGradient>
-                                        ))}
-                                    </defs>
-                                    <Pie
-                                        data={siteTypeData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={85}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {siteTypeData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} filter="drop-shadow(0px 4px 8px rgba(0,0,0,0.2))" />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
-                                </PieChart>
-                            </ResponsiveContainer>
+                            chartsVisible ? (
+                                <ResponsiveContainer width="100%" height={220} minWidth={0} minHeight={0} debounce={50}>
+                                    <PieChart>
+                                        <defs>
+                                            {siteTypeData.map((entry, index) => (
+                                                <linearGradient key={`grad-${index}`} id={`colorSite-${index}`} x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor={entry.color} stopOpacity={0.8} />
+                                                    <stop offset="95%" stopColor={entry.color} stopOpacity={0.2} />
+                                                </linearGradient>
+                                            ))}
+                                        </defs>
+                                        <Pie
+                                            data={siteTypeData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={85}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            stroke="none"
+                                        >
+                                            {siteTypeData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} filter="drop-shadow(0px 4px 8px rgba(0,0,0,0.2))" />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>
                         ) : (
                             <div className="no-data-state">
                                 <Globe size={40} style={{ opacity: 0.3 }} />
@@ -497,33 +493,29 @@ const SharePointDashboard = () => {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
                 gap: '20px',
-                marginBottom: '24px',
-                alignItems: 'start'
+                marginBottom: '24px'
             }}>
                 {/* OneDrive Activity */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="chart-card glass-card"
+                    className="chart-card glass-card clickable-tile"
+                    onClick={() => navigate('/service/sharepoint/onedrive')}
                 >
                     <div className="chart-header">
                         <h3 style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                             OneDrive activity
                         </h3>
-                        <button className="view-all-btn" onClick={() => navigate('/service/usage?tab=onedrive')}>
+                        <button className="view-all-btn">
                             Details <Maximize2 size={14} />
                         </button>
                     </div>
-                    <div
-                        className="clickable-area"
-                        onClick={() => navigate('/service/usage?tab=onedrive')}
-                        style={{ cursor: 'pointer' }}
-                    >
+                    <div style={{ padding: '0 16px' }}>
                         <h2 style={{ fontSize: '28px', fontWeight: 800, margin: '8px 0', color: 'var(--text-primary)' }}>
                             {dashboardData.activity.oneDrive?.length > 0
                                 ? dashboardData.activity.oneDrive[dashboardData.activity.oneDrive.length - 1].active
-                                : '1.1'} active accounts
+                                : '0'} active accounts
                         </h2>
                         <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginBottom: '16px' }}>
                             Last 30 days as of {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
@@ -531,26 +523,28 @@ const SharePointDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '200px' }}>
                         {dashboardData.activity.oneDrive?.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-                                <AreaChart data={dashboardData.activity.oneDrive}>
-                                    <defs>
-                                        <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--glass-border)" />
-                                    <XAxis dataKey="date" hide />
-                                    <YAxis hide />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Area type="monotone" dataKey="active" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorActive)" />
-                                    <Area type="monotone" dataKey="total" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" />
-                                </AreaChart>
-                            </ResponsiveContainer>
+                            chartsVisible ? (
+                                <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0} debounce={50}>
+                                    <AreaChart data={dashboardData.activity.oneDrive}>
+                                        <defs>
+                                            <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                            </linearGradient>
+                                            <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.2} />
+                                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--glass-border)" />
+                                        <XAxis dataKey="date" hide />
+                                        <YAxis hide />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Area type="monotone" dataKey="active" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorActive)" />
+                                        <Area type="monotone" dataKey="total" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>
                         ) : (
                             <div className="no-data-state">
                                 <Activity size={32} style={{ opacity: 0.3 }} />
@@ -582,7 +576,7 @@ const SharePointDashboard = () => {
                     </div>
                     <div style={{ padding: '0 16px' }}>
                         <h2 style={{ fontSize: '28px', fontWeight: 800, margin: '8px 0', color: 'var(--text-primary)' }}>
-                            {dashboardData.activity.totalFiles > 0 ? dashboardData.activity.totalFiles : '637'} OneDrive files
+                            {dashboardData.activity.totalFiles > 0 ? dashboardData.activity.totalFiles : '0'} OneDrive files
                         </h2>
                         <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginBottom: '16px' }}>
                             Last 30 days as of {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} (UTC)
@@ -590,24 +584,26 @@ const SharePointDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '200px' }}>
                         {dashboardData.activity.files?.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-                                <AreaChart data={dashboardData.activity.files}>
-                                    <defs>
-                                        <linearGradient id="colorViewed" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#0dbcd4" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#0dbcd4" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--glass-border)" />
-                                    <XAxis dataKey="date" hide />
-                                    <YAxis hide />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Area type="monotone" dataKey="viewed" stroke="#0dbcd4" strokeWidth={3} fillOpacity={1} fill="url(#colorViewed)" />
-                                    <Area type="monotone" dataKey="synced" stroke="#8b1157" strokeWidth={2} fillOpacity={0.1} fill="#8b1157" />
-                                    <Area type="monotone" dataKey="sharedInternally" stroke="#4a72ff" strokeWidth={2} fillOpacity={0.1} fill="#4a72ff" />
-                                    <Area type="monotone" dataKey="sharedExternally" stroke="#a3a3a3" strokeWidth={2} fillOpacity={0.1} fill="#a3a3a3" />
-                                </AreaChart>
-                            </ResponsiveContainer>
+                            chartsVisible ? (
+                                <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0} debounce={50}>
+                                    <AreaChart data={dashboardData.activity.files}>
+                                        <defs>
+                                            <linearGradient id="colorViewed" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#0dbcd4" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#0dbcd4" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--glass-border)" />
+                                        <XAxis dataKey="date" hide />
+                                        <YAxis hide />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Area type="monotone" dataKey="viewed" stroke="#0dbcd4" strokeWidth={3} fillOpacity={1} fill="url(#colorViewed)" />
+                                        <Area type="monotone" dataKey="synced" stroke="#8b1157" strokeWidth={2} fillOpacity={0.1} fill="#8b1157" />
+                                        <Area type="monotone" dataKey="sharedInternally" stroke="#4a72ff" strokeWidth={2} fillOpacity={0.1} fill="#4a72ff" />
+                                        <Area type="monotone" dataKey="sharedExternally" stroke="#a3a3a3" strokeWidth={2} fillOpacity={0.1} fill="#a3a3a3" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>
                         ) : (
                             <div className="no-data-state">
                                 <FileText size={32} style={{ opacity: 0.3 }} />
@@ -615,16 +611,11 @@ const SharePointDashboard = () => {
                             </div>
                         )}
                     </div>
-                    <div className="chart-legend" style={{ justifyContent: 'flex-start', padding: '16px', flexWrap: 'wrap' }}>
-                        <div className="legend-item"><span className="legend-dot" style={{ background: '#0dbcd4' }}></span><span>Viewed Or Edited</span></div>
+                    <div className="chart-legend" style={{ justifyContent: 'flex-start', padding: '16px' }}>
+                        <div className="legend-item"><span className="legend-dot" style={{ background: '#0dbcd4' }}></span><span>Viewed</span></div>
                         <div className="legend-item"><span className="legend-dot" style={{ background: '#8b1157' }}></span><span>Synced</span></div>
-                        <div className="legend-item"><span className="legend-dot" style={{ background: '#4a72ff' }}></span><span>Shared Internally</span></div>
-                        <div className="legend-item"><span className="legend-dot" style={{ background: '#a3a3a3' }}></span><span>Shared Externally</span></div>
-                    </div>
-                    <div style={{ padding: '0 16px 16px' }}>
-                        <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', margin: 0 }}>
-                            🚀 4.77% increase in the number of files from 6 months ago
-                        </p>
+                        <div className="legend-item"><span className="legend-dot" style={{ background: '#4a72ff' }}></span><span>Internal</span></div>
+                        <div className="legend-item"><span className="legend-dot" style={{ background: '#a3a3a3' }}></span><span>External</span></div>
                     </div>
                 </motion.div>
 
@@ -661,6 +652,11 @@ const SharePointDashboard = () => {
                             <div className="no-data-state">
                                 <Bell size={32} style={{ opacity: 0.3 }} />
                                 <p>No new messages</p>
+                                {window._serviceMessages403Warned && (
+                                    <p style={{ fontSize: '10px', color: 'var(--text-dim)', textAlign: 'center', marginTop: '8px' }}>
+                                        Additional permissions (ServiceMessage.Read.All) required to view messages.
+                                    </p>
+                                )}
                             </div>
                         )}
                     </div>

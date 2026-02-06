@@ -199,7 +199,7 @@ const PIMRolesPage = () => {
                 )}
             </div>
 
-            <style jsx>{`
+            <style>{`
                 .page-container { padding: 0; }
                 .page-header {
                     display: flex;

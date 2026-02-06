@@ -11365,7 +11365,7 @@
             {
               "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
               "displayName": "vivek",
-              "lastActivityDate": "2026-02-02",
+              "lastActivityDate": "2026-02-03",
               "teamChatMessages": 0,
               "privateChatMessages": 0,
               "calls": 0,
@@ -11428,9 +11428,9 @@
             {
               "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
               "displayName": "demouser",
-              "lastActivityDate": "2025-12-13",
+              "lastActivityDate": "2026-02-03",
               "teamChatMessages": 0,
-              "privateChatMessages": 0,
+              "privateChatMessages": 1,
               "calls": 0,
               "meetings": 0
             },
@@ -11454,6 +11454,20 @@
             }
           ],
           "counts": [
+            {
+              "reportDate": "2026-02-04",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "reportDate": "2026-02-03",
+              "teamChatMessages": 0,
+              "privateChatMessages": 1,
+              "calls": 0,
+              "meetings": 0
+            },
             {
               "reportDate": "2026-02-02",
               "teamChatMessages": 0,
@@ -11488,20 +11502,6 @@
               "privateChatMessages": 0,
               "calls": 0,
               "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-28",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-27",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
             }
           ]
         },
@@ -11512,15 +11512,15 @@
               "displayName": "Vivek Kumar",
               "lastActivityDate": "2026-01-28",
               "sendCount": 0,
-              "receiveCount": 18,
-              "readCount": 3
+              "receiveCount": 2,
+              "readCount": 0
             },
             {
               "userPrincipalName": "Vishal@intunetraininglabs.onmicrosoft.com",
               "displayName": "Vishal",
               "lastActivityDate": null,
               "sendCount": 0,
-              "receiveCount": 19,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
@@ -11528,7 +11528,7 @@
               "displayName": "anje",
               "lastActivityDate": null,
               "sendCount": 0,
-              "receiveCount": 18,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
@@ -11536,7 +11536,7 @@
               "displayName": "PN",
               "lastActivityDate": "2025-11-25",
               "sendCount": 0,
-              "receiveCount": 18,
+              "receiveCount": 2,
               "readCount": 0
             },
             {
@@ -11560,23 +11560,23 @@
               "displayName": "Pilot User",
               "lastActivityDate": "2026-01-27",
               "sendCount": 0,
-              "receiveCount": 18,
-              "readCount": 1
+              "receiveCount": 5,
+              "readCount": 0
             },
             {
               "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
               "displayName": "Demo User",
-              "lastActivityDate": "2025-12-30",
+              "lastActivityDate": "2026-02-04",
               "sendCount": 0,
-              "receiveCount": 18,
-              "readCount": 0
+              "receiveCount": 7,
+              "readCount": 2
             },
             {
               "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
               "displayName": "Parth Narang",
               "lastActivityDate": null,
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -11590,46 +11590,46 @@
           ],
           "counts": [
             {
-              "reportDate": "2026-01-27",
-              "sendCount": 0,
-              "receiveCount": 2,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-28",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
-            },
-            {
               "reportDate": "2026-01-29",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 7,
+              "readCount": 2
             },
             {
               "reportDate": "2026-01-30",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 7,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-31",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 2,
               "readCount": 0
             },
             {
               "reportDate": "2026-02-01",
               "sendCount": 0,
-              "receiveCount": 80,
-              "readCount": 3
+              "receiveCount": 6,
+              "readCount": 0
             },
             {
               "reportDate": "2026-02-02",
               "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 1
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2026-02-03",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2026-02-04",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
             }
           ]
         },
@@ -11823,7 +11823,7 @@
               "syncedFileCount": 0,
               "sharedInternalFileCount": 0,
               "sharedExternalFileCount": 0,
-              "storageUsedInBytes": 1156007
+              "storageUsedInBytes": 1156539
             },
             {
               "siteUrl": "",
@@ -11843,7 +11843,7 @@
               "syncedFileCount": 0,
               "sharedInternalFileCount": 0,
               "sharedExternalFileCount": 0,
-              "storageUsedInBytes": 4839253
+              "storageUsedInBytes": 4851057
             },
             {
               "siteUrl": "",
@@ -11968,6 +11968,16 @@
           ],
           "counts": [
             {
+              "reportDate": "2026-02-04",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
+            {
+              "reportDate": "2026-02-03",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
+            {
               "reportDate": "2026-02-02",
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0
@@ -11989,16 +11999,6 @@
             },
             {
               "reportDate": "2026-01-29",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-28",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-27",
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0
             }
@@ -12032,12 +12032,12 @@
               "userPrincipalName": "N/A",
               "displayName": "Unknown User",
               "storageUsedInBytes": 3391675,
-              "activeFileCount": 0,
+              "activeFileCount": 1,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
               "sharedInternalFileCount": 0,
               "sharedExternalFileCount": 0,
-              "lastActivityDate": "2025-12-30"
+              "lastActivityDate": "2026-02-03"
             },
             {
               "userPrincipalName": "N/A",
@@ -12274,7 +12274,7 @@
           "counts": []
         }
       },
-      "timestamp": 1770204038199,
+      "timestamp": 1770369524957,
       "source": "UsageReports",
       "period": "D7"
     },
@@ -12285,7 +12285,7 @@
             {
               "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
               "displayName": "vivek",
-              "lastActivityDate": "2026-02-02",
+              "lastActivityDate": "2026-02-03",
               "teamChatMessages": 0,
               "privateChatMessages": 1,
               "calls": 0,
@@ -12348,9 +12348,9 @@
             {
               "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
               "displayName": "demouser",
-              "lastActivityDate": "2025-12-13",
+              "lastActivityDate": "2026-02-03",
               "teamChatMessages": 0,
-              "privateChatMessages": 3,
+              "privateChatMessages": 4,
               "calls": 4,
               "meetings": 8
             },
@@ -12374,6 +12374,20 @@
             }
           ],
           "counts": [
+            {
+              "reportDate": "2026-02-04",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "reportDate": "2026-02-03",
+              "teamChatMessages": 0,
+              "privateChatMessages": 1,
+              "calls": 0,
+              "meetings": 0
+            },
             {
               "reportDate": "2026-02-02",
               "teamChatMessages": 0,
@@ -13619,20 +13633,6 @@
               "privateChatMessages": 0,
               "calls": 0,
               "meetings": 0
-            },
-            {
-              "reportDate": "2025-08-08",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2025-08-07",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
             }
           ]
         },
@@ -13643,7 +13643,7 @@
               "displayName": "Vivek Kumar",
               "lastActivityDate": "2026-01-28",
               "sendCount": 0,
-              "receiveCount": 90,
+              "receiveCount": 91,
               "readCount": 48
             },
             {
@@ -13651,7 +13651,7 @@
               "displayName": "Vishal",
               "lastActivityDate": null,
               "sendCount": 0,
-              "receiveCount": 31,
+              "receiveCount": 32,
               "readCount": 0
             },
             {
@@ -13659,7 +13659,7 @@
               "displayName": "anje",
               "lastActivityDate": null,
               "sendCount": 0,
-              "receiveCount": 18,
+              "receiveCount": 19,
               "readCount": 0
             },
             {
@@ -13667,7 +13667,7 @@
               "displayName": "PN",
               "lastActivityDate": "2025-11-25",
               "sendCount": 0,
-              "receiveCount": 91,
+              "receiveCount": 92,
               "readCount": 1
             },
             {
@@ -13691,16 +13691,16 @@
               "displayName": "Pilot User",
               "lastActivityDate": "2026-01-27",
               "sendCount": 22,
-              "receiveCount": 119,
+              "receiveCount": 123,
               "readCount": 82
             },
             {
               "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
               "displayName": "Demo User",
-              "lastActivityDate": "2025-12-30",
+              "lastActivityDate": "2026-02-04",
               "sendCount": 3,
-              "receiveCount": 50,
-              "readCount": 1
+              "receiveCount": 56,
+              "readCount": 3
             },
             {
               "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
@@ -13721,99 +13721,87 @@
           ],
           "counts": [
             {
-              "reportDate": "2025-08-07",
-              "sendCount": 0,
-              "receiveCount": 2,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2025-08-08",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
-            },
-            {
               "reportDate": "2025-08-09",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 7,
+              "readCount": 2
             },
             {
               "reportDate": "2025-08-10",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 7,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-11",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 2,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-12",
               "sendCount": 0,
-              "receiveCount": 80,
-              "readCount": 3
+              "receiveCount": 6,
+              "readCount": 0
             },
             {
               "reportDate": "2025-08-13",
               "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 1
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-08-14",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-15",
               "sendCount": 0,
-              "receiveCount": 6,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-16",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 80,
+              "readCount": 3
             },
             {
               "reportDate": "2025-08-17",
-              "sendCount": 1,
-              "receiveCount": 0,
+              "sendCount": 0,
+              "receiveCount": 6,
               "readCount": 1
             },
             {
               "reportDate": "2025-08-18",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-19",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-20",
               "sendCount": 0,
-              "receiveCount": 6,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-21",
-              "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 0
+              "sendCount": 1,
+              "receiveCount": 0,
+              "readCount": 1
             },
             {
               "reportDate": "2025-08-22",
               "sendCount": 0,
-              "receiveCount": 6,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -13825,85 +13813,85 @@
             {
               "reportDate": "2025-08-24",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-25",
               "sendCount": 0,
-              "receiveCount": 7,
-              "readCount": 3
+              "receiveCount": 1,
+              "readCount": 0
             },
             {
               "reportDate": "2025-08-26",
               "sendCount": 0,
-              "receiveCount": 9,
-              "readCount": 9
+              "receiveCount": 6,
+              "readCount": 0
             },
             {
               "reportDate": "2025-08-27",
-              "sendCount": 2,
-              "receiveCount": 9,
+              "sendCount": 0,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-28",
               "sendCount": 0,
-              "receiveCount": 2,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-29",
               "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
+              "receiveCount": 7,
+              "readCount": 3
             },
             {
               "reportDate": "2025-08-30",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 9,
+              "readCount": 9
             },
             {
               "reportDate": "2025-08-31",
-              "sendCount": 0,
-              "receiveCount": 21,
+              "sendCount": 2,
+              "receiveCount": 9,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-01",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 2,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-02",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-03",
               "sendCount": 0,
-              "receiveCount": 5,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-04",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 21,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-05",
               "sendCount": 0,
-              "receiveCount": 6,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-06",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -13915,20 +13903,20 @@
             {
               "reportDate": "2025-09-08",
               "sendCount": 0,
-              "receiveCount": 5,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-09",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-10",
-              "sendCount": 4,
-              "receiveCount": 10,
-              "readCount": 2
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-09-11",
@@ -13939,7 +13927,7 @@
             {
               "reportDate": "2025-09-12",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 5,
               "readCount": 0
             },
             {
@@ -13950,14 +13938,14 @@
             },
             {
               "reportDate": "2025-09-14",
-              "sendCount": 0,
-              "receiveCount": 2,
-              "readCount": 8
+              "sendCount": 4,
+              "receiveCount": 10,
+              "readCount": 2
             },
             {
               "reportDate": "2025-09-15",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 5,
               "readCount": 0
             },
             {
@@ -13969,49 +13957,49 @@
             {
               "reportDate": "2025-09-17",
               "sendCount": 0,
-              "receiveCount": 7,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-18",
               "sendCount": 0,
-              "receiveCount": 5,
-              "readCount": 0
+              "receiveCount": 2,
+              "readCount": 8
             },
             {
               "reportDate": "2025-09-19",
               "sendCount": 0,
-              "receiveCount": 5,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-20",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-21",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 7,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-22",
               "sendCount": 0,
-              "receiveCount": 8,
-              "readCount": 14
+              "receiveCount": 5,
+              "readCount": 0
             },
             {
               "reportDate": "2025-09-23",
               "sendCount": 0,
-              "receiveCount": 2,
+              "receiveCount": 5,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-24",
               "sendCount": 0,
-              "receiveCount": 4,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -14023,18 +14011,18 @@
             {
               "reportDate": "2025-09-26",
               "sendCount": 0,
-              "receiveCount": 4,
-              "readCount": 0
+              "receiveCount": 8,
+              "readCount": 14
             },
             {
               "reportDate": "2025-09-27",
-              "sendCount": 3,
-              "receiveCount": 6,
+              "sendCount": 0,
+              "receiveCount": 2,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-28",
-              "sendCount": 2,
+              "sendCount": 0,
               "receiveCount": 4,
               "readCount": 0
             },
@@ -14042,31 +14030,31 @@
               "reportDate": "2025-09-29",
               "sendCount": 0,
               "receiveCount": 1,
-              "readCount": 1
+              "readCount": 0
             },
             {
               "reportDate": "2025-09-30",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 4,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-01",
-              "sendCount": 0,
+              "sendCount": 3,
               "receiveCount": 6,
-              "readCount": 2
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-02",
-              "sendCount": 1,
-              "receiveCount": 3,
-              "readCount": 3
+              "sendCount": 2,
+              "receiveCount": 4,
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-03",
               "sendCount": 0,
-              "receiveCount": 4,
-              "readCount": 0
+              "receiveCount": 1,
+              "readCount": 1
             },
             {
               "reportDate": "2025-10-04",
@@ -14077,8 +14065,8 @@
             {
               "reportDate": "2025-10-05",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 6,
+              "readCount": 2
             },
             {
               "reportDate": "2025-10-06",
@@ -14089,26 +14077,26 @@
             {
               "reportDate": "2025-10-07",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 4,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-08",
-              "sendCount": 2,
-              "receiveCount": 4,
-              "readCount": 3
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-09",
               "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 1
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-10",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "sendCount": 1,
+              "receiveCount": 3,
+              "readCount": 3
             },
             {
               "reportDate": "2025-10-11",
@@ -14118,15 +14106,15 @@
             },
             {
               "reportDate": "2025-10-12",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "sendCount": 2,
+              "receiveCount": 4,
+              "readCount": 3
             },
             {
               "reportDate": "2025-10-13",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 1,
+              "readCount": 1
             },
             {
               "reportDate": "2025-10-14",
@@ -14137,19 +14125,19 @@
             {
               "reportDate": "2025-10-15",
               "sendCount": 0,
-              "receiveCount": 5,
-              "readCount": 3
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-16",
-              "sendCount": 8,
-              "receiveCount": 8,
-              "readCount": 8
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-17",
               "sendCount": 0,
-              "receiveCount": 4,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14161,37 +14149,37 @@
             {
               "reportDate": "2025-10-19",
               "sendCount": 0,
-              "receiveCount": 4,
-              "readCount": 20
+              "receiveCount": 5,
+              "readCount": 3
             },
             {
               "reportDate": "2025-10-20",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
+              "sendCount": 8,
+              "receiveCount": 8,
+              "readCount": 8
             },
             {
               "reportDate": "2025-10-21",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 4,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-22",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-23",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 4,
+              "readCount": 20
             },
             {
               "reportDate": "2025-10-24",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
@@ -14203,37 +14191,37 @@
             {
               "reportDate": "2025-10-26",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 1
+              "receiveCount": 3,
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-27",
-              "sendCount": 1,
-              "receiveCount": 1,
+              "sendCount": 0,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-28",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-29",
               "sendCount": 0,
-              "receiveCount": 4,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-30",
               "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 9
+              "receiveCount": 0,
+              "readCount": 1
             },
             {
               "reportDate": "2025-10-31",
-              "sendCount": 0,
-              "receiveCount": 0,
+              "sendCount": 1,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -14244,15 +14232,15 @@
             },
             {
               "reportDate": "2025-11-02",
-              "sendCount": 1,
+              "sendCount": 0,
               "receiveCount": 4,
-              "readCount": 5
+              "readCount": 0
             },
             {
               "reportDate": "2025-11-03",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 1,
+              "readCount": 9
             },
             {
               "reportDate": "2025-11-04",
@@ -14263,14 +14251,14 @@
             {
               "reportDate": "2025-11-05",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-06",
-              "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 0
+              "sendCount": 1,
+              "receiveCount": 4,
+              "readCount": 5
             },
             {
               "reportDate": "2025-11-07",
@@ -14281,19 +14269,19 @@
             {
               "reportDate": "2025-11-08",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-09",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-10",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -14305,8 +14293,8 @@
             {
               "reportDate": "2025-11-12",
               "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 1
+              "receiveCount": 3,
+              "readCount": 0
             },
             {
               "reportDate": "2025-11-13",
@@ -14329,13 +14317,13 @@
             {
               "reportDate": "2025-11-16",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 6,
+              "readCount": 1
             },
             {
               "reportDate": "2025-11-17",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14347,7 +14335,7 @@
             {
               "reportDate": "2025-11-19",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14359,7 +14347,7 @@
             {
               "reportDate": "2025-11-21",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -14371,7 +14359,7 @@
             {
               "reportDate": "2025-11-23",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
@@ -14389,19 +14377,19 @@
             {
               "reportDate": "2025-11-26",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-27",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-28",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14413,31 +14401,31 @@
             {
               "reportDate": "2025-11-30",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-01",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-02",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-03",
               "sendCount": 0,
-              "receiveCount": 6,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-04",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14455,55 +14443,55 @@
             {
               "reportDate": "2025-12-07",
               "sendCount": 0,
-              "receiveCount": 3,
-              "readCount": 3
+              "receiveCount": 6,
+              "readCount": 0
             },
             {
               "reportDate": "2025-12-08",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-09",
               "sendCount": 0,
               "receiveCount": 0,
-              "readCount": 2
+              "readCount": 0
             },
             {
               "reportDate": "2025-12-10",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-11",
               "sendCount": 0,
-              "receiveCount": 7,
-              "readCount": 0
+              "receiveCount": 3,
+              "readCount": 3
             },
             {
               "reportDate": "2025-12-12",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-13",
               "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 0
+              "receiveCount": 0,
+              "readCount": 2
             },
             {
               "reportDate": "2025-12-14",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-15",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 7,
               "readCount": 0
             },
             {
@@ -14515,38 +14503,38 @@
             {
               "reportDate": "2025-12-17",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-18",
-              "sendCount": 1,
-              "receiveCount": 2,
+              "sendCount": 0,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-19",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-20",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-21",
-              "sendCount": 1,
-              "receiveCount": 2,
+              "sendCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-22",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 1
+              "sendCount": 1,
+              "receiveCount": 2,
+              "readCount": 0
             },
             {
               "reportDate": "2025-12-23",
@@ -14558,19 +14546,19 @@
               "reportDate": "2025-12-24",
               "sendCount": 0,
               "receiveCount": 3,
-              "readCount": 26
+              "readCount": 0
             },
             {
               "reportDate": "2025-12-25",
-              "sendCount": 0,
-              "receiveCount": 0,
+              "sendCount": 1,
+              "receiveCount": 2,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-26",
               "sendCount": 0,
-              "receiveCount": 2,
-              "readCount": 0
+              "receiveCount": 0,
+              "readCount": 1
             },
             {
               "reportDate": "2025-12-27",
@@ -14581,8 +14569,8 @@
             {
               "reportDate": "2025-12-28",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 3,
+              "readCount": 26
             },
             {
               "reportDate": "2025-12-29",
@@ -14593,13 +14581,13 @@
             {
               "reportDate": "2025-12-30",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 2,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-31",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14611,19 +14599,19 @@
             {
               "reportDate": "2026-01-02",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-03",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-04",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -14635,25 +14623,25 @@
             {
               "reportDate": "2026-01-06",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-07",
               "sendCount": 0,
-              "receiveCount": 14,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-08",
               "sendCount": 0,
-              "receiveCount": 44,
-              "readCount": 3
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2026-01-09",
               "sendCount": 0,
-              "receiveCount": 14,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14665,37 +14653,37 @@
             {
               "reportDate": "2026-01-11",
               "sendCount": 0,
-              "receiveCount": 45,
+              "receiveCount": 14,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-12",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 44,
+              "readCount": 3
             },
             {
               "reportDate": "2026-01-13",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 14,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-14",
               "sendCount": 0,
-              "receiveCount": 12,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-15",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 45,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-16",
               "sendCount": 0,
-              "receiveCount": 12,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14707,7 +14695,7 @@
             {
               "reportDate": "2026-01-18",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 12,
               "readCount": 0
             },
             {
@@ -14719,13 +14707,13 @@
             {
               "reportDate": "2026-01-20",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 12,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-21",
               "sendCount": 0,
-              "receiveCount": 12,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14737,7 +14725,7 @@
             {
               "reportDate": "2026-01-23",
               "sendCount": 0,
-              "receiveCount": 12,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14749,25 +14737,25 @@
             {
               "reportDate": "2026-01-25",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 12,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-26",
               "sendCount": 0,
-              "receiveCount": 12,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-27",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 12,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-28",
               "sendCount": 0,
-              "receiveCount": 24,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -14779,7 +14767,7 @@
             {
               "reportDate": "2026-01-30",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 12,
               "readCount": 0
             },
             {
@@ -14791,11 +14779,23 @@
             {
               "reportDate": "2026-02-01",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 24,
               "readCount": 0
             },
             {
               "reportDate": "2026-02-02",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2026-02-03",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2026-02-04",
               "sendCount": 0,
               "receiveCount": 0,
               "readCount": 0
@@ -14992,7 +14992,7 @@
               "syncedFileCount": 0,
               "sharedInternalFileCount": 0,
               "sharedExternalFileCount": 0,
-              "storageUsedInBytes": 1156007
+              "storageUsedInBytes": 1156539
             },
             {
               "siteUrl": "",
@@ -15012,7 +15012,7 @@
               "syncedFileCount": 0,
               "sharedInternalFileCount": 0,
               "sharedExternalFileCount": 0,
-              "storageUsedInBytes": 4839253
+              "storageUsedInBytes": 4851057
             },
             {
               "siteUrl": "",
@@ -15136,6 +15136,16 @@
             }
           ],
           "counts": [
+            {
+              "reportDate": "2026-02-04",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
+            {
+              "reportDate": "2026-02-03",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
             {
               "reportDate": "2026-02-02",
               "viewedOrEditedFileCount": 0,
@@ -16025,16 +16035,6 @@
               "reportDate": "2025-08-09",
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2025-08-08",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2025-08-07",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
             }
           ]
         },
@@ -16071,7 +16071,7 @@
               "syncedFileCount": 0,
               "sharedInternalFileCount": 0,
               "sharedExternalFileCount": 0,
-              "lastActivityDate": "2025-12-30"
+              "lastActivityDate": "2026-02-03"
             },
             {
               "userPrincipalName": "N/A",
@@ -16309,7 +16309,7 @@
         },
         "period": "D180"
       },
-      "timestamp": 1770204039275,
+      "timestamp": 1770369526228,
       "source": "UsageReports_Background",
       "period": "D180"
     },
@@ -17954,7 +17954,749 @@
         }
       ],
       "timestamp": 1770354542036
+    },
+    "security": {
+      "data": {
+        "alerts": {
+          "total": 0,
+          "bySeverity": {},
+          "highSeverity": 0,
+          "mediumSeverity": 0,
+          "lowSeverity": 0
+        },
+        "incidents": {
+          "total": 0,
+          "byStatus": {},
+          "active": 0,
+          "resolved": 0
+        },
+        "secureScore": {
+          "current": 183.92,
+          "max": 283,
+          "percentage": 65
+        },
+        "riskyUsers": {
+          "total": 3,
+          "byLevel": {
+            "none": 3
+          },
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "riskDetections": {
+          "total": 1,
+          "recent": [
+            {
+              "id": "3fd484e9c17120fd6456cbf08224c1e5779265654415415203945b7ab350d890",
+              "requestId": "15bab749-893f-4d23-af11-bad0c7ea1e00",
+              "correlationId": "9595af51-c6e4-4a32-aef1-a93fe665c9a9",
+              "riskEventType": "unfamiliarFeatures",
+              "riskState": "dismissed",
+              "riskLevel": "low",
+              "riskDetail": "aiConfirmedSigninSafe",
+              "source": "IdentityProtection",
+              "detectionTimingType": "realtime",
+              "activity": "signin",
+              "tokenIssuerType": "AzureAD",
+              "ipAddress": "2401:4900:be7b:bf81:1c81:3f7d:eaef:1b6f",
+              "activityDateTime": "2026-01-01T05:48:43.3929589Z",
+              "detectedDateTime": "2026-01-01T05:48:43.3929589Z",
+              "lastUpdatedDateTime": "2026-01-01T05:50:05.9915345Z",
+              "userId": "d0ecf2fc-f45a-4e27-9625-0a766b1ee0c7",
+              "userDisplayName": "Test",
+              "userPrincipalName": "test1@intunetraininglabs.onmicrosoft.com",
+              "additionalInfo": "[{\"Key\":\"riskReasons\",\"Value\":[\"UnfamiliarASN\",\"UnfamiliarBrowser\",\"UnfamiliarDevice\",\"UnfamiliarIP\",\"UnfamiliarLocation\",\"UnfamiliarEASId\",\"UnfamiliarTenantIPsubnet\"]},{\"Key\":\"userAgent\",\"Value\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; WebView/3.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19045\"},{\"Key\":\"alertUrl\",\"Value\":null},{\"Key\":\"mitreTechniques\",\"Value\":\"T1078.004\"}]",
+              "location": {
+                "city": "Chhindwara",
+                "state": "Madhya Pradesh",
+                "countryOrRegion": "IN",
+                "geoCoordinates": {
+                  "latitude": 22.0574,
+                  "longitude": 78.9382
+                }
+              }
+            }
+          ]
+        },
+        "mfa": {
+          "registered": 7,
+          "total": 12,
+          "coverage": 58
+        }
+      },
+      "timestamp": 1770359082298,
+      "source": "SecurityDashboard"
+    },
+    "governance": {
+      "data": {
+        "conditionalAccess": {
+          "total": 5,
+          "byState": {
+            "enabled": 1,
+            "enabledForReportingButNotEnforced": 2,
+            "disabled": 2
+          },
+          "enabled": 1,
+          "enabledForReportingButNotEnforced": 2,
+          "disabled": 2,
+          "policies": [
+            {
+              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+              "displayName": "Mac Require",
+              "createdDateTime": "2025-05-20T10:42:06.9289356Z",
+              "modifiedDateTime": "2025-06-11T04:51:05.3148743Z",
+              "state": "enabled",
+              "conditions": {
+                "userRiskLevels": [],
+                "signInRiskLevels": [],
+                "clientAppTypes": [
+                  "all"
+                ],
+                "servicePrincipalRiskLevels": [],
+                "insiderRiskLevels": null,
+                "locations": null,
+                "clientApplications": null,
+                "authenticationFlows": null,
+                "applications": {
+                  "includeApplications": [
+                    "All"
+                  ],
+                  "excludeApplications": [],
+                  "includeUserActions": [],
+                  "includeAuthenticationContextClassReferences": [],
+                  "applicationFilter": null
+                },
+                "users": {
+                  "includeUsers": [
+                    "2ead211d-88a6-45f2-98b3-ba305520ac82"
+                  ],
+                  "excludeUsers": [],
+                  "includeGroups": [],
+                  "excludeGroups": [],
+                  "includeRoles": [],
+                  "excludeRoles": [],
+                  "includeGuestsOrExternalUsers": null,
+                  "excludeGuestsOrExternalUsers": null
+                },
+                "platforms": {
+                  "includePlatforms": [
+                    "windows",
+                    "macOS"
+                  ],
+                  "excludePlatforms": []
+                },
+                "devices": {
+                  "deviceFilter": {
+                    "mode": "include",
+                    "rule": "device.deviceOwnership -eq \"Personal\""
+                  }
+                }
+              },
+              "grantControls": {
+                "operator": "OR",
+                "builtInControls": [
+                  "compliantDevice"
+                ],
+                "customAuthenticationFactors": [],
+                "termsOfUse": [],
+                "authenticationStrength@odata.context": "https://graph.microsoft.com/v1.0/$metadata#identity/conditionalAccess/policies('827cca3b-73e6-4765-ab4d-cae7c857a64f')/grantControls/authenticationStrength/$entity",
+                "authenticationStrength": null
+              }
+            },
+            {
+              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+              "displayName": "Require phishing-resistant multifactor authentication for admins",
+              "createdDateTime": "2026-01-06T05:40:21.7902837Z",
+              "modifiedDateTime": null,
+              "state": "enabledForReportingButNotEnforced",
+              "conditions": {
+                "userRiskLevels": [],
+                "signInRiskLevels": [],
+                "clientAppTypes": [
+                  "all"
+                ],
+                "servicePrincipalRiskLevels": [],
+                "insiderRiskLevels": null,
+                "platforms": null,
+                "locations": null,
+                "devices": null,
+                "clientApplications": null,
+                "authenticationFlows": null,
+                "applications": {
+                  "includeApplications": [
+                    "All"
+                  ],
+                  "excludeApplications": [],
+                  "includeUserActions": [],
+                  "includeAuthenticationContextClassReferences": [],
+                  "applicationFilter": null
+                },
+                "users": {
+                  "includeUsers": [],
+                  "excludeUsers": [
+                    "19e93c31-96aa-4f2b-a7da-7569a4491f68"
+                  ],
+                  "includeGroups": [],
+                  "excludeGroups": [],
+                  "includeRoles": [
+                    "62e90394-69f5-4237-9190-012177145e10",
+                    "194ae4cb-b126-40b2-bd5b-6091b380977d",
+                    "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+                    "29232cdf-9323-42fd-ade2-1d097af3e4de",
+                    "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9",
+                    "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+                    "b0f54661-2d74-4c50-afa3-1ec803f12efe",
+                    "fe930be7-5e62-47db-91af-98c3a49a38b1",
+                    "c4e39bd9-1100-46d3-8c65-fb160da0071f",
+                    "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+                    "158c047a-c907-4556-b7ef-446551a6b5f7",
+                    "966707d0-3269-4727-9be2-8c3a10f19b9d",
+                    "7be44c8a-adaf-4e2a-84d6-ab2649e08a13",
+                    "e8611ab8-c189-46e8-94e1-60213ab1f814",
+                    "17315797-102d-40b4-93e0-432062caca18",
+                    "e6d1a23a-da11-4be4-9570-befc86d067a7",
+                    "3a2c62db-5318-420d-8d74-23affee5d9d5",
+                    "44367163-eba1-44c3-98af-f5787879f96a",
+                    "11648597-926c-4cf3-9c36-bcebb0ba8dcc"
+                  ],
+                  "excludeRoles": [],
+                  "includeGuestsOrExternalUsers": null,
+                  "excludeGuestsOrExternalUsers": null
+                }
+              },
+              "grantControls": {
+                "operator": "OR",
+                "builtInControls": [],
+                "customAuthenticationFactors": [],
+                "termsOfUse": [],
+                "authenticationStrength@odata.context": "https://graph.microsoft.com/v1.0/$metadata#identity/conditionalAccess/policies('3a08ae40-d799-40a0-b54f-7e18e6250cbc')/grantControls/authenticationStrength/$entity",
+                "authenticationStrength": {
+                  "id": "00000000-0000-0000-0000-000000000004",
+                  "createdDateTime": "2021-12-01T08:00:00Z",
+                  "modifiedDateTime": "2021-12-01T08:00:00Z",
+                  "displayName": "Phishing-resistant MFA",
+                  "description": "Phishing-resistant, Passwordless methods for the strongest authentication, such as a FIDO2 security key",
+                  "policyType": "builtIn",
+                  "requirementsSatisfied": "mfa",
+                  "allowedCombinations": [
+                    "windowsHelloForBusiness",
+                    "fido2",
+                    "x509CertificateMultiFactor"
+                  ],
+                  "combinationConfigurations@odata.context": "https://graph.microsoft.com/v1.0/$metadata#identity/conditionalAccess/policies('3a08ae40-d799-40a0-b54f-7e18e6250cbc')/grantControls/authenticationStrength/combinationConfigurations",
+                  "combinationConfigurations": []
+                }
+              }
+            },
+            {
+              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+              "displayName": "Use application enforced restrictions for O365 apps",
+              "createdDateTime": "2026-01-06T06:27:13.7318799Z",
+              "modifiedDateTime": null,
+              "state": "enabledForReportingButNotEnforced",
+              "grantControls": null,
+              "conditions": {
+                "userRiskLevels": [],
+                "signInRiskLevels": [],
+                "clientAppTypes": [
+                  "all"
+                ],
+                "servicePrincipalRiskLevels": [],
+                "insiderRiskLevels": null,
+                "platforms": null,
+                "locations": null,
+                "devices": null,
+                "clientApplications": null,
+                "authenticationFlows": null,
+                "applications": {
+                  "includeApplications": [
+                    "Office365"
+                  ],
+                  "excludeApplications": [],
+                  "includeUserActions": [],
+                  "includeAuthenticationContextClassReferences": [],
+                  "applicationFilter": null
+                },
+                "users": {
+                  "includeUsers": [
+                    "All"
+                  ],
+                  "excludeUsers": [
+                    "19e93c31-96aa-4f2b-a7da-7569a4491f68"
+                  ],
+                  "includeGroups": [],
+                  "excludeGroups": [],
+                  "includeRoles": [],
+                  "excludeRoles": [],
+                  "includeGuestsOrExternalUsers": null,
+                  "excludeGuestsOrExternalUsers": null
+                }
+              }
+            },
+            {
+              "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+              "displayName": "Microsoft-managed: Block legacy authentication",
+              "createdDateTime": "2026-01-22T12:05:06.5508666Z",
+              "modifiedDateTime": null,
+              "state": "disabled",
+              "conditions": {
+                "userRiskLevels": [],
+                "signInRiskLevels": [],
+                "clientAppTypes": [
+                  "exchangeActiveSync",
+                  "other"
+                ],
+                "servicePrincipalRiskLevels": [],
+                "insiderRiskLevels": null,
+                "platforms": null,
+                "locations": null,
+                "devices": null,
+                "clientApplications": null,
+                "authenticationFlows": null,
+                "applications": {
+                  "includeApplications": [
+                    "All"
+                  ],
+                  "excludeApplications": [],
+                  "includeUserActions": [],
+                  "includeAuthenticationContextClassReferences": [],
+                  "applicationFilter": null
+                },
+                "users": {
+                  "includeUsers": [
+                    "All"
+                  ],
+                  "excludeUsers": [
+                    "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0"
+                  ],
+                  "includeGroups": [],
+                  "excludeGroups": [],
+                  "includeRoles": [],
+                  "excludeRoles": [],
+                  "includeGuestsOrExternalUsers": null,
+                  "excludeGuestsOrExternalUsers": null
+                }
+              },
+              "grantControls": {
+                "operator": "OR",
+                "builtInControls": [
+                  "block"
+                ],
+                "customAuthenticationFactors": [],
+                "termsOfUse": [],
+                "authenticationStrength@odata.context": "https://graph.microsoft.com/v1.0/$metadata#identity/conditionalAccess/policies('53dfba16-5026-4d3a-9ba3-6b1e6b286a49')/grantControls/authenticationStrength/$entity",
+                "authenticationStrength": null
+              }
+            },
+            {
+              "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+              "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+              "createdDateTime": "2026-01-22T12:05:07.1080429Z",
+              "modifiedDateTime": null,
+              "state": "disabled",
+              "conditions": {
+                "userRiskLevels": [],
+                "signInRiskLevels": [],
+                "clientAppTypes": [
+                  "all"
+                ],
+                "servicePrincipalRiskLevels": [],
+                "insiderRiskLevels": null,
+                "platforms": null,
+                "locations": null,
+                "devices": null,
+                "clientApplications": null,
+                "authenticationFlows": null,
+                "applications": {
+                  "includeApplications": [
+                    "All"
+                  ],
+                  "excludeApplications": [],
+                  "includeUserActions": [],
+                  "includeAuthenticationContextClassReferences": [],
+                  "applicationFilter": null
+                },
+                "users": {
+                  "includeUsers": [],
+                  "excludeUsers": [
+                    "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0"
+                  ],
+                  "includeGroups": [],
+                  "excludeGroups": [],
+                  "includeRoles": [
+                    "62e90394-69f5-4237-9190-012177145e10",
+                    "194ae4cb-b126-40b2-bd5b-6091b380977d",
+                    "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+                    "29232cdf-9323-42fd-ade2-1d097af3e4de",
+                    "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9",
+                    "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+                    "b0f54661-2d74-4c50-afa3-1ec803f12efe",
+                    "fe930be7-5e62-47db-91af-98c3a49a38b1",
+                    "c4e39bd9-1100-46d3-8c65-fb160da0071f",
+                    "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+                    "158c047a-c907-4556-b7ef-446551a6b5f7",
+                    "966707d0-3269-4727-9be2-8c3a10f19b9d",
+                    "7be44c8a-adaf-4e2a-84d6-ab2649e08a13",
+                    "e8611ab8-c189-46e8-94e1-60213ab1f814",
+                    "17315797-102d-40b4-93e0-432062caca18",
+                    "e6d1a23a-da11-4be4-9570-befc86d067a7",
+                    "3a2c62db-5318-420d-8d74-23affee5d9d5",
+                    "44367163-eba1-44c3-98af-f5787879f96a",
+                    "11648597-926c-4cf3-9c36-bcebb0ba8dcc"
+                  ],
+                  "excludeRoles": [],
+                  "includeGuestsOrExternalUsers": null,
+                  "excludeGuestsOrExternalUsers": null
+                }
+              },
+              "grantControls": {
+                "operator": "OR",
+                "builtInControls": [],
+                "customAuthenticationFactors": [],
+                "termsOfUse": [],
+                "authenticationStrength@odata.context": "https://graph.microsoft.com/v1.0/$metadata#identity/conditionalAccess/policies('26f1e407-f330-4498-a6ac-c4584994ebf1')/grantControls/authenticationStrength/$entity",
+                "authenticationStrength": {
+                  "id": "00000000-0000-0000-0000-000000000004",
+                  "createdDateTime": "2021-12-01T08:00:00Z",
+                  "modifiedDateTime": "2021-12-01T08:00:00Z",
+                  "displayName": "Phishing-resistant MFA",
+                  "description": "Phishing-resistant, Passwordless methods for the strongest authentication, such as a FIDO2 security key",
+                  "policyType": "builtIn",
+                  "requirementsSatisfied": "mfa",
+                  "allowedCombinations": [
+                    "windowsHelloForBusiness",
+                    "fido2",
+                    "x509CertificateMultiFactor"
+                  ],
+                  "combinationConfigurations@odata.context": "https://graph.microsoft.com/v1.0/$metadata#identity/conditionalAccess/policies('26f1e407-f330-4498-a6ac-c4584994ebf1')/grantControls/authenticationStrength/combinationConfigurations",
+                  "combinationConfigurations": []
+                }
+              }
+            }
+          ]
+        },
+        "roles": {
+          "definitions": 135,
+          "assignments": 18,
+          "eligibleAssignments": 0,
+          "privilegedAssignments": 6
+        },
+        "accessReviews": {
+          "total": 0,
+          "active": 0,
+          "reviews": []
+        },
+        "entitlementManagement": {
+          "catalogs": 3,
+          "catalogsList": [
+            {
+              "id": "625162e6-2008-420a-b4ca-4796f25677e5",
+              "displayName": "chjbhj",
+              "description": "njnj",
+              "state": "published",
+              "createdDateTime": "2026-01-06T11:20:38.23Z"
+            },
+            {
+              "id": "469816ac-fb5b-45ed-bcf6-30e554e04715",
+              "displayName": "testing purpose ",
+              "description": "Just testing ",
+              "state": "published",
+              "createdDateTime": "2024-02-12T08:47:04.3Z"
+            },
+            {
+              "id": "0b932d8a-90a4-44a2-919f-88cf7c8238a3",
+              "displayName": "General",
+              "description": "Built-in catalog.",
+              "state": "published",
+              "createdDateTime": "2023-11-29T07:54:05.7Z"
+            }
+          ]
+        },
+        "mfa": {
+          "totalUsers": 12,
+          "capable": 7,
+          "mfaRegistered": 7,
+          "ssprRegistered": 5
+        },
+        "compliance": {
+          "agreements": 0,
+          "agreementsList": []
+        },
+        "audit": [
+          {
+            "id": "PIM_c30f2c4c-561e-4f56-9c3b-938ecc57c61a_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140538790720950",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T06:04:39.072095Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_8fc33972-20f5-4baa-9796-aaa1c734fcf2_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140537434462440",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T06:02:23.446244Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_4d5189da-9626-458a-9884-9ed4d3874eee_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140536542191060",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T06:00:54.219106Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_dab07c5a-fd95-476d-9bb8-5879208e1a34_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140532908646660",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:54:50.864666Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_fcfbba60-1d87-4706-a5a1-bcf0cb96f1f0_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140532903920080",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:54:50.392008Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_1d14d831-83c4-4bf8-bb24-603b84359ce4_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140532463176310",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:54:06.317631Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_24cf5cda-ee8d-4925-ae1f-d4fce2b4e806_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140530899721840",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:51:29.972184Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_0c3d4481-ab09-4d50-b0b5-3a88049c53f3_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140530530810290",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:50:53.081029Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_0a0cf9a7-11d2-46bb-8261-0dc2479e8268_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140528855198810",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:48:05.519881Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_ebf74f12-7a1f-4ec8-95d4-9cbc4b6bfd7f_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140527195023940",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:45:19.502394Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_e1938ecf-59b9-4ef3-94d7-6002c86192ff_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140525524457270",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:42:32.445727Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_5c6408bf-c20e-4976-90c0-73ab03d96d6d_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140523735821020",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:39:33.582102Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_cc2be44f-cda5-410f-a371-70a0beed69c0_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140523715624910",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:39:31.562491Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_fdf03da2-30e7-47ed-ac8e-0383a666e62d_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140521147013480",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:35:14.701348Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_3b934990-6033-4838-b59d-11174d4d48b8_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140520795049820",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:34:39.504982Z",
+            "result": "success"
+          },
+          {
+            "id": "PIM_ba83044b-5427-40fd-b835-64ea92212314_3163c13f-b80f-426c-94b0-fa4c0bf66ad7_134140520748690830",
+            "activity": "Add member to role outside of PIM (permanent)",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:34:34.869083Z",
+            "result": "success"
+          },
+          {
+            "id": "Directory_35bcfe8d-fc2d-4721-ba83-a284b60a657a_ESZ7S_57725080",
+            "activity": "Add member to role",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:33:06.9923985Z",
+            "result": "success"
+          },
+          {
+            "id": "Directory_bb85a2c5-4e5d-49c4-95ff-eae6940a5d61_UK6HH_88083865",
+            "activity": "Add member to role",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:33:06.8946223Z",
+            "result": "success"
+          },
+          {
+            "id": "Directory_8bb23349-2e79-4baf-a447-3a385e5b3537_LI3LD_92308470",
+            "activity": "Add member to role",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:33:06.8873425Z",
+            "result": "success"
+          },
+          {
+            "id": "Directory_2fe9f8f5-b828-47e6-91e4-caae50fcdd66_1Q4CR_24106505",
+            "activity": "Remove member from role",
+            "category": "RoleManagement",
+            "actor": "vivek@intunetraininglabs.onmicrosoft.com",
+            "timestamp": "2026-01-28T05:32:56.8619997Z",
+            "result": "success"
+          }
+        ]
+      },
+      "timestamp": 1770369647252,
+      "source": "GovernanceDashboard"
+    },
+    "sharepoint": {
+      "data": {
+        "sites": {
+          "total": 11,
+          "byType": {
+            "Communication Sites": 9,
+            "Other": 2
+          },
+          "recentSites": [
+            {
+              "createdDateTime": "2025-12-11T10:13:26Z",
+              "id": "sswari.sharepoint.com,8fff42af-e169-491e-b1ac-138f8d06667b,ad59cd11-173f-4425-ac60-28c223898e7b",
+              "lastModifiedDateTime": "2025-12-11T10:17:38.2793159Z",
+              "name": "coJsE0OdIkqu2uEOCncHOUMyf2xonzdAgLfc6cUQwJg",
+              "webUrl": "https://sswari.sharepoint.com/contentstorage/coJsE0OdIkqu2uEOCncHOUMyf2xonzdAgLfc6cUQwJg",
+              "displayName": "Designer"
+            },
+            {
+              "createdDateTime": "2025-11-25T10:22:49Z",
+              "id": "sswari.sharepoint.com,19ec65dc-1d0e-43fb-91f0-163e3f9d72b6,7b0b7324-bce5-42fd-9915-877f9d58d20c",
+              "lastModifiedDateTime": "2025-10-31T18:54:04Z",
+              "name": "Test-Datamanagement",
+              "webUrl": "https://sswari.sharepoint.com/sites/Test-Datamanagement",
+              "displayName": "Test - Data management"
+            },
+            {
+              "createdDateTime": "2025-07-10T08:07:04Z",
+              "id": "sswari.sharepoint.com,17eb6c63-971d-4a25-94b9-b50cc86dca5a,dfae8e67-541f-42a7-86b5-bf7fcfce4d16",
+              "lastModifiedDateTime": "2025-07-02T18:55:29Z",
+              "name": "Test",
+              "webUrl": "https://sswari.sharepoint.com/sites/Test",
+              "displayName": "Test"
+            },
+            {
+              "createdDateTime": "2025-06-25T08:58:37Z",
+              "id": "sswari.sharepoint.com,3b073aaa-4a21-4655-bb89-2c051ac90a4f,d7dce11e-e1ce-40f5-80a1-0413232204d5",
+              "lastModifiedDateTime": "2025-06-23T18:30:51Z",
+              "name": "demo",
+              "webUrl": "https://sswari.sharepoint.com/sites/demo",
+              "displayName": "Demo"
+            },
+            {
+              "createdDateTime": "2025-04-16T09:26:02Z",
+              "id": "sswari.sharepoint.com,d73e338e-8f0f-462f-a736-1d9aa03b7fc1,d1d1af05-dac2-49aa-929f-7b94fea01511",
+              "lastModifiedDateTime": "2025-04-16T09:26:07Z",
+              "name": "all-team",
+              "webUrl": "https://sswari.sharepoint.com/sites/all-team",
+              "displayName": "all-team"
+            }
+          ]
+        },
+        "drives": {
+          "total": 3,
+          "documentLibraries": 3,
+          "personal": 0
+        },
+        "storage": {
+          "usedGB": 0,
+          "totalGB": 76800,
+          "percentUsed": 0
+        },
+        "myDrive": {
+          "usedGB": 0,
+          "totalGB": 1024
+        },
+        "activity": {
+          "totalFiles": 0,
+          "oneDrive": [],
+          "files": []
+        },
+        "messages": []
+      },
+      "timestamp": 1770369120788,
+      "source": "SharePointDashboard"
+    },
+    "securityAlerts": {
+      "data": [],
+      "timestamp": 1770355142436
+    },
+    "purview": {
+      "data": {
+        "stats": {
+          "totalAssets": 0,
+          "assetDistribution": [],
+          "assetTypes": 0,
+          "classifications": 0,
+          "classificationDistribution": [],
+          "glossaryTermsCount": 0,
+          "glossaryCategoriesCount": 0,
+          "dataSources": 0,
+          "scanStats": {
+            "totalSources": 0,
+            "activeSources": 0,
+            "inactiveSources": 0,
+            "pendingSources": 0
+          },
+          "collections": 0,
+          "policies": 0,
+          "assetsWithLineage": 0,
+          "sensitiveAssets": 0,
+          "lastUpdated": "2026-02-06T06:30:41.060Z",
+          "isConfigured": false
+        },
+        "assetDistribution": []
+      },
+      "timestamp": 1770359441061,
+      "source": "PurviewDashboard"
     }
   },
-  "lastUpdated": 1770354542067
+  "lastUpdated": 1770369647324
 }
