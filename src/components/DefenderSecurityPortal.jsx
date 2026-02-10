@@ -24,7 +24,7 @@ import SecurityDetailModal from './SecurityDetailModal';
 const Sparkline = ({ data, color = '#6366f1', type = 'line' }) => {
     return (
         <div className="sparkline-container">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 {type === 'area' ? (
                     <AreaChart data={data}>
                         <defs>
@@ -333,6 +333,7 @@ const DefenderSecurityPortal = () => {
                     <EmailCollaborationTab
                         sharepointSites={sharepointSites}
                         guestUsers={guestUsers}
+                        riskyUsers={riskyUsers}
                         navigate={navigate}
                         openModal={openModal}
                     />
@@ -1222,10 +1223,16 @@ const CloudAppsTab = ({ oauthApps, navigate, openModal }) => {
 };
 
 // ============ EMAIL & COLLABORATION TAB ============
-const EmailCollaborationTab = ({ sharepointSites, guestUsers, navigate, openModal }) => {
+const EmailCollaborationTab = ({ sharepointSites, guestUsers, riskyUsers, navigate, openModal }) => {
 
     const sitesList = sharepointSites?.value || [];
     const guestsList = guestUsers?.value || [];
+    const riskyUsersList = riskyUsers?.value || [];
+
+    // Guest user analytics
+    const guestsAtRisk = guestsList.filter(g =>
+        riskyUsersList.some(r => r.id === g.id)
+    ).length;
 
     // Trend Data
     const siteTrend = generateTrendData(sitesList.length, 0.05);

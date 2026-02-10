@@ -15787,7 +15787,7 @@
         "securityBaselines": 4,
         "adminRoles": 9
       },
-      "timestamp": 1770707959091,
+      "timestamp": 1770712780373,
       "source": "IntuneMonitoring"
     },
     "intuneDevices": {
@@ -15902,7 +15902,7 @@
           "coverage": 54
         }
       },
-      "timestamp": 1770708203924,
+      "timestamp": 1770712863629,
       "source": "SecurityDashboard"
     },
     "governance": {
@@ -16463,7 +16463,7 @@
           }
         ]
       },
-      "timestamp": 1770708207692,
+      "timestamp": 1770708211208,
       "source": "GovernanceDashboard"
     },
     "sharepoint": {
@@ -16566,12 +16566,12 @@
           "policies": 0,
           "assetsWithLineage": 0,
           "sensitiveAssets": 0,
-          "lastUpdated": "2026-02-10T07:19:04.686Z",
+          "lastUpdated": "2026-02-10T08:40:24.290Z",
           "isConfigured": false
         },
         "assetDistribution": []
       },
-      "timestamp": 1770707944719,
+      "timestamp": 1770712824313,
       "source": "PurviewDashboard"
     },
     "teams": {
@@ -23160,5 +23160,5 @@
       "timestamp": 1770637688061
     }
   },
-  "lastUpdated": 1770708207743
+  "lastUpdated": 1770712863654
 }

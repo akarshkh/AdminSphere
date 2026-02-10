@@ -278,7 +278,6 @@ export const searchableItems = [
         category: 'Intune',
         icon: FileText,
         tags: ['audit', 'logs', 'activity', 'history', 'changes', 'events']
-    },
     }
 ];
 
