@@ -1,5 +1,5 @@
-import { connectToDatabase } from '../../../src/utils/database.js';
-import { PDF } from '../../../src/models/PDF.js';
+import { connectToDatabase } from '../../../frontend/src/utils/database.js';
+import { PDF } from '../../../frontend/src/models/PDF.js';
 
 export default async function handler(req, res) {
     // Check method

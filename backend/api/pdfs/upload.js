@@ -1,7 +1,7 @@
 import { IncomingForm } from 'formidable';
 import fs from 'fs';
-import { connectToDatabase } from '../../src/utils/database.js';
-import { PDF } from '../../src/models/PDF.js';
+import { connectToDatabase } from '../../frontend/src/utils/database.js';
+import { PDF } from '../../frontend/src/models/PDF.js';
 
 // Disable Vercel's default body parser to let formidable handle the upload stream
 export const config = {

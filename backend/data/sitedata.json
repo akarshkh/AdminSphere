@@ -8862,7 +8862,7 @@
           "mailboxes": 12,
           "activeMail": 10,
           "domains": 5,
-          "healthIssues": 12
+          "healthIssues": 10
         },
         "entra": {
           "users": 13,
@@ -8931,7 +8931,7 @@
           },
           "entraTotal": "18",
           "configProfiles": 8,
-          "applications": 7
+          "applications": 8
         },
         "security": {
           "score": 183.82,
@@ -8961,7 +8961,7 @@
           "storage": 57612224558
         }
       },
-      "timestamp": 1770708175759,
+      "timestamp": 1770789595158,
       "source": "BirdsEyeView"
     },
     "alerts": {
@@ -9072,14 +9072,9 @@
           ],
           "signIns": [
             {
-              "name": "2026-02-03",
-              "failed": 23,
-              "successful": 32
-            },
-            {
               "name": "2026-02-04",
-              "failed": 12,
-              "successful": 27
+              "failed": 5,
+              "successful": 14
             },
             {
               "name": "2026-02-05",
@@ -9108,8 +9103,13 @@
             },
             {
               "name": "2026-02-10",
-              "failed": 2,
-              "successful": 22
+              "failed": 3,
+              "successful": 42
+            },
+            {
+              "name": "2026-02-11",
+              "failed": 0,
+              "successful": 3
             }
           ],
           "emailTrend": [
@@ -9200,31 +9200,31 @@
           ],
           "userGrowthTrend": [
             {
-              "week": "2026-02-08",
+              "week": "2026-02-09",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-09",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-09",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-09",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-09",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-09",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-09",
               "active": 0
             }
           ],
@@ -9232,7 +9232,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1770708167900,
+      "timestamp": 1770789582266,
       "source": "OverviewDashboard"
     },
     "usageReports": {
@@ -14227,7 +14227,7 @@
           "status": "Identity Guard"
         }
       },
-      "timestamp": 1770705736787,
+      "timestamp": 1770789632100,
       "source": "EntraDashboard"
     },
     "entraUsers": {
@@ -23160,5 +23160,5 @@
       "timestamp": 1770637688061
     }
   },
-  "lastUpdated": 1770712863654
+  "lastUpdated": 1770789632126
 }

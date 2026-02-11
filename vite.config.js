@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'; // Reload config timestamp: 1
 import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import path from 'path';
-import { pdfManifestPlugin } from './src/plugins/pdfManifestPlugin.js';
+import { pdfManifestPlugin } from './frontend/src/plugins/pdfManifestPlugin.js';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -16,7 +16,7 @@ export default defineConfig({
           if (req.url.startsWith('/api/data/')) {
             const urlParts = req.url.split('/');
             const filename = urlParts[urlParts.length - 1].split('?')[0] + '.json';
-            const filePath = path.join(process.cwd(), 'data', filename);
+            const filePath = path.join(process.cwd(), 'backend', 'data', filename);
 
             if (req.method === 'GET') {
               try {
