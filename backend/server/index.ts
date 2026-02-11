@@ -34,6 +34,10 @@ app.use(cors()); // Allow all CORS for dev
 app.use(bodyParser.json({ limit: '500mb' }));
 app.use(bodyParser.urlencoded({ limit: '500mb', extended: true }));
 
+// Serve static files from built frontend
+const publicPath = path.join(__dirname, '../../frontend/dist');
+app.use(express.static(publicPath));
+
 /**
  * Proxy for downloading reports to bypass CORS
  * GET /api/proxy/download?url=...
@@ -266,4 +270,15 @@ function generateAISummary(store: any): string {
 }
 
 const port = process.env.PORT || 4000;
+
+// Catch-all route for React Router - serve index.html for all unmatched routes
+app.get('*', (req, res) => {
+    const indexPath = path.join(__dirname, '../../frontend/dist/index.html');
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).json({ error: 'Frontend not built. Please run npm run build' });
+    }
+});
+
 app.listen(port, () => console.log(`Exchange admin server listening on http://localhost:${port}`));
