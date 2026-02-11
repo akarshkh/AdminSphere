@@ -108,4 +108,8 @@ export default defineConfig({
       'Cross-Origin-Embedder-Policy': 'unsafe-none',
     },
   },
+  build: {
+    outDir: 'frontend/dist',
+    root: 'frontend/src',
+  },
 })
