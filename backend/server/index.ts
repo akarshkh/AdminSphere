@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import dotenv from 'dotenv';
 import { executeExchangeJobSync } from '../jobs/exchange.sync.ts';
 import { listAudits } from '../shared/logging/exchangeAudit.ts';
 import connectDB from './config/db.ts';
@@ -10,6 +11,9 @@ import { PowerShellService } from '../services/powerShell.service.ts';
 import { subscriptionGuard } from './middleware/subscriptionGuard.ts';
 
 import { fileURLToPath } from 'url';
+
+// Load environment variables
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -272,7 +276,7 @@ function generateAISummary(store: any): string {
 const port = process.env.PORT || 4000;
 
 // Catch-all route for React Router - serve index.html for all unmatched routes
-app.get('*', (req, res) => {
+app.use((req, res) => {
     const indexPath = path.join(__dirname, '../../frontend/dist/index.html');
     if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
