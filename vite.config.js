@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import path from 'path';
 import { pdfManifestPlugin } from './frontend/src/plugins/pdfManifestPlugin.js';
-
+//ls
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
