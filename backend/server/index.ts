@@ -21,13 +21,21 @@ const __dirname = path.dirname(__filename);
 // Path to sitedata.json
 const SITEDATA_PATH = path.join(__dirname, '..', 'data', 'sitedata.json');
 
+console.log('[Server] Starting AdminSphere server...');
+console.log('[Server] Environment:', process.env.NODE_ENV || 'development');
+console.log('[Server] Frontend path:', path.join(__dirname, '../../frontend/dist'));
+
 // Connect to MongoDB
-connectDB();
+try {
+    connectDB();
+} catch (err) {
+    console.error('[Server] Failed to initialize database:', err);
+}
 
 // If Redis is available, ensure worker is started
 try {
     import('../jobs/workers/exchange.worker').catch(() => {
-        console.warn('BullMQ worker not started (Redis may not be available). Using sync mode.');
+        console.warn('[Server] BullMQ worker not started (Redis may not be available). Using sync mode.');
     });
 } catch (e) {
     // Worker optional
@@ -281,8 +289,23 @@ app.use((req, res) => {
     if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
     } else {
+        console.warn('[Server] index.html not found at:', indexPath);
         res.status(404).json({ error: 'Frontend not built. Please run npm run build' });
     }
 });
 
-app.listen(port, () => console.log(`Exchange admin server listening on http://localhost:${port}`));
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('[Server] Error:', err);
+    res.status(500).json({ error: 'Internal server error', message: err.message });
+});
+
+const server = app.listen(port, () => {
+    console.log(`[Server] ✅ Exchange admin server listening on http://localhost:${port}`);
+    console.log(`[Server] Frontend: ${path.join(__dirname, '../../frontend/dist')}`);
+});
+
+server.on('error', (err) => {
+    console.error('[Server] Failed to start server:', err);
+    process.exit(1);
+});

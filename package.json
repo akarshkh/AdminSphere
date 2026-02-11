@@ -8,7 +8,7 @@
     "server": "tsx backend/server/index.ts",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "build": "vite build",
-    "start": "node --loader tsx backend/server/index.ts",
+    "start": "tsx backend/server/index.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },
