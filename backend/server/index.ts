@@ -25,12 +25,8 @@ console.log('[Server] Starting AdminSphere server...');
 console.log('[Server] Environment:', process.env.NODE_ENV || 'development');
 console.log('[Server] Frontend path:', path.join(__dirname, '../../frontend/dist'));
 
-// Connect to MongoDB
-try {
-    connectDB();
-} catch (err) {
-    console.error('[Server] Failed to initialize database:', err);
-}
+// Connect to MongoDB (non-blocking, continues if fails)
+connectDB();
 
 // If Redis is available, ensure worker is started
 try {
