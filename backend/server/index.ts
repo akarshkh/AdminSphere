@@ -42,6 +42,11 @@ app.use(cors()); // Allow all CORS for dev
 app.use(bodyParser.json({ limit: '500mb' }));
 app.use(bodyParser.urlencoded({ limit: '500mb', extended: true }));
 
+// Health check endpoint for Azure
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Serve static files from built frontend
 const publicPath = path.join(__dirname, '../../frontend/dist');
 app.use(express.static(publicPath));
