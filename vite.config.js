@@ -2,13 +2,11 @@ import { defineConfig } from 'vite'; // Reload config timestamp: 1
 import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import path from 'path';
-import { pdfManifestPlugin } from './frontend/src/plugins/pdfManifestPlugin.js';
-//ls
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    pdfManifestPlugin(),
     {
       name: 'save-data-plugin',
       configureServer(server) {
