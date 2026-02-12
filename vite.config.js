@@ -109,7 +109,6 @@ export default defineConfig({
     },
   },
   build: {
-    root: 'frontend/src',
-    outDir: '../../frontend/dist',
+    outDir: 'frontend/dist',
   },
 })
