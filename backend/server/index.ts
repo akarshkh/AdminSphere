@@ -4,11 +4,6 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
-import { executeExchangeJobSync } from '../jobs/exchange.sync.ts';
-import { listAudits } from '../shared/logging/exchangeAudit.ts';
-import connectDB from './config/db.ts';
-import { PowerShellService } from '../services/powerShell.service.ts';
-import { subscriptionGuard } from './middleware/subscriptionGuard.ts';
 
 import { fileURLToPath } from 'url';
 
@@ -18,16 +13,70 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Path to sitedata.json
-const SITEDATA_PATH = path.join(__dirname, '..', 'data', 'sitedata.json');
-
 console.log('[Server] Starting AdminSphere server...');
 console.log('[Server] Environment:', process.env.NODE_ENV || 'development');
 console.log('[Server] Frontend path:', path.join(__dirname, '../../frontend/dist'));
 
+// Dynamically import optional modules
+let executeExchangeJobSync = null;
+let listAudits = null;
+let connectDB = null;
+let PowerShellService = null;
+let subscriptionGuard = null;
+
+// Initialize optional modules
+(async () => {
+  try {
+    const mod = await import('../jobs/exchange.sync.ts');
+    executeExchangeJobSync = mod.executeExchangeJobSync;
+  } catch (e) {
+    console.warn('[Server] Could not load exchange sync:', String(e).substring(0, 80));
+  }
+  
+  try {
+    const mod = await import('../shared/logging/exchangeAudit.ts');
+    listAudits = mod.listAudits;
+  } catch (e) {
+    console.warn('[Server] Could not load audit logging:', String(e).substring(0, 80));
+  }
+  
+  try {
+    const mod = await import('./config/db.ts');
+    connectDB = mod.default;
+    connectDB();
+  } catch (e) {
+    console.warn('[Server] Could not initialize database:', String(e).substring(0, 80));
+  }
+  
+  try {
+    const mod = await import('../services/powerShell.service.ts');
+    PowerShellService = mod.PowerShellService;
+  } catch (e) {
+    console.warn('[Server] Could not load PowerShell service:', String(e).substring(0, 80));
+  }
+  
+  try {
+    const mod = await import('./middleware/subscriptionGuard.ts');
+    subscriptionGuard = mod.subscriptionGuard;
+  } catch (e) {
+    console.warn('[Server] Could not load subscription guard:', String(e).substring(0, 80));
+  }
+})();
+
+// Path to sitedata.json
+const SITEDATA_PATH = path.join(__dirname, '..', 'data', 'sitedata.json');
+
+// Fallback middleware if subscription guard fails to load
+const fallbackGuard = (req, res, next) => {
+  console.warn('[Server] Using fallback subscription guard (module not loaded)');
+  next();
+};
+
 try {
     // Connect to MongoDB (non-blocking, continues if fails)
-    connectDB();
+    if (connectDB && typeof connectDB === 'function') {
+      connectDB();
+    }
 
     // If Redis is available, ensure worker is started
     try {
@@ -95,8 +144,11 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
  * Enqueue and execute Get-OrganizationConfig synchronously (no BullMQ needed)
  * Returns result immediately
  */
-app.post('/api/jobs/org-config', subscriptionGuard, async (_req, res) => {
+app.post('/api/jobs/org-config', subscriptionGuard || fallbackGuard, async (_req, res) => {
     try {
+        if (!executeExchangeJobSync) {
+            return res.status(503).json({ success: false, error: 'Exchange job service not available' });
+        }
         const result = await executeExchangeJobSync({ action: 'Get-OrganizationConfig' });
         res.json(result);
     } catch (err: any) {
@@ -106,6 +158,9 @@ app.post('/api/jobs/org-config', subscriptionGuard, async (_req, res) => {
 
 app.get('/api/audits', async (req, res) => {
     try {
+        if (!listAudits) {
+            return res.json({ success: true, audits: [] });
+        }
         const limit = parseInt(String(req.query.limit || '50'), 10);
         const rows = await listAudits(limit);
         res.json({ success: true, audits: rows });
@@ -119,8 +174,11 @@ app.get('/api/audits', async (req, res) => {
  * POST /api/script/run
  * Body: { "command": "Get-Date" }
  */
-app.post('/api/script/run', subscriptionGuard, async (req, res) => {
+app.post('/api/script/run', subscriptionGuard || fallbackGuard, async (req, res) => {
     try {
+        if (!PowerShellService) {
+            return res.status(503).json({ success: false, error: 'PowerShell service not available' });
+        }
         const { command, token, tokenType, organization, userUpn } = req.body;
         if (!command) {
             return res.status(400).json({ success: false, error: 'Missing command' });
@@ -140,6 +198,9 @@ app.post('/api/script/run', subscriptionGuard, async (req, res) => {
  * GET /api/script/peek
  */
 app.get('/api/script/peek', (_req, res) => {
+    if (!PowerShellService) {
+        return res.json({ output: 'PowerShell service not available' });
+    }
     res.json(PowerShellService.getLiveOutput());
 });
 
@@ -148,6 +209,9 @@ app.get('/api/script/peek', (_req, res) => {
  * POST /api/script/reset
  */
 app.post('/api/script/reset', (_req, res) => {
+    if (!PowerShellService) {
+        return res.json({ success: false, message: 'PowerShell service not available' });
+    }
     PowerShellService.resetSession();
     res.json({ success: true, message: 'Session reset' });
 });
@@ -158,7 +222,7 @@ app.post('/api/script/reset', (_req, res) => {
  */
 
 // Save site data to sitedata.json (supports full overwrite or partial section update)
-app.post('/api/sitedata/save', subscriptionGuard, async (req, res) => {
+app.post('/api/sitedata/save', subscriptionGuard || fallbackGuard, async (req, res) => {
     try {
         const body = req.body;
         if (!body) {
