@@ -315,3 +315,22 @@ server.on('error', (err) => {
     console.error('[Server] Failed to start server:', err);
     process.exit(1);
 });
+
+// Global error handlers
+process.on('uncaughtException', (err) => {
+    console.error('[Server] Uncaught Exception:', err);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('[Server] Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
+});
+
+process.on('SIGTERM', () => {
+    console.log('[Server] SIGTERM received, shutting down gracefully');
+    server.close(() => {
+        console.log('[Server] Server closed');
+        process.exit(0);
+    });
+});
