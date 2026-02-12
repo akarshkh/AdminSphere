@@ -12,7 +12,7 @@ import { subscriptionGuard } from './middleware/subscriptionGuard.ts';
 
 import { fileURLToPath } from 'url';
 
-// Load environment variables
+// Load environment variables FIRST
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,16 +25,21 @@ console.log('[Server] Starting AdminSphere server...');
 console.log('[Server] Environment:', process.env.NODE_ENV || 'development');
 console.log('[Server] Frontend path:', path.join(__dirname, '../../frontend/dist'));
 
-// Connect to MongoDB (non-blocking, continues if fails)
-connectDB();
-
-// If Redis is available, ensure worker is started
 try {
-    import('../jobs/workers/exchange.worker').catch(() => {
-        console.warn('[Server] BullMQ worker not started (Redis may not be available). Using sync mode.');
-    });
-} catch (e) {
-    // Worker optional
+    // Connect to MongoDB (non-blocking, continues if fails)
+    connectDB();
+
+    // If Redis is available, ensure worker is started
+    try {
+        import('../jobs/workers/exchange.worker').catch(() => {
+            console.warn('[Server] BullMQ worker not started (Redis may not be available). Using sync mode.');
+        });
+    } catch (e) {
+        // Worker optional
+    }
+} catch (err) {
+    console.error('[Server] Initialization error:', err);
+    console.warn('[Server] Continuing in degraded mode...');
 }
 
 const app = express();
